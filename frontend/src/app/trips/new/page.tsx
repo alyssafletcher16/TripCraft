@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { Navbar } from '@/components/layout/Navbar'
 import { Sidebar } from '@/components/layout/Sidebar'
+import { NewTripForm } from '@/components/trips/NewTripForm'
 
 export const metadata: Metadata = { title: 'New Trip — TripCraft' }
 
@@ -13,10 +14,7 @@ export default function NewTripPage() {
         <main className="p-12 bg-surface">
           <p className="eyebrow mb-2">Plan a Trip</p>
           <h1 className="page-title mb-8">Where to?</h1>
-          {/* NewTripBuilder wizard will be built feature-by-feature */}
-          <div className="card p-8 max-w-xl">
-            <p className="text-slate text-sm">Trip builder coming soon…</p>
-          </div>
+          <NewTripForm />
         </main>
       </div>
     </div>

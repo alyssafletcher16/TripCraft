@@ -4,19 +4,21 @@ import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Button } from '@/components/ui/Button'
 
 export function LoginForm() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError('')
     setLoading(true)
+
+    const data = new FormData(e.currentTarget)
+    const email = data.get('email') as string
+    const password = data.get('password') as string
+
     try {
       const result = await signIn('credentials', {
         email,
@@ -34,42 +36,61 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white/5 border border-white/10 rounded-3xl p-8">
+    <form
+      onSubmit={handleSubmit}
+      className="border border-white/10 rounded-3xl p-8"
+      style={{ background: 'rgba(255,255,255,0.05)' }}
+    >
       <div className="flex flex-col gap-4">
         <div>
-          <label className="block text-white/50 text-xs font-mono uppercase tracking-wider mb-1.5">
+          <label
+            htmlFor="login-email"
+            className="block text-white/50 text-xs font-mono uppercase tracking-wider mb-1.5"
+          >
             Email
           </label>
           <input
+            id="login-email"
             type="email"
+            name="email"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-white/8 border border-white/15 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 focus:outline-none focus:border-terra"
+            autoComplete="email"
+            className="w-full rounded-xl px-4 py-3 text-sm border border-white/15 focus:outline-none focus:border-terra focus:ring-1 focus:ring-terra/40"
+            style={{ background: 'rgba(255,255,255,0.08)', color: '#fff' }}
             placeholder="you@example.com"
           />
         </div>
+
         <div>
-          <label className="block text-white/50 text-xs font-mono uppercase tracking-wider mb-1.5">
+          <label
+            htmlFor="login-password"
+            className="block text-white/50 text-xs font-mono uppercase tracking-wider mb-1.5"
+          >
             Password
           </label>
           <input
+            id="login-password"
             type="password"
+            name="password"
             required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-white/8 border border-white/15 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 focus:outline-none focus:border-terra"
+            autoComplete="current-password"
+            className="w-full rounded-xl px-4 py-3 text-sm border border-white/15 focus:outline-none focus:border-terra focus:ring-1 focus:ring-terra/40"
+            style={{ background: 'rgba(255,255,255,0.08)', color: '#fff' }}
             placeholder="••••••••"
           />
         </div>
 
         {error && (
-          <p className="text-danger text-sm text-center">{error}</p>
+          <p className="text-red-400 text-sm text-center">{error}</p>
         )}
 
-        <Button type="submit" loading={loading} className="w-full justify-center mt-2">
-          Sign in
-        </Button>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full mt-2 bg-terra text-white py-3 rounded-full text-sm font-semibold transition-all duration-200 hover:bg-terra-lt disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? 'Signing in…' : 'Sign in'}
+        </button>
       </div>
 
       <p className="text-white/35 text-sm text-center mt-6">

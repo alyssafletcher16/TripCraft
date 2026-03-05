@@ -137,11 +137,11 @@ npm run db:migrate
 - [x] Route shells created (users, trips, days, blocks, reflections, discover)
 - [x] Design system in Tailwind config
 - [x] PostgreSQL connected + migrations run
-- [ ] Landing page (convert from tripcraft-v5.jsx)
-- [ ] Auth — register + login forms working
-- [ ] Trip creation flow working end-to-end
-- [ ] Itinerary builder working end-to-end
-- [ ] Block creation (flight, hotel, activity, food, note)
+- [x] Landing page (convert from tripcraft-v5.jsx)
+- [x] Auth — register + login forms working
+- [x] Trip creation flow working end-to-end
+- [x] Itinerary builder working end-to-end
+- [x] Block creation (flight, hotel, activity, food, note)
 - [ ] Activity comparison modal
 - [ ] Post-trip reflection flow
 - [ ] Discover feed — community tab

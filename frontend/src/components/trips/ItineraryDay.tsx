@@ -2,10 +2,17 @@
 
 import { useState } from 'react'
 import { Block } from './Block'
+import { AddBlockForm } from './AddBlockForm'
 import type { ItineraryDay as DayType } from '@/types'
 
-export function ItineraryDay({ day }: { day: DayType }) {
+interface Props {
+  day: DayType
+  onBlockAdded?: () => void
+}
+
+export function ItineraryDay({ day, onBlockAdded }: Props) {
   const [open, setOpen] = useState(true)
+  const [addingBlock, setAddingBlock] = useState(false)
 
   return (
     <div className="bg-white rounded-2xl border-[1.5px] border-mist overflow-hidden hover:border-terra/30 transition-colors">
@@ -53,8 +60,28 @@ export function ItineraryDay({ day }: { day: DayType }) {
             <Block key={block.id} block={block} />
           ))}
 
-          {day.blocks.length === 0 && (
-            <p className="text-slate text-sm py-4 text-center">No blocks yet — add flights, hotels, or activities.</p>
+          {day.blocks.length === 0 && !addingBlock && (
+            <p className="text-slate text-sm py-2 text-center">
+              No blocks yet — add flights, hotels, or activities.
+            </p>
+          )}
+
+          {addingBlock ? (
+            <AddBlockForm
+              dayId={day.id}
+              onSuccess={() => {
+                setAddingBlock(false)
+                onBlockAdded?.()
+              }}
+              onCancel={() => setAddingBlock(false)}
+            />
+          ) : (
+            <button
+              onClick={() => setAddingBlock(true)}
+              className="w-full py-2.5 border border-dashed border-mist rounded-xl text-slate text-sm hover:border-terra/40 hover:text-terra transition-colors"
+            >
+              + Add block
+            </button>
           )}
         </div>
       )}

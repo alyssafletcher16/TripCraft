@@ -113,6 +113,7 @@ export interface ChecklistItem {
 // NextAuth session extension
 declare module 'next-auth' {
   interface Session {
+    accessToken?: string
     user: {
       id: string
       email: string
