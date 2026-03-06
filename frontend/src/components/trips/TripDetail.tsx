@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { ItineraryDay } from './ItineraryDay'
+import { ReflectionModal } from './ReflectionModal'
 import { Badge } from '@/components/ui/Badge'
 import type { Trip, TripStatus } from '@/types'
 
@@ -157,6 +158,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [addingDay, setAddingDay] = useState(false)
+  const [reflecting, setReflecting] = useState(false)
 
   const fetchTrip = useCallback(() => {
     if (!session?.accessToken) return
@@ -190,6 +192,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
   }
 
   return (
+    <>
     <div className="max-w-3xl flex flex-col gap-6">
 
       {/* ── Trip header ─────────────────────────────────────────── */}
@@ -238,6 +241,54 @@ export function TripDetail({ tripId }: { tripId: string }) {
         )}
       </div>
 
+      {/* ── Reflect banner — shown for completed trips ──────────── */}
+      {trip.status === 'COMPLETED' && !trip.reflection && (
+        <div className="rounded-2xl p-5 flex items-center gap-4 border border-gold/20"
+          style={{ background: 'linear-gradient(135deg, #0D2B45, #143352)' }}>
+          <div className="flex-1">
+            <div className="font-serif text-lg font-bold text-white">How was {trip.destination}?</div>
+            <div className="text-[12px] text-white/60 mt-0.5">Take 2 minutes to reflect on your trip — your insights help future travelers.</div>
+          </div>
+          <button
+            onClick={() => setReflecting(true)}
+            className="flex-shrink-0 px-5 py-2 rounded-full text-[12px] font-semibold transition-all hover:bg-gold/30"
+            style={{ background: 'rgba(201,168,76,0.2)', border: '1px solid rgba(201,168,76,0.4)', color: '#E2C06A' }}
+          >
+            Reflect on this trip →
+          </button>
+        </div>
+      )}
+
+      {/* Reflection summary — shown when reflection exists */}
+      {trip.reflection && (
+        <div className="bg-white rounded-2xl border border-mist p-5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">✦</span>
+              <span className="font-mono text-[10px] text-slate uppercase tracking-wider">Trip Reflection</span>
+            </div>
+            <button
+              onClick={() => setReflecting(true)}
+              className="text-[11px] text-slate hover:text-terra transition-colors"
+            >
+              Edit
+            </button>
+          </div>
+          <div className="text-[13px] text-slate leading-relaxed space-y-1">
+            {trip.reflection.tripTitle && (
+              <div className="font-serif text-base font-bold text-ink mb-1">{trip.reflection.tripTitle}</div>
+            )}
+            {trip.reflection.rank != null && (
+              <div>🏆 <span className="text-terra font-semibold">
+                {trip.reflection.rank < 25 ? "Worst trip I've taken" : trip.reflection.rank < 50 ? "Solid but not top-tier" : trip.reflection.rank < 75 ? "One of my favorites" : "Top 3 of my life"}
+              </span></div>
+            )}
+            {trip.reflection.expectation && <div>💭 {trip.reflection.expectation}</div>}
+            {trip.reflection.sentence && <div>📝 <em>"{trip.reflection.sentence.slice(0, 100)}{trip.reflection.sentence.length > 100 ? '…' : ''}"</em></div>}
+          </div>
+        </div>
+      )}
+
       {/* ── Itinerary days ──────────────────────────────────────── */}
       <div className="flex flex-col gap-4">
         {trip.days.length === 0 && !addingDay && (
@@ -272,5 +323,19 @@ export function TripDetail({ tripId }: { tripId: string }) {
         )}
       </div>
     </div>
+
+    {/* ── Reflection modal ────────────────────────────────────── */}
+    {reflecting && (
+      <ReflectionModal
+        trip={trip}
+        accessToken={session?.accessToken}
+        onClose={() => setReflecting(false)}
+        onSaved={() => {
+          setReflecting(false)
+          fetchTrip()
+        }}
+      />
+    )}
+    </>
   )
 }

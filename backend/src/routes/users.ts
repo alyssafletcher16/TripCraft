@@ -60,6 +60,29 @@ usersRouter.post(
   }
 )
 
+// POST /api/users/oauth  — upsert a user from Google OAuth (called by NextAuth server-side)
+// Protected by a shared internal secret so it's not publicly exploitable.
+usersRouter.post('/oauth', async (req: Request, res: Response) => {
+  const secret = req.headers['x-internal-secret']
+  if (!secret || secret !== process.env.NEXTAUTH_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' })
+  }
+  const { email, name, avatar } = req.body
+  if (!email) return res.status(400).json({ error: 'Email required' })
+  try {
+    const user = await prisma.user.upsert({
+      where: { email },
+      update: { name: name ?? undefined, avatar: avatar ?? undefined },
+      create: { email, name: name ?? email.split('@')[0], avatar: avatar ?? null, password: null },
+      select: { id: true, email: true, name: true, avatar: true },
+    })
+    return res.json(user)
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 // GET /api/users/me
 usersRouter.get('/me', requireAuth, async (req: AuthRequest, res) => {
   try {

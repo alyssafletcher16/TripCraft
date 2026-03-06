@@ -224,6 +224,28 @@ model ChecklistItem {
 
 // ─── Community / Discover ────────────────────────────────────────────────────
 
+// ─── Places API Cache ─────────────────────────────────────────────────────────
+
+model PlaceCache {
+  id          String   @id @default(cuid())
+  placeId     String   @unique
+  name        String
+  type        String
+  rating      Float
+  reviewCount Int
+  priceLevel  Int?
+  reviews     Json
+  photos      Json
+  address     String
+  website     String?
+  phone       String?
+  hours       Json?
+  lastFetched DateTime
+  createdAt   DateTime @default(now())
+}
+
+// ─── Community / Discover ────────────────────────────────────────────────────
+
 model CommunityUpvote {
   id        String   @id @default(cuid())
   userId    String

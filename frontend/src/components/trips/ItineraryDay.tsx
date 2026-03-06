@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Block } from './Block'
 import { AddBlockForm } from './AddBlockForm'
+import { ActivityCompareModal } from './ActivityCompareModal'
 import type { ItineraryDay as DayType } from '@/types'
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
 export function ItineraryDay({ day, onBlockAdded }: Props) {
   const [open, setOpen] = useState(true)
   const [addingBlock, setAddingBlock] = useState(false)
+  const [comparingActivities, setComparingActivities] = useState(false)
 
   return (
     <div className="bg-white rounded-2xl border-[1.5px] border-mist overflow-hidden hover:border-terra/30 transition-colors">
@@ -76,12 +78,32 @@ export function ItineraryDay({ day, onBlockAdded }: Props) {
               onCancel={() => setAddingBlock(false)}
             />
           ) : (
-            <button
-              onClick={() => setAddingBlock(true)}
-              className="w-full py-2.5 border border-dashed border-mist rounded-xl text-slate text-sm hover:border-terra/40 hover:text-terra transition-colors"
-            >
-              + Add block
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setAddingBlock(true)}
+                className="flex-1 py-2.5 border border-dashed border-mist rounded-xl text-slate text-sm hover:border-terra/40 hover:text-terra transition-colors"
+              >
+                + Add block
+              </button>
+              <button
+                onClick={() => setComparingActivities(true)}
+                className="py-2.5 px-4 border border-dashed border-mist rounded-xl text-slate text-xs hover:border-terra/40 hover:text-terra transition-colors whitespace-nowrap"
+              >
+                ⇄ Compare activities
+              </button>
+            </div>
+          )}
+
+          {comparingActivities && (
+            <ActivityCompareModal
+              dayId={day.id}
+              dayName={day.name}
+              onClose={() => setComparingActivities(false)}
+              onBlockAdded={() => {
+                setComparingActivities(false)
+                onBlockAdded?.()
+              }}
+            />
           )}
         </div>
       )}

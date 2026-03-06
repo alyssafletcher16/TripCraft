@@ -8,6 +8,8 @@ import { daysRouter } from './routes/days'
 import { blocksRouter } from './routes/blocks'
 import { reflectionsRouter } from './routes/reflections'
 import { discoverRouter } from './routes/discover'
+import { placesRouter } from './routes/places'
+import { intelligenceRouter } from './routes/intelligence'
 
 dotenv.config()
 
@@ -34,6 +36,8 @@ app.use('/api/trips/:tripId/days', daysRouter)
 app.use('/api/days/:dayId/blocks', blocksRouter)
 app.use('/api/trips/:tripId/reflection', reflectionsRouter)
 app.use('/api/discover', discoverRouter)
+app.use('/api/places', placesRouter)
+app.use('/api/intelligence', intelligenceRouter)
 
 app.listen(PORT, () => {
   console.log(`TripCraft API running on http://localhost:${PORT}`)

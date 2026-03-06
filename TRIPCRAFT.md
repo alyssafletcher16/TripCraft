@@ -142,11 +142,11 @@ npm run db:migrate
 - [x] Trip creation flow working end-to-end
 - [x] Itinerary builder working end-to-end
 - [x] Block creation (flight, hotel, activity, food, note)
-- [ ] Activity comparison modal
-- [ ] Post-trip reflection flow
-- [ ] Discover feed — community tab
-- [ ] Discover feed — friends tab
-- [ ] Interactive discover map
+- [x] Activity comparison modal
+- [x] Post-trip reflection flow
+- [x] Discover feed — community tab
+- [x] Discover feed — friends tab
+- [x] Interactive discover map
 - [ ] Profile page — world map header
 - [ ] Profile page — draggable rankings
 - [ ] Trip detail modal (photos, thoughts, itinerary)
