@@ -298,7 +298,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
         )}
 
         {trip.days.map((day) => (
-          <ItineraryDay key={day.id} day={day} onBlockAdded={fetchTrip} />
+          <ItineraryDay key={day.id} day={day} destination={trip.destination} onBlockAdded={fetchTrip} />
         ))}
 
         {addingDay ? (

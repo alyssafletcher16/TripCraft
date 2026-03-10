@@ -3,18 +3,17 @@
 import { useState } from 'react'
 import { Block } from './Block'
 import { AddBlockForm } from './AddBlockForm'
-import { ActivityCompareModal } from './ActivityCompareModal'
 import type { ItineraryDay as DayType } from '@/types'
 
 interface Props {
   day: DayType
+  destination?: string
   onBlockAdded?: () => void
 }
 
-export function ItineraryDay({ day, onBlockAdded }: Props) {
+export function ItineraryDay({ day, destination, onBlockAdded }: Props) {
   const [open, setOpen] = useState(true)
   const [addingBlock, setAddingBlock] = useState(false)
-  const [comparingActivities, setComparingActivities] = useState(false)
 
   return (
     <div className="bg-white rounded-2xl border-[1.5px] border-mist overflow-hidden hover:border-terra/30 transition-colors">
@@ -50,9 +49,15 @@ export function ItineraryDay({ day, onBlockAdded }: Props) {
               {day.photos.map((p) => (
                 <div
                   key={p.id}
-                  className="w-[72px] h-[56px] rounded-[10px] border-2 border-mist flex items-center justify-center text-2xl bg-foam"
+                  className="w-[72px] h-[56px] rounded-[10px] border-2 border-mist overflow-hidden bg-foam flex items-center justify-center"
                 >
-                  {p.emoji ?? '📷'}
+                  {p.url ? (
+                    <img src={p.url} alt={p.caption ?? ''} className="w-full h-full object-cover" />
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-slate/40">
+                      <path d="M20 5h-3.17L15 3H9L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
+                  )}
                 </div>
               ))}
             </div>
@@ -71,6 +76,7 @@ export function ItineraryDay({ day, onBlockAdded }: Props) {
           {addingBlock ? (
             <AddBlockForm
               dayId={day.id}
+              destination={destination}
               onSuccess={() => {
                 setAddingBlock(false)
                 onBlockAdded?.()
@@ -78,32 +84,12 @@ export function ItineraryDay({ day, onBlockAdded }: Props) {
               onCancel={() => setAddingBlock(false)}
             />
           ) : (
-            <div className="flex gap-2">
-              <button
-                onClick={() => setAddingBlock(true)}
-                className="flex-1 py-2.5 border border-dashed border-mist rounded-xl text-slate text-sm hover:border-terra/40 hover:text-terra transition-colors"
-              >
-                + Add block
-              </button>
-              <button
-                onClick={() => setComparingActivities(true)}
-                className="py-2.5 px-4 border border-dashed border-mist rounded-xl text-slate text-xs hover:border-terra/40 hover:text-terra transition-colors whitespace-nowrap"
-              >
-                ⇄ Compare activities
-              </button>
-            </div>
-          )}
-
-          {comparingActivities && (
-            <ActivityCompareModal
-              dayId={day.id}
-              dayName={day.name}
-              onClose={() => setComparingActivities(false)}
-              onBlockAdded={() => {
-                setComparingActivities(false)
-                onBlockAdded?.()
-              }}
-            />
+            <button
+              onClick={() => setAddingBlock(true)}
+              className="w-full py-2.5 border border-dashed border-mist rounded-xl text-slate text-sm hover:border-terra/40 hover:text-terra transition-colors"
+            >
+              + Add block
+            </button>
           )}
         </div>
       )}

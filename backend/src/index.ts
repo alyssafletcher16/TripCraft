@@ -10,6 +10,8 @@ import { reflectionsRouter } from './routes/reflections'
 import { discoverRouter } from './routes/discover'
 import { placesRouter } from './routes/places'
 import { intelligenceRouter } from './routes/intelligence'
+import { compareRouter } from './routes/compare'
+import { activitiesRouter } from './routes/activities'
 
 dotenv.config()
 
@@ -38,6 +40,8 @@ app.use('/api/trips/:tripId/reflection', reflectionsRouter)
 app.use('/api/discover', discoverRouter)
 app.use('/api/places', placesRouter)
 app.use('/api/intelligence', intelligenceRouter)
+app.use('/api/compare', compareRouter)
+app.use('/api/activities', activitiesRouter)
 
 app.listen(PORT, () => {
   console.log(`TripCraft API running on http://localhost:${PORT}`)

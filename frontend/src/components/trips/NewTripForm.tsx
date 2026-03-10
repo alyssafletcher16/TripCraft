@@ -1,23 +1,22 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { DESTINATIONS } from '@/data/destinations'
 
 const VIBES = [
-  { id: 'adventure',  label: 'Adventure',  icon: '🧗' },
-  { id: 'foodie',     label: 'Foodie',     icon: '🍝' },
-  { id: 'cultural',   label: 'Cultural',   icon: '🏛' },
-  { id: 'romantic',   label: 'Romantic',   icon: '♡'  },
-  { id: 'hiking',     label: 'Hiking',     icon: '🥾' },
-  { id: 'relaxation', label: 'Relaxation', icon: '🌅' },
-  { id: 'solo',       label: 'Solo',       icon: '🧳' },
-  { id: 'nightlife',  label: 'Nightlife',  icon: '🌙' },
-  { id: 'budget',     label: 'Budget',     icon: '💸' },
-  { id: 'luxury',     label: 'Luxury',     icon: '✦'  },
+  { id: 'adventure',  label: 'Adventure'  },
+  { id: 'foodie',     label: 'Foodie'     },
+  { id: 'cultural',   label: 'Cultural'   },
+  { id: 'romantic',   label: 'Romantic'   },
+  { id: 'hiking',     label: 'Hiking'     },
+  { id: 'relaxation', label: 'Relaxation' },
+  { id: 'solo',       label: 'Solo'       },
+  { id: 'nightlife',  label: 'Nightlife'  },
+  { id: 'budget',     label: 'Budget'     },
+  { id: 'luxury',     label: 'Luxury'     },
 ]
-
-const EMOJIS = ['✈', '🌋', '🏖', '🗼', '🏔', '🌿', '🏙', '🗺', '🌊', '🍷', '🎭', '🧳', '🌸', '🏝', '🎿']
 
 const INPUT_CLS =
   'w-full border border-mist rounded-xl px-4 py-3 text-sm text-ink bg-white focus:outline-none focus:border-terra focus:ring-1 focus:ring-terra/30 placeholder-slate/50'
@@ -28,9 +27,49 @@ export function NewTripForm() {
   const router = useRouter()
   const { data: session } = useSession()
   const [selectedVibes, setSelectedVibes] = useState<string[]>([])
-  const [selectedEmoji, setSelectedEmoji] = useState('✈')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // Destination autocomplete
+  const [destQuery, setDestQuery]       = useState('')
+  const [destCity, setDestCity]         = useState('')
+  const [destCountry, setDestCountry]   = useState('')
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Show all when empty, filter when typing — always alphabetized
+  const filtered = DESTINATIONS
+    .filter((d) =>
+      destQuery.trim().length === 0
+        ? true
+        : d.label.toLowerCase().includes(destQuery.toLowerCase())
+    )
+    .sort((a, b) => a.label.localeCompare(b.label))
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  function selectDestination(city: string, country: string, label: string) {
+    setDestQuery(label)
+    setDestCity(city)
+    setDestCountry(country)
+    setDropdownOpen(false)
+  }
+
+  function handleDestInput(value: string) {
+    setDestQuery(value)
+    setDestCity('')
+    setDestCountry('')
+    setDropdownOpen(true)
+  }
 
   function toggleVibe(id: string) {
     setSelectedVibes((prev) =>
@@ -44,8 +83,8 @@ export function NewTripForm() {
     setLoading(true)
 
     const data = new FormData(e.currentTarget)
-    const destination = data.get('destination') as string
-    const country     = data.get('country') as string
+    const destination = destCity || destQuery.trim()
+    const country     = destCountry || undefined
     const startDate   = data.get('startDate') as string
     const endDate     = data.get('endDate') as string
     const travelers   = parseInt(data.get('travelers') as string) || 1
@@ -53,6 +92,12 @@ export function NewTripForm() {
     const budget      = budgetStr ? parseFloat(budgetStr) : undefined
     const customTitle = data.get('title') as string
     const title       = customTitle.trim() || destination
+
+    if (!destination) {
+      setError('Please enter a destination')
+      setLoading(false)
+      return
+    }
 
     try {
       const res = await fetch(
@@ -66,13 +111,12 @@ export function NewTripForm() {
           body: JSON.stringify({
             title,
             destination,
-            country:   country || undefined,
+            country,
             startDate: startDate || undefined,
             endDate:   endDate || undefined,
             travelers,
             budget,
-            vibes:     selectedVibes,
-            coverEmoji: selectedEmoji,
+            vibes: selectedVibes,
           }),
         }
       )
@@ -98,41 +142,58 @@ export function NewTripForm() {
       <div className="bg-white rounded-2xl border border-mist p-7">
         <h2 className="font-serif text-xl font-bold text-ink mb-5">Destination</h2>
         <div className="flex flex-col gap-4">
+
           <div>
-            <label htmlFor="destination" className={LABEL_CLS}>City / Region *</label>
+            <label htmlFor="dest-input" className={LABEL_CLS}>City, Region, or Country *</label>
+            <div className="relative" ref={dropdownRef}>
+              <input
+                id="dest-input"
+                type="text"
+                autoComplete="off"
+                value={destQuery}
+                onChange={(e) => handleDestInput(e.target.value)}
+                onFocus={() => setDropdownOpen(true)}
+                placeholder="e.g. Tokyo, Amalfi Coast, Iceland"
+                className={INPUT_CLS}
+              />
+
+              {dropdownOpen && (
+                <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-mist rounded-xl shadow-lg overflow-hidden max-h-[280px] overflow-y-auto">
+                  {filtered.length > 0 ? (
+                    filtered.map((d) => (
+                      <button
+                        key={d.label}
+                        type="button"
+                        onMouseDown={(e) => {
+                          e.preventDefault()
+                          selectDestination(d.city, d.country, d.label)
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-ink hover:bg-foam transition-colors flex items-center justify-between gap-3 border-b border-mist/40 last:border-b-0"
+                      >
+                        <span className="font-medium">{d.city}</span>
+                        <span className="text-slate text-xs flex-shrink-0">{d.country}</span>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-4 py-3 text-sm text-slate">
+                      No matches — you can still use this as a custom destination
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="title" className={LABEL_CLS}>Trip title (optional)</label>
             <input
-              id="destination"
-              name="destination"
+              id="title"
+              name="title"
               type="text"
-              required
               autoComplete="off"
-              placeholder="e.g. Sicily, Italy"
+              placeholder="Defaults to destination"
               className={INPUT_CLS}
             />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="country" className={LABEL_CLS}>Country</label>
-              <input
-                id="country"
-                name="country"
-                type="text"
-                autoComplete="off"
-                placeholder="e.g. Italy"
-                className={INPUT_CLS}
-              />
-            </div>
-            <div>
-              <label htmlFor="title" className={LABEL_CLS}>Trip title (optional)</label>
-              <input
-                id="title"
-                name="title"
-                type="text"
-                autoComplete="off"
-                placeholder="Defaults to destination"
-                className={INPUT_CLS}
-              />
-            </div>
           </div>
         </div>
       </div>
@@ -187,36 +248,13 @@ export function NewTripForm() {
               key={v.id}
               type="button"
               onClick={() => toggleVibe(v.id)}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-full border-[1.5px] text-sm transition-all duration-150 ${
+              className={`px-4 py-2 rounded-full border-[1.5px] text-sm transition-all duration-150 ${
                 selectedVibes.includes(v.id)
                   ? 'bg-ocean border-ocean text-white'
                   : 'bg-white border-mist text-ink hover:border-terra hover:text-terra'
               }`}
             >
-              <span>{v.icon}</span>
-              <span>{v.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Cover emoji ───────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-mist p-7">
-        <h2 className="font-serif text-xl font-bold text-ink mb-1">Cover icon</h2>
-        <p className="text-slate text-xs mb-4">Pick an emoji for your trip card</p>
-        <div className="flex flex-wrap gap-2">
-          {EMOJIS.map((emoji) => (
-            <button
-              key={emoji}
-              type="button"
-              onClick={() => setSelectedEmoji(emoji)}
-              className={`w-11 h-11 text-xl rounded-xl border-[1.5px] transition-all duration-150 ${
-                selectedEmoji === emoji
-                  ? 'border-terra bg-terra/10'
-                  : 'border-mist bg-foam hover:border-terra/40'
-              }`}
-            >
-              {emoji}
+              {v.label}
             </button>
           ))}
         </div>
