@@ -985,6 +985,7 @@ function UrlComparePanel({ onClose }: { onClose: () => void }) {
         allTours={[tour]}
         destination={''}
         onBack={() => setDetailIdx(null)} onAdd={() => {}} adding={false}
+        onBookClick={() => {}}
       />
     )
   }
