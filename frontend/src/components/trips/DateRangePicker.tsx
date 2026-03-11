@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 
 function isSameDay(a: Date, b: Date) {
   return (
@@ -26,7 +26,7 @@ function formatDisplay(d: Date) {
 }
 
 function firstDayOfMonth(year: number, month: number) {
-  return new Date(year, month, 1).getDay() // 0 = Sunday
+  return new Date(year, month, 1).getDay()
 }
 
 function daysInMonth(year: number, month: number) {
@@ -65,15 +65,10 @@ function MonthGrid({
   })
   const firstDay = firstDayOfMonth(year, month)
   const numDays = daysInMonth(year, month)
-
   const effectiveEnd = selecting === 'end' && hoverDate ? hoverDate : end
 
-  function isStart(d: Date) {
-    return start ? isSameDay(d, start) : false
-  }
-  function isEnd(d: Date) {
-    return effectiveEnd ? isSameDay(d, effectiveEnd) : false
-  }
+  function isStart(d: Date) { return start ? isSameDay(d, start) : false }
+  function isEnd(d: Date) { return effectiveEnd ? isSameDay(d, effectiveEnd) : false }
   function inRange(d: Date) {
     if (!start || !effectiveEnd) return false
     const lo = start < effectiveEnd ? start : effectiveEnd
@@ -92,7 +87,7 @@ function MonthGrid({
       <div className="text-center text-sm font-semibold text-ink mb-3">{monthName}</div>
       <div className="grid grid-cols-7 text-center">
         {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((d) => (
-          <div key={d} className="text-[10px] text-slate/60 py-1 font-medium">
+          <div key={d} className="text-[10px] text-slate/50 py-1.5 font-medium uppercase tracking-wide">
             {d}
           </div>
         ))}
@@ -111,16 +106,14 @@ function MonthGrid({
               onMouseEnter={() => onDayHover(date)}
               onMouseLeave={() => onDayHover(null)}
               className={[
-                'relative h-8 w-full text-xs transition-colors select-none',
+                'relative h-9 w-full text-xs font-medium transition-all select-none',
                 _start || _end
-                  ? 'bg-terra text-white rounded-full font-semibold z-10'
+                  ? 'bg-terra text-white rounded-full font-bold shadow-sm z-10'
                   : _range
-                  ? 'bg-terra/15 text-ink'
-                  : 'text-ink hover:bg-foam rounded-full',
-                _today && !_start && !_end ? 'font-bold underline underline-offset-2' : '',
-              ]
-                .join(' ')
-                .trim()}
+                  ? 'bg-terra/12 text-ink rounded-none'
+                  : 'text-ink hover:bg-terra/10 rounded-full hover:text-terra',
+                _today && !_start && !_end ? 'ring-1 ring-terra/40 rounded-full' : '',
+              ].join(' ').trim()}
             >
               {date.getDate()}
             </button>
@@ -135,23 +128,11 @@ export function DateRangePicker({ startDate, endDate, onChange }: Props) {
   const today = new Date()
   const [viewYear, setViewYear] = useState(today.getFullYear())
   const [viewMonth, setViewMonth] = useState(today.getMonth())
-  const [open, setOpen] = useState(false)
   const [hoverDate, setHoverDate] = useState<Date | null>(null)
   const [selecting, setSelecting] = useState<'start' | 'end'>('start')
-  const ref = useRef<HTMLDivElement>(null)
 
   const start = startDate ? parseLocal(startDate) : null
   const end = endDate ? parseLocal(endDate) : null
-
-  useEffect(() => {
-    function handleOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleOutside)
-    return () => document.removeEventListener('mousedown', handleOutside)
-  }, [])
 
   function handleDayClick(date: Date) {
     if (selecting === 'start' || !start || date < start) {
@@ -160,124 +141,110 @@ export function DateRangePicker({ startDate, endDate, onChange }: Props) {
     } else {
       onChange(startDate, toDateStr(date))
       setSelecting('start')
-      setOpen(false)
     }
   }
 
   function prevMonth() {
-    if (viewMonth === 0) {
-      setViewMonth(11)
-      setViewYear((y) => y - 1)
-    } else {
-      setViewMonth((m) => m - 1)
-    }
+    if (viewMonth === 0) { setViewMonth(11); setViewYear((y) => y - 1) }
+    else setViewMonth((m) => m - 1)
   }
 
   function nextMonth() {
-    if (viewMonth === 11) {
-      setViewMonth(0)
-      setViewYear((y) => y + 1)
-    } else {
-      setViewMonth((m) => m + 1)
-    }
+    if (viewMonth === 11) { setViewMonth(0); setViewYear((y) => y + 1) }
+    else setViewMonth((m) => m + 1)
   }
 
   const nextMonthNum = viewMonth === 11 ? 0 : viewMonth + 1
   const nextYearNum = viewMonth === 11 ? viewYear + 1 : viewYear
 
-  const displayText =
-    start && end
-      ? `${formatDisplay(start)} – ${formatDisplay(end)}`
-      : start
-      ? `${formatDisplay(start)} – pick end date`
-      : 'Select date range'
+  const totalNights =
+    start && end ? Math.round((end.getTime() - start.getTime()) / 86400000) : null
 
   return (
-    <div className="relative" ref={ref}>
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="w-full border border-mist rounded-xl px-4 py-3 text-sm text-left bg-white focus:outline-none focus:border-terra focus:ring-1 focus:ring-terra/30 flex items-center justify-between gap-3"
-      >
-        <span className={start ? 'text-ink' : 'text-slate/50'}>{displayText}</span>
-        <svg
-          className="w-4 h-4 text-slate flex-shrink-0"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-          />
-        </svg>
-      </button>
-
-      {open && (
-        <div className="absolute z-50 top-full left-0 mt-2 bg-white border border-mist rounded-2xl shadow-xl p-5 w-max max-w-[calc(100vw-2rem)]">
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={prevMonth}
-              className="p-2 hover:bg-foam rounded-lg text-slate hover:text-ink transition-colors text-lg leading-none"
-            >
-              ‹
-            </button>
-            <div className="flex gap-6 flex-1">
-              <MonthGrid
-                year={viewYear}
-                month={viewMonth}
-                start={start}
-                end={end}
-                hoverDate={hoverDate}
-                selecting={selecting}
-                onDayClick={handleDayClick}
-                onDayHover={setHoverDate}
-              />
-              <div className="w-px bg-mist self-stretch" />
-              <MonthGrid
-                year={nextYearNum}
-                month={nextMonthNum}
-                start={start}
-                end={end}
-                hoverDate={hoverDate}
-                selecting={selecting}
-                onDayClick={handleDayClick}
-                onDayHover={setHoverDate}
-              />
-            </div>
-            <button
-              type="button"
-              onClick={nextMonth}
-              className="p-2 hover:bg-foam rounded-lg text-slate hover:text-ink transition-colors text-lg leading-none"
-            >
-              ›
-            </button>
-          </div>
-
-          <div className="flex justify-between items-center border-t border-mist pt-3 mt-4">
-            <span className="text-xs text-slate">
-              {selecting === 'end' && start
-                ? 'Now click your return date'
-                : 'Click your departure date'}
+    <div className="border border-mist rounded-2xl bg-white overflow-hidden">
+      {/* Header — selected range summary */}
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-mist bg-foam/40">
+        <div className="flex gap-6 text-sm">
+          <div>
+            <span className="text-xs text-slate/60 uppercase tracking-wide font-medium block mb-0.5">Departure</span>
+            <span className={start ? 'text-ink font-semibold' : 'text-slate/40'}>
+              {start ? formatDisplay(start) : 'Pick a date'}
             </span>
-            {(start || end) && (
-              <button
-                type="button"
-                onClick={() => {
-                  onChange('', '')
-                  setSelecting('start')
-                }}
-                className="text-xs text-terra hover:underline"
-              >
-                Clear
-              </button>
-            )}
+          </div>
+          <div className="flex items-center text-mist">→</div>
+          <div>
+            <span className="text-xs text-slate/60 uppercase tracking-wide font-medium block mb-0.5">Return</span>
+            <span className={end ? 'text-ink font-semibold' : 'text-slate/40'}>
+              {end ? formatDisplay(end) : 'Pick a date'}
+            </span>
           </div>
         </div>
-      )}
+        {(start || end) && (
+          <button
+            type="button"
+            onClick={() => { onChange('', ''); setSelecting('start') }}
+            className="text-xs text-terra hover:underline ml-4"
+          >
+            Clear
+          </button>
+        )}
+      </div>
+
+      {/* Calendar grid */}
+      <div className="p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <button
+            type="button"
+            onClick={prevMonth}
+            className="p-2 hover:bg-foam rounded-lg text-slate hover:text-ink transition-colors leading-none"
+          >
+            ‹
+          </button>
+          <div className="flex gap-6 flex-1">
+            <MonthGrid
+              year={viewYear}
+              month={viewMonth}
+              start={start}
+              end={end}
+              hoverDate={hoverDate}
+              selecting={selecting}
+              onDayClick={handleDayClick}
+              onDayHover={setHoverDate}
+            />
+            <div className="w-px bg-mist self-stretch" />
+            <MonthGrid
+              year={nextYearNum}
+              month={nextMonthNum}
+              start={start}
+              end={end}
+              hoverDate={hoverDate}
+              selecting={selecting}
+              onDayClick={handleDayClick}
+              onDayHover={setHoverDate}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={nextMonth}
+            className="p-2 hover:bg-foam rounded-lg text-slate hover:text-ink transition-colors leading-none"
+          >
+            ›
+          </button>
+        </div>
+
+        <div className="flex items-center justify-center gap-3 pt-3 border-t border-mist">
+          <span className="text-xs text-slate/60">
+            {selecting === 'end' && start
+              ? 'Now click your return date'
+              : 'Click your departure date'}
+          </span>
+          {totalNights !== null && totalNights > 0 && (
+            <span className="text-xs font-semibold text-terra bg-terra/10 px-2.5 py-1 rounded-full">
+              {totalNights} {totalNights === 1 ? 'night' : 'nights'}
+            </span>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
