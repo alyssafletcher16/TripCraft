@@ -2,6 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const VIATOR_API_KEY = process.env.VIATOR_API_KEY ?? ''
 const VIATOR_BASE = 'https://api.viator.com/partner'
+const VIATOR_AFFILIATE_ID = process.env.NEXT_PUBLIC_VIATOR_AFFILIATE_ID ?? ''
+
+function withAffiliateParams(url: string): string {
+  try {
+    const u = new URL(url)
+    u.searchParams.set('pid', VIATOR_AFFILIATE_ID)
+    u.searchParams.set('mcid', '42383')
+    u.searchParams.set('medium', 'api')
+    u.searchParams.set('campaign', 'tripcraft')
+    return u.toString()
+  } catch {
+    return url
+  }
+}
 
 const CACHE = new Map<string, { data: unknown; fetchedAt: number }>()
 const TTL = 24 * 60 * 60 * 1000
@@ -99,7 +113,7 @@ export async function POST(req: NextRequest) {
         snippet,
         itinerary: [],
         reviews: [],
-        bookingUrl: p.productUrl ?? null,
+        bookingUrl: p.productUrl ? withAffiliateParams(p.productUrl) : null,
         image: coverImage,
       }
     })
