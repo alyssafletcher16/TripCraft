@@ -27,10 +27,7 @@ export function ItineraryDay({ day, destination, onBlockAdded }: Props) {
           <span className="bg-ocean text-white font-mono text-[10px] px-3 py-1 rounded-full tracking-[1px]">
             Day {String(day.dayNum).padStart(2, '0')}
           </span>
-          <div>
-            <div className="font-serif text-lg font-bold text-ink">{day.name}</div>
-            {day.theme && <div className="text-[11px] text-slate">{day.theme}</div>}
-          </div>
+          {day.theme && <div className="text-[11px] text-slate">{day.theme}</div>}
         </div>
         <div className="flex items-center gap-3">
           {day.date && (

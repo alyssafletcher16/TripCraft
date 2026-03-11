@@ -14,142 +14,7 @@ const STATUS_VARIANT: Record<TripStatus, 'gold' | 'green' | 'ocean' | 'slate'> =
   ACTIVE: 'gold', COMPLETED: 'green', PLANNING: 'ocean', DRAFT: 'slate',
 }
 
-// ── Add Day inline form ────────────────────────────────────────────────────────
-function AddDayForm({
-  tripId,
-  nextDayNum,
-  startDate,
-  accessToken,
-  onSuccess,
-  onCancel,
-}: {
-  tripId: string
-  nextDayNum: number
-  startDate: string | null
-  accessToken?: string
-  onSuccess: () => void
-  onCancel: () => void
-}) {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-
-  // Auto-fill date based on trip start date + day offset
-  const autoDate = startDate
-    ? new Date(new Date(startDate).getTime() + (nextDayNum - 1) * 86_400_000)
-        .toISOString()
-        .split('T')[0]
-    : ''
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-
-    const data = new FormData(e.currentTarget)
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'}/api/trips/${tripId}/days`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            dayNum: nextDayNum,
-            name: data.get('name'),
-            theme: data.get('theme') || null,
-            date: data.get('date') || null,
-          }),
-        }
-      )
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Failed to add day' }))
-        throw new Error(err.error || 'Failed to add day')
-      }
-
-      onSuccess()
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white rounded-2xl border border-mist p-6 flex flex-col gap-3"
-    >
-      <div className="flex items-center gap-2 mb-1">
-        <span className="bg-ocean text-white font-mono text-[10px] px-3 py-1 rounded-full tracking-[1px]">
-          Day {String(nextDayNum).padStart(2, '0')}
-        </span>
-        <h3 className="font-serif text-base font-bold text-ink">Add a day</h3>
-      </div>
-
-      <div className="grid grid-cols-[1fr_160px] gap-3">
-        <div>
-          <label className="block text-slate text-[10px] font-mono uppercase tracking-wider mb-1">
-            Day name *
-          </label>
-          <input
-            name="name"
-            type="text"
-            required
-            autoComplete="off"
-            placeholder="e.g. Arrival & Palermo"
-            className="w-full border border-mist rounded-xl px-3 py-2.5 text-sm text-ink bg-white focus:outline-none focus:border-terra"
-          />
-        </div>
-        <div>
-          <label className="block text-slate text-[10px] font-mono uppercase tracking-wider mb-1">
-            Date
-          </label>
-          <input
-            name="date"
-            type="date"
-            defaultValue={autoDate}
-            className="w-full border border-mist rounded-xl px-3 py-2.5 text-sm text-ink bg-white focus:outline-none focus:border-terra"
-          />
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-slate text-[10px] font-mono uppercase tracking-wider mb-1">
-          Theme (optional)
-        </label>
-        <input
-          name="theme"
-          type="text"
-          autoComplete="off"
-          placeholder="e.g. Baroque churches, street food, hidden gems"
-          className="w-full border border-mist rounded-xl px-3 py-2.5 text-sm text-ink bg-white focus:outline-none focus:border-terra"
-        />
-      </div>
-
-      {error && <p className="text-red-500 text-xs">{error}</p>}
-
-      <div className="flex gap-2">
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-terra text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-terra-lt disabled:opacity-50"
-        >
-          {loading ? 'Adding…' : 'Add day'}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2 rounded-lg text-sm text-slate hover:text-ink border border-mist"
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
-  )
-}
+const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
 
 // ── Main trip detail view ──────────────────────────────────────────────────────
 export function TripDetail({ tripId }: { tripId: string }) {
@@ -157,17 +22,42 @@ export function TripDetail({ tripId }: { tripId: string }) {
   const [trip, setTrip] = useState<Trip | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [addingDay, setAddingDay] = useState(false)
   const [reflecting, setReflecting] = useState(false)
 
   const fetchTrip = useCallback(() => {
     if (!session?.accessToken) return
-    fetch(`${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'}/api/trips/${tripId}`, {
+    fetch(`${API}/api/trips/${tripId}`, {
       headers: { Authorization: `Bearer ${session.accessToken}` },
     })
       .then((r) => {
         if (!r.ok) throw new Error('Trip not found')
         return r.json()
+      })
+      .then(async (data: Trip) => {
+        // Auto-create days from trip duration if none exist yet
+        if (data.days.length === 0 && data.startDate && data.endDate) {
+          const start = new Date(data.startDate)
+          const end = new Date(data.endDate)
+          const numDays = Math.round((end.getTime() - start.getTime()) / 86_400_000) + 1
+          await Promise.all(
+            Array.from({ length: numDays }, (_, i) => {
+              const date = new Date(start.getTime() + i * 86_400_000).toISOString().split('T')[0]
+              return fetch(`${API}/api/trips/${tripId}/days`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${session.accessToken}`,
+                },
+                body: JSON.stringify({ dayNum: i + 1, name: `Day ${i + 1}`, date, theme: null }),
+              })
+            })
+          )
+          // Re-fetch so we get the created days
+          return fetch(`${API}/api/trips/${tripId}`, {
+            headers: { Authorization: `Bearer ${session.accessToken}` },
+          }).then((r) => r.json())
+        }
+        return data
       })
       .then((data) => {
         setTrip(data)
@@ -291,36 +181,19 @@ export function TripDetail({ tripId }: { tripId: string }) {
 
       {/* ── Itinerary days ──────────────────────────────────────── */}
       <div className="flex flex-col gap-4">
-        {trip.days.length === 0 && !addingDay && (
+        {trip.days.length === 0 && (
           <div className="bg-white rounded-2xl border border-mist p-10 text-center">
-            <p className="text-slate text-sm">No days yet — add your first day below.</p>
+            <p className="text-slate text-sm">
+              {trip.startDate && trip.endDate
+                ? 'Setting up your itinerary…'
+                : 'Add start and end dates to your trip to generate your itinerary.'}
+            </p>
           </div>
         )}
 
         {trip.days.map((day) => (
           <ItineraryDay key={day.id} day={day} destination={trip.destination} onBlockAdded={fetchTrip} />
         ))}
-
-        {addingDay ? (
-          <AddDayForm
-            tripId={tripId}
-            nextDayNum={trip.days.length + 1}
-            startDate={trip.startDate}
-            accessToken={session?.accessToken}
-            onSuccess={() => {
-              setAddingDay(false)
-              fetchTrip()
-            }}
-            onCancel={() => setAddingDay(false)}
-          />
-        ) : (
-          <button
-            onClick={() => setAddingDay(true)}
-            className="w-full py-3 border border-dashed border-mist rounded-2xl text-slate text-sm hover:border-terra/40 hover:text-terra transition-colors"
-          >
-            + Add Day {trip.days.length + 1}
-          </button>
-        )}
       </div>
     </div>
 
