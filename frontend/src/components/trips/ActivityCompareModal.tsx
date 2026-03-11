@@ -902,12 +902,12 @@ function CompareModal({
                         <td className="px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle">
                           <div className="flex items-center gap-1.5">
                             <a
-                              href={getSearchUrl(t.bookingCompany, activity.name, destination, t.provider)}
+                              href={t.bookingUrl || getSearchUrl(t.bookingCompany, activity.name, destination, t.provider)}
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => {
                                 e.stopPropagation()
-                                const url = getSearchUrl(t.bookingCompany, activity.name, destination, t.provider)
+                                const url = t.bookingUrl || getSearchUrl(t.bookingCompany, activity.name, destination, t.provider)
                                 onBookClick(getPlatformKey(t.bookingCompany), url, activity.name)
                               }}
                               className="py-[7px] px-3 rounded-full border-[1.5px] border-terra text-xs text-terra font-medium whitespace-nowrap hover:bg-terra hover:text-white transition-colors"
