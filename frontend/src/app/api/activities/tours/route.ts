@@ -7,10 +7,12 @@ const VIATOR_AFFILIATE_ID = process.env.NEXT_PUBLIC_VIATOR_AFFILIATE_ID ?? ''
 function withAffiliateParams(url: string): string {
   try {
     const u = new URL(url)
+    // Strip Viator's internal params that cause redirect to destination browse page
+    u.searchParams.delete('mcid')
+    u.searchParams.delete('medium')
+    u.searchParams.delete('api_version')
+    // Keep only our affiliate ID for commission tracking
     u.searchParams.set('pid', VIATOR_AFFILIATE_ID)
-    u.searchParams.set('mcid', '42383')
-    u.searchParams.set('medium', 'api')
-    u.searchParams.set('campaign', 'tripcraft')
     return u.toString()
   } catch {
     return url
