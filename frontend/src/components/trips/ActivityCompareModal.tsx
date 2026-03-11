@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { AFFILIATES } from '@/config/affiliates'
+import { trackBookingClick } from '@/utils/bookingTracking'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 type Review = {
@@ -67,19 +69,30 @@ function toUSD(price: number, currency: string): string {
 
 // ── Search URL builder (never uses AI-hallucinated URLs) ──────────────────────
 function getSearchUrl(bookingCompany: string, activityName: string, destination: string, provider?: string): string {
-  const co      = bookingCompany.toLowerCase()
+  const co    = bookingCompany.toLowerCase()
   // Include provider name so results land on (or very near) the specific operator
-  const terms   = provider ? `${activityName} ${provider} ${destination}` : `${activityName} ${destination}`
-  const q       = encodeURIComponent(terms)
-  const actOnly = encodeURIComponent(activityName)
-  if (co.includes('getyourguide')) return `https://www.getyourguide.com/s/?q=${q}`
-  if (co.includes('viator'))       return `https://www.viator.com/search/${encodeURIComponent(destination)}?text=${encodeURIComponent(provider ? `${activityName} ${provider}` : activityName)}`
+  const terms = provider ? `${activityName} ${provider} ${destination}` : `${activityName} ${destination}`
+  const q     = encodeURIComponent(terms)
+  if (co.includes('getyourguide')) return `https://www.getyourguide.com/s/?q=${q}&partner_id=${AFFILIATES.GYG_ID}`
+  if (co.includes('viator'))       return `https://www.viator.com/search/${q}?pid=${AFFILIATES.VIATOR_ID}&mcid=42383&medium=api`
   if (co.includes('klook'))        return `https://www.klook.com/en-US/search/?keyword=${q}`
   if (co.includes('airbnb'))       return `https://www.airbnb.com/experiences?query=${q}`
   if (co.includes('tripadvisor'))  return `https://www.tripadvisor.com/Search?q=${q}`
   if (co.includes('musement'))     return `https://www.musement.com/us/search/#?query=${q}`
   // Fallback: Google search targeted at the specific platform
   return `https://www.google.com/search?q=${encodeURIComponent(`${activityName} ${provider ?? ''} ${destination} site:${co.replace(/\s/g, '')}.com`)}`
+}
+
+// ── Derive platform key from booking company name (for tracking) ──────────────
+function getPlatformKey(bookingCompany: string): string {
+  const co = bookingCompany.toLowerCase()
+  if (co.includes('getyourguide')) return 'getyourguide'
+  if (co.includes('viator'))       return 'viator'
+  if (co.includes('klook'))        return 'klook'
+  if (co.includes('airbnb'))       return 'airbnb'
+  if (co.includes('tripadvisor'))  return 'tripadvisor'
+  if (co.includes('musement'))     return 'musement'
+  return co
 }
 
 // ── CSS constants ─────────────────────────────────────────────────────────────
@@ -144,6 +157,7 @@ function TourDetailPanel({
   onBack,
   onAdd,
   adding,
+  onBookClick,
 }: {
   tour: Tour
   actName: string
@@ -152,11 +166,13 @@ function TourDetailPanel({
   onBack: () => void
   onAdd: () => void
   adding: boolean
+  onBookClick: (platform: string, url: string, title: string) => void
 }) {
   const [showReviewsModal, setShowReviewsModal] = useState(false)
   const [showUSD, setShowUSD] = useState(false)
   const isNonUSD = tour.currency.toUpperCase() !== 'USD'
-  const bookUrl = getSearchUrl(tour.bookingCompany, actName, destination, tour.provider)
+  const bookUrl = (tour as { bookingUrl?: string }).bookingUrl
+    || getSearchUrl(tour.bookingCompany, actName, destination, tour.provider)
 
   return (
     <>
@@ -331,6 +347,7 @@ function TourDetailPanel({
               href={bookUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => onBookClick(getPlatformKey(tour.bookingCompany), bookUrl, actName)}
               className="flex-1 border-[1.5px] border-terra text-terra py-[11px] px-7 rounded-full text-[13px] font-semibold text-center hover:bg-terra/5 transition-colors"
             >
               Book on {tour.bookingCompany} ↗
@@ -515,12 +532,14 @@ function CompareModal({
   onClose,
   onAdd,
   adding,
+  onBookClick,
 }: {
   activity: Activity
   destination: string
   onClose: () => void
   onAdd: (tour: Tour, actName: string) => void
   adding: boolean
+  onBookClick: (platform: string, url: string, title: string) => void
 }) {
   const [detailTour, setDetailTour]         = useState<Tour | null>(null)
   const [showAllReviews, setShowAllReviews] = useState<Tour | null>(null)
@@ -649,6 +668,7 @@ function CompareModal({
         onBack={() => setDetailTour(null)}
         onAdd={() => onAdd(detailTour, activity.name)}
         adding={adding}
+        onBookClick={onBookClick}
       />
     )
   }
@@ -885,7 +905,11 @@ function CompareModal({
                               href={getSearchUrl(t.bookingCompany, activity.name, destination, t.provider)}
                               target="_blank"
                               rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                const url = getSearchUrl(t.bookingCompany, activity.name, destination, t.provider)
+                                onBookClick(getPlatformKey(t.bookingCompany), url, activity.name)
+                              }}
                               className="py-[7px] px-3 rounded-full border-[1.5px] border-terra text-xs text-terra font-medium whitespace-nowrap hover:bg-terra hover:text-white transition-colors"
                             >
                               Book ↗
@@ -1194,7 +1218,7 @@ function ActivityModal({
 // ── Main export ───────────────────────────────────────────────────────────────
 interface ActivityCompareModalProps {
   dayId: string
-  dayName: string
+  tripId?: string
   destination?: string
   onClose: () => void
   onBlockAdded: () => void
@@ -1202,7 +1226,7 @@ interface ActivityCompareModalProps {
 
 export function ActivityCompareModal({
   dayId,
-  dayName,
+  tripId,
   destination,
   onClose,
   onBlockAdded,
@@ -1250,6 +1274,10 @@ export function ActivityCompareModal({
     }
   }
 
+  function handleBookClick(platform: string, url: string, activityTitle: string) {
+    trackBookingClick({ activityTitle, platform, url, tripId, token: session?.accessToken })
+  }
+
   async function handleAdd(tour: Tour, actName: string) {
     setAdding(true)
     try {
@@ -1291,6 +1319,7 @@ export function ActivityCompareModal({
         onClose={() => setView('list')}
         onAdd={adding ? () => {} : handleAdd}
         adding={adding}
+        onBookClick={handleBookClick}
       />
     )
   }
