@@ -5,10 +5,9 @@ import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 
 const NAV_LINKS = [
-  { href: '/trips',    label: 'My Trips'   },
-  { href: '/discover', label: 'Discover'   },
-  { href: '/trips/new', label: 'New Trip'  },
-  { href: '/profile',  label: 'Profile'   },
+  { href: '/trips',    label: 'My Trips' },
+  { href: '/discover', label: 'Discover' },
+  { href: '/profile',  label: 'Profile'  },
 ]
 
 export function Navbar() {
@@ -34,6 +33,15 @@ export function Navbar() {
       </div>
 
       <div className="flex items-center gap-3">
+        {session && (
+          <Link
+            href="/trips/new"
+            className="rounded-full bg-terra hover:bg-terra-lt px-4 h-9 flex items-center justify-center text-white text-sm font-semibold transition-colors shadow-md"
+            title="New Trip"
+          >
+            + New Trip
+          </Link>
+        )}
         {session ? (
           <button
             onClick={() => signOut({ callbackUrl: '/' })}
