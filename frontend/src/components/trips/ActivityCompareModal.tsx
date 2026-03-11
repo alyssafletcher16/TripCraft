@@ -1184,14 +1184,16 @@ function ActivityModal({
                 <div className="flex-1">
                   <div className="font-serif text-[18px] font-bold text-ink mb-[3px]">{act.name}</div>
                   <div className="flex flex-wrap gap-3 text-xs text-slate">
-                    <span>★ up to {act.topRating}</span>
-                    <span>{act.totalReviews.toLocaleString()} reviews</span>
-                    <span className="text-terra font-medium">
-                      {act.currency} {act.minPrice}–{act.maxPrice}/person
-                    </span>
+                    {act.topRating ? <span>★ up to {act.topRating}</span> : null}
+                    {act.totalReviews ? <span>{act.totalReviews.toLocaleString()} reviews</span> : null}
+                    {act.minPrice ? (
+                      <span className="text-terra font-medium">
+                        {act.currency ?? 'USD'} {act.minPrice}–{act.maxPrice}/person
+                      </span>
+                    ) : null}
                   </div>
                   <div className="mt-1.5 text-[10px] font-mono text-slate/70 uppercase tracking-wider">
-                    {act.companies} options · GetYourGuide, Viator, Klook &amp; more
+                    {act.companies ? `${act.companies} options · ` : ''}GetYourGuide, Viator, Klook &amp; more
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1.5 flex-shrink-0">

@@ -54,10 +54,13 @@ router.get('/', async (req, res) => {
 
 For obscure destinations, only include what genuinely exists there. Do not invent things.
 
-Return ONLY a JSON array — no other text. Each item:
-{"name":"string","icon":"single emoji","category":"Nature|Adventure|Cultural|Scenic|Food & Drink|Water|Nightlife|Sports"}
+Return ONLY a JSON array — no other text. Each item must have exactly these fields:
+{"name":"string","icon":"single emoji","category":"Nature|Adventure|Cultural|Scenic|Food & Drink|Water|Nightlife|Sports","minPrice":number,"maxPrice":number,"currency":"USD","topRating":number,"totalReviews":number,"companies":number}
 
-Just these 3 fields per activity.`
+minPrice/maxPrice = typical USD price range per person (integers).
+topRating = typical top rating out of 5 (e.g. 4.7).
+totalReviews = estimated total reviews across platforms (integer).
+companies = estimated number of tour operators (integer).`
 
     const msg = await anthropic.messages.create({
       model:      'claude-haiku-4-5-20251001',
