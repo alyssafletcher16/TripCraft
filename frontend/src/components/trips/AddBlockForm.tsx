@@ -23,12 +23,13 @@ const INPUT = 'w-full border border-mist rounded-lg px-3 py-2 text-sm text-ink b
 
 interface Props {
   dayId: string
+  tripId?: string
   destination?: string
   onSuccess: () => void
   onCancel: () => void
 }
 
-export function AddBlockForm({ dayId, destination, onSuccess, onCancel }: Props) {
+export function AddBlockForm({ dayId, tripId, destination, onSuccess, onCancel }: Props) {
   const { data: session } = useSession()
 
   // Step 1: type not picked yet
@@ -102,7 +103,7 @@ export function AddBlockForm({ dayId, destination, onSuccess, onCancel }: Props)
     return (
       <ActivityCompareModal
         dayId={dayId}
-        dayName=""
+        tripId={tripId}
         destination={destination}
         onClose={() => setShowBrowse(false)}
         onBlockAdded={onSuccess}

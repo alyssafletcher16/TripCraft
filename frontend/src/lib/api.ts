@@ -85,6 +85,15 @@ export const api = {
       request(`/api/trips/${tripId}/reflection`, { method: 'PUT', body: JSON.stringify(data) }, token),
   },
 
+  // ─── Booking Clicks ───────────────────────────────────────────────────────
+  bookingClicks: {
+    track: (
+      data: { activityTitle: string; platform: string; url: string; tripId?: string; blockId?: string },
+      token: string
+    ) =>
+      request('/api/booking-clicks', { method: 'POST', body: JSON.stringify(data) }, token),
+  },
+
   // ─── Discover ─────────────────────────────────────────────────────────────
   discover: {
     feed: (params?: { vibe?: string; sort?: string; limit?: number; offset?: number }) => {

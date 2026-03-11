@@ -1,4 +1,7 @@
+'use client'
+
 import { Badge } from '@/components/ui/Badge'
+import { BookingCTA } from '@/components/BookingCTA'
 import type { Block as BlockType } from '@/types'
 
 // SVG icons per block type — no emojis
@@ -45,7 +48,13 @@ const TYPE_ICONS: Record<string, { svg: React.ReactNode; bg: string; color: stri
   },
 }
 
-export function Block({ block }: { block: BlockType }) {
+interface BlockProps {
+  block: BlockType
+  tripId?: string
+  destination?: string
+}
+
+export function Block({ block, tripId, destination }: BlockProps) {
   const meta = TYPE_ICONS[block.type] ?? TYPE_ICONS.NOTE
 
   return (
@@ -80,6 +89,10 @@ export function Block({ block }: { block: BlockType }) {
               </span>
             )}
           </div>
+        )}
+
+        {destination && (block.type === 'ACTIVITY' || block.type === 'STAY') && (
+          <BookingCTA block={block} destination={destination} tripId={tripId} />
         )}
       </div>
     </div>

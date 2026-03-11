@@ -12,6 +12,7 @@ interface Props {
 }
 
 export function ItineraryDay({ day, destination, onBlockAdded }: Props) {
+  const tripId = day.tripId
   const [open, setOpen] = useState(true)
   const [addingBlock, setAddingBlock] = useState(false)
 
@@ -64,7 +65,7 @@ export function ItineraryDay({ day, destination, onBlockAdded }: Props) {
           )}
 
           {day.blocks.map((block) => (
-            <Block key={block.id} block={block} />
+            <Block key={block.id} block={block} tripId={tripId} destination={destination} />
           ))}
 
           {day.blocks.length === 0 && !addingBlock && (
@@ -76,6 +77,7 @@ export function ItineraryDay({ day, destination, onBlockAdded }: Props) {
           {addingBlock ? (
             <AddBlockForm
               dayId={day.id}
+              tripId={tripId}
               destination={destination}
               onSuccess={() => {
                 setAddingBlock(false)
