@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { DESTINATIONS } from '@/data/destinations'
+import { DateRangePicker } from './DateRangePicker'
 
 const VIBES = [
   { id: 'adventure',  label: 'Adventure'  },
@@ -27,8 +28,14 @@ export function NewTripForm() {
   const router = useRouter()
   const { data: session } = useSession()
   const [selectedVibes, setSelectedVibes] = useState<string[]>([])
+  const [customVibeInput, setCustomVibeInput] = useState('')
+  const [customVibes, setCustomVibes] = useState<string[]>([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // Date range
+  const [dateStart, setDateStart] = useState('')
+  const [dateEnd, setDateEnd] = useState('')
 
   // Destination autocomplete
   const [destQuery, setDestQuery]       = useState('')
@@ -77,6 +84,18 @@ export function NewTripForm() {
     )
   }
 
+  function addCustomVibe() {
+    const tag = customVibeInput.trim().toLowerCase()
+    if (!tag) return
+    if (customVibes.includes(tag) || VIBES.some((v) => v.id === tag)) return
+    setCustomVibes((prev) => [...prev, tag])
+    setCustomVibeInput('')
+  }
+
+  function removeCustomVibe(tag: string) {
+    setCustomVibes((prev) => prev.filter((v) => v !== tag))
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError('')
@@ -85,8 +104,6 @@ export function NewTripForm() {
     const data = new FormData(e.currentTarget)
     const destination = destCity || destQuery.trim()
     const country     = destCountry || undefined
-    const startDate   = data.get('startDate') as string
-    const endDate     = data.get('endDate') as string
     const travelers   = parseInt(data.get('travelers') as string) || 1
     const budgetStr   = data.get('budget') as string
     const budget      = budgetStr ? parseFloat(budgetStr) : undefined
@@ -112,11 +129,11 @@ export function NewTripForm() {
             title,
             destination,
             country,
-            startDate: startDate || undefined,
-            endDate:   endDate || undefined,
+            startDate: dateStart || undefined,
+            endDate:   dateEnd || undefined,
             travelers,
             budget,
-            vibes: selectedVibes,
+            vibes: [...selectedVibes, ...customVibes],
           }),
         }
       )
@@ -129,7 +146,14 @@ export function NewTripForm() {
       const trip = await res.json()
       router.push(`/trips/${trip.id}`)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      if (
+        err instanceof TypeError &&
+        (err.message === 'Load failed' || err.message === 'Failed to fetch')
+      ) {
+        setError('Could not reach the server. Please make sure the backend is running.')
+      } else {
+        setError(err instanceof Error ? err.message : 'Something went wrong')
+      }
     } finally {
       setLoading(false)
     }
@@ -201,39 +225,43 @@ export function NewTripForm() {
       {/* ── Dates & Travelers ─────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-mist p-7">
         <h2 className="font-serif text-xl font-bold text-ink mb-5">Dates &amp; Travelers</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-4">
+
           <div>
-            <label htmlFor="startDate" className={LABEL_CLS}>Start date</label>
-            <input id="startDate" name="startDate" type="date" className={INPUT_CLS} />
-          </div>
-          <div>
-            <label htmlFor="endDate" className={LABEL_CLS}>End date</label>
-            <input id="endDate" name="endDate" type="date" className={INPUT_CLS} />
-          </div>
-          <div>
-            <label htmlFor="travelers" className={LABEL_CLS}>
-              Total travelers (including you)
-            </label>
-            <input
-              id="travelers"
-              name="travelers"
-              type="number"
-              min={1}
-              defaultValue={1}
-              className={INPUT_CLS}
+            <label className={LABEL_CLS}>Trip dates</label>
+            <DateRangePicker
+              startDate={dateStart}
+              endDate={dateEnd}
+              onChange={(s, e) => { setDateStart(s); setDateEnd(e) }}
             />
           </div>
-          <div>
-            <label htmlFor="budget" className={LABEL_CLS}>Total budget (USD)</label>
-            <input
-              id="budget"
-              name="budget"
-              type="number"
-              min={0}
-              step={50}
-              placeholder="e.g. 3200"
-              className={INPUT_CLS}
-            />
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="travelers" className={LABEL_CLS}>
+                Total travelers (including you)
+              </label>
+              <input
+                id="travelers"
+                name="travelers"
+                type="number"
+                min={1}
+                defaultValue={1}
+                className={INPUT_CLS}
+              />
+            </div>
+            <div>
+              <label htmlFor="budget" className={LABEL_CLS}>Total budget (USD)</label>
+              <input
+                id="budget"
+                name="budget"
+                type="number"
+                min={0}
+                step={50}
+                placeholder="e.g. 3200"
+                className={INPUT_CLS}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -241,8 +269,8 @@ export function NewTripForm() {
       {/* ── Vibes ─────────────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-mist p-7">
         <h2 className="font-serif text-xl font-bold text-ink mb-1">Trip vibes</h2>
-        <p className="text-slate text-xs mb-4">Select all that apply</p>
-        <div className="flex flex-wrap gap-2">
+        <p className="text-slate text-xs mb-4">Select all that apply, or add your own</p>
+        <div className="flex flex-wrap gap-2 mb-4">
           {VIBES.map((v) => (
             <button
               key={v.id}
@@ -257,6 +285,44 @@ export function NewTripForm() {
               {v.label}
             </button>
           ))}
+          {customVibes.map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border-[1.5px] bg-ocean border-ocean text-white text-sm"
+            >
+              {tag}
+              <button
+                type="button"
+                onClick={() => removeCustomVibe(tag)}
+                className="hover:opacity-70 leading-none"
+                aria-label={`Remove ${tag}`}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+
+        {/* Custom vibe input */}
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={customVibeInput}
+            onChange={(e) => setCustomVibeInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') { e.preventDefault(); addCustomVibe() }
+            }}
+            placeholder="Add a custom vibe…"
+            className="flex-1 border border-mist rounded-xl px-4 py-2.5 text-sm text-ink bg-white focus:outline-none focus:border-terra focus:ring-1 focus:ring-terra/30 placeholder-slate/50"
+          />
+          <button
+            type="button"
+            onClick={addCustomVibe}
+            disabled={!customVibeInput.trim()}
+            className="px-4 py-2.5 rounded-xl border-[1.5px] border-terra text-terra text-sm font-medium hover:bg-terra hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Add
+          </button>
         </div>
       </div>
 
