@@ -9,7 +9,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <div className="grid grid-cols-[272px_1fr] min-h-[calc(100vh-62px)]">
+      <div className="md:grid md:grid-cols-[272px_1fr] min-h-[calc(100vh-62px)]">
         <Sidebar activeTab="profile" />
         <main className="bg-surface overflow-y-auto">
           <ProfileHeader />

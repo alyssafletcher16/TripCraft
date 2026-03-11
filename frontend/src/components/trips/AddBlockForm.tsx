@@ -118,7 +118,7 @@ export function AddBlockForm({ dayId, tripId, destination, onSuccess, onCancel }
         <div className="text-[10px] font-mono text-slate uppercase tracking-wider mb-3">
           What kind of block?
         </div>
-        <div className="grid grid-cols-5 gap-2">
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
           {BLOCK_TYPES.map((t) => (
             <button
               key={t.id}
@@ -262,7 +262,7 @@ export function AddBlockForm({ dayId, tripId, destination, onSuccess, onCancel }
       </div>
 
       {/* Detail + Price */}
-      <div className="grid grid-cols-[1fr_140px] gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-[1fr_140px] gap-3">
         <div>
           <label className="block text-slate text-[10px] font-mono uppercase tracking-wider mb-1">
             Detail
@@ -311,7 +311,7 @@ export function AddBlockForm({ dayId, tripId, destination, onSuccess, onCancel }
       </div>
 
       {/* Conf code + cancel policy */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="block text-slate text-[10px] font-mono uppercase tracking-wider mb-1">
             Confirmation #

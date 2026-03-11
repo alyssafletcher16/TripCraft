@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
+import { useSidebar } from './SidebarContext'
 
 const NAV_LINKS = [
   { href: '/trips',    label: 'My Trips' },
@@ -13,14 +14,31 @@ const NAV_LINKS = [
 export function Navbar() {
   const pathname = usePathname()
   const { data: session } = useSession()
+  const { toggle } = useSidebar()
 
   return (
-    <nav className="flex items-center justify-between px-12 h-[62px] bg-deep sticky top-0 z-[300] border-b border-gold/15">
-      <Link href="/" className="font-serif text-[22px] font-black text-foam tracking-[-0.5px] flex items-center">
-        trip<span className="text-terra italic">craft</span>
-      </Link>
+    <nav className="flex items-center justify-between px-4 sm:px-8 md:px-12 h-[62px] bg-deep sticky top-0 z-[300] border-b border-gold/15">
+      {/* Left: hamburger (mobile) + logo */}
+      <div className="flex items-center gap-3">
+        {/* Hamburger — visible only on mobile */}
+        <button
+          type="button"
+          onClick={toggle}
+          className="md:hidden flex flex-col justify-center gap-[5px] w-8 h-8 p-1 rounded-lg hover:bg-white/10 transition-colors"
+          aria-label="Open menu"
+        >
+          <span className="block w-full h-[1.5px] bg-white/70 rounded-full" />
+          <span className="block w-full h-[1.5px] bg-white/70 rounded-full" />
+          <span className="block w-5 h-[1.5px] bg-white/70 rounded-full" />
+        </button>
 
-      <div className="flex gap-1">
+        <Link href="/" className="font-serif text-[22px] font-black text-foam tracking-[-0.5px] flex items-center">
+          trip<span className="text-terra italic">craft</span>
+        </Link>
+      </div>
+
+      {/* Center nav links — hidden on mobile */}
+      <div className="hidden md:flex gap-1">
         {NAV_LINKS.map(({ href, label }) => (
           <Link
             key={href}
@@ -32,20 +50,22 @@ export function Navbar() {
         ))}
       </div>
 
-      <div className="flex items-center gap-3">
+      {/* Right: auth actions */}
+      <div className="flex items-center gap-2 sm:gap-3">
         {session && (
           <Link
             href="/trips/new"
-            className="rounded-full bg-terra hover:bg-terra-lt px-4 h-9 flex items-center justify-center text-white text-sm font-semibold transition-colors shadow-md"
+            className="rounded-full bg-terra hover:bg-terra-lt px-3 sm:px-4 h-9 flex items-center justify-center text-white text-sm font-semibold transition-colors shadow-md"
             title="New Trip"
           >
-            + New Trip
+            <span className="sm:hidden">+</span>
+            <span className="hidden sm:inline">+ New Trip</span>
           </Link>
         )}
         {session ? (
           <button
             onClick={() => signOut({ callbackUrl: '/' })}
-            className="text-white/50 text-sm hover:text-white transition-colors"
+            className="hidden sm:block text-white/50 text-sm hover:text-white transition-colors"
           >
             Sign out
           </button>
@@ -54,8 +74,9 @@ export function Navbar() {
             <Link href="/login" className="text-white/50 text-sm hover:text-white transition-colors">
               Sign in
             </Link>
-            <Link href="/register" className="bg-terra text-white px-5 py-2 rounded-full text-sm font-semibold transition-all hover:bg-terra-lt">
-              Get started
+            <Link href="/register" className="bg-terra text-white px-4 sm:px-5 py-2 rounded-full text-sm font-semibold transition-all hover:bg-terra-lt">
+              <span className="sm:hidden">Join</span>
+              <span className="hidden sm:inline">Get started</span>
             </Link>
           </>
         )}

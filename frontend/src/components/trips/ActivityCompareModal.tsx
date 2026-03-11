@@ -96,10 +96,10 @@ function getPlatformKey(bookingCompany: string): string {
 }
 
 // ── CSS constants ─────────────────────────────────────────────────────────────
-const OVERLAY    = 'fixed inset-0 z-[1000] bg-[rgba(7,24,37,0.82)] backdrop-blur-[5px] flex items-center justify-center p-6'
+const OVERLAY    = 'fixed inset-0 z-[1000] bg-[rgba(7,24,37,0.82)] backdrop-blur-[5px] flex items-center justify-center p-2 sm:p-6'
 const MODAL      = 'bg-surface rounded-[24px] w-full max-w-[900px] max-h-[92vh] overflow-hidden flex flex-col shadow-[0_48px_96px_rgba(0,0,0,0.5)] border border-white/[0.08]'
-const MODAL_HD   = 'px-7 pt-[22px] pb-4 border-b border-mist flex items-start justify-between flex-shrink-0'
-const MODAL_BODY = 'overflow-y-auto px-7 py-5 flex-1'
+const MODAL_HD   = 'px-4 sm:px-7 pt-4 sm:pt-[22px] pb-4 border-b border-mist flex items-start justify-between flex-shrink-0'
+const MODAL_BODY = 'overflow-y-auto px-4 sm:px-7 py-4 sm:py-5 flex-1'
 const X_BTN      = 'w-8 h-8 rounded-full border-[1.5px] border-mist bg-transparent text-[15px] text-slate cursor-pointer flex items-center justify-center flex-shrink-0 hover:bg-mist transition-colors'
 
 // ── Badge ─────────────────────────────────────────────────────────────────────
@@ -716,7 +716,7 @@ function CompareModal({
           </div>
 
           {/* Sort + Filter bar */}
-          <div className="px-7 py-3 border-b border-mist flex-shrink-0 bg-foam/60">
+          <div className="px-4 sm:px-7 py-3 border-b border-mist flex-shrink-0 bg-foam/60">
             <div className="flex items-center gap-3">
               {/* Sort */}
               <div className="flex items-center gap-2">
@@ -1128,7 +1128,7 @@ function ActivityModal({
 
         {/* Category filter */}
         {!loading && activities.length > 0 && (
-          <div className="px-7 pt-3 pb-0 flex gap-1.5 flex-wrap flex-shrink-0">
+          <div className="px-4 sm:px-7 pt-3 pb-0 flex gap-1.5 flex-wrap flex-shrink-0">
             {categories.map((c) => (
               <button
                 key={c}

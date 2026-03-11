@@ -105,6 +105,6 @@
   }
 
   .page-title {
-    @apply font-serif text-[38px] font-bold text-ink leading-tight;
+    @apply font-serif text-[28px] sm:text-[34px] md:text-[38px] font-bold text-ink leading-tight;
   }
 }

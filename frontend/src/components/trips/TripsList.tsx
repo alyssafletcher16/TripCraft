@@ -35,7 +35,7 @@ export function TripsList() {
 
   if (loading || status === 'loading') {
     return (
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {[0, 1, 2].map((i) => (
           <div key={i} className="bg-white rounded-2xl border border-mist h-40 animate-pulse" />
         ))}
@@ -64,7 +64,7 @@ export function TripsList() {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
       {trips.map((trip) => (
         <TripCard
           key={trip.id}

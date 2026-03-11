@@ -4,15 +4,8 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { useSidebar } from './SidebarContext'
 import type { Trip } from '@/types'
-
-// ── CSS class equivalents ────────────────────────────────────────────────────
-// .sidebar       → bg-deep px-[18px] py-7 flex flex-col gap-1 border-r border-white/[0.06]
-// .sb-section    → font-mono text-[9px] text-slate tracking-[2px] uppercase pt-[18px] px-[10px] pb-2
-// .sb-item       → flex items-center gap-[11px] px-3 py-[10px] rounded-[10px] duration-150 text-white/50 text-[13px]
-// .sb-item:hover → hover:bg-white/[0.06] hover:text-white/85
-// .sb-item.active→ bg-terra/15 text-terra-lt ring-1 ring-inset ring-terra/20
-// .sb-icon       → text-[15px] w-5 text-center flex-shrink-0
 
 const SB_ITEM =
   'flex items-center gap-[11px] px-3 py-[10px] rounded-[10px] transition-all duration-150 text-white/50 text-[13px] hover:bg-white/[0.06] hover:text-white/85'
@@ -21,7 +14,7 @@ const SB_ICON = 'text-[15px] w-5 text-center flex-shrink-0'
 const SB_SECTION = 'font-mono text-[9px] text-slate tracking-[2px] uppercase pt-[18px] px-[10px] pb-2'
 
 // ── Past trips collapsible ───────────────────────────────────────────────────
-function PastTripsToggle({ trips }: { trips: Trip[] }) {
+function PastTripsToggle({ trips, onNav }: { trips: Trip[]; onNav: () => void }) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
 
@@ -57,6 +50,7 @@ function PastTripsToggle({ trips }: { trips: Trip[] }) {
               <Link
                 key={trip.id}
                 href={`/trips/${trip.id}`}
+                onClick={onNav}
                 className={`flex items-center gap-[11px] px-[10px] py-2 rounded-[10px] transition-all duration-150 text-white/50 text-[12px] hover:bg-white/[0.06] hover:text-white/85 ${active ? SB_ACTIVE : ''}`}
               >
                 <span className="text-[14px] w-5 text-center flex-shrink-0">
@@ -76,6 +70,7 @@ function PastTripsToggle({ trips }: { trips: Trip[] }) {
 export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
   const pathname = usePathname()
   const { data: session, status } = useSession()
+  const { isOpen, close } = useSidebar()
   const [trips, setTrips] = useState<Trip[]>([])
 
   useEffect(() => {
@@ -88,18 +83,32 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
       .catch(() => {})
   }, [session?.accessToken])
 
+  // Close sidebar when route changes on mobile
+  useEffect(() => {
+    close()
+  }, [pathname]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const activeTrips    = trips.filter((t) => t.status === 'ACTIVE' || t.status === 'PLANNING')
   const draftTrips     = trips.filter((t) => t.status === 'DRAFT')
   const completedTrips = trips.filter((t) => t.status === 'COMPLETED')
   const hasTrips       = trips.length > 0
 
-  return (
-    // .sidebar
-    <aside className="bg-deep px-[18px] py-7 flex flex-col gap-1 border-r border-white/[0.06]">
+  const sidebarContent = (
+    <aside className="bg-deep px-[18px] py-7 flex flex-col gap-1 border-r border-white/[0.06] h-full">
+      {/* Close button — mobile only */}
+      <button
+        type="button"
+        onClick={close}
+        className="md:hidden self-end mb-2 w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-white/80 hover:bg-white/10 transition-colors"
+        aria-label="Close menu"
+      >
+        ✕
+      </button>
 
       {/* ── Discover ────────────────────────────────────────────── */}
       <Link
         href="/discover"
+        onClick={close}
         className={`${SB_ITEM} ${pathname.startsWith('/discover') ? SB_ACTIVE : ''}`}
       >
         <span className={SB_ICON}>◎</span>
@@ -107,21 +116,19 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
       </Link>
 
       {/* ── My Itineraries ──────────────────────────────────────── */}
-      {/* .sb-section */}
       <div className={SB_SECTION}>My Itineraries</div>
 
-      {/* Active / Planning trips */}
       {activeTrips.map((trip) => {
         const active = pathname === `/trips/${trip.id}`
         return (
           <Link
             key={trip.id}
             href={`/trips/${trip.id}`}
+            onClick={close}
             className={`${SB_ITEM} ${active ? SB_ACTIVE : ''}`}
           >
             <span className={SB_ICON}>{trip.coverEmoji || '◻'}</span>
             <span className="flex-1 truncate">{trip.title}</span>
-            {/* gold "active" label — matches prototype style exactly */}
             <span className="ml-auto text-[10px] text-gold flex-shrink-0">
               {trip.status === 'ACTIVE' ? 'active' : 'planning'}
             </span>
@@ -129,13 +136,13 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
         )
       })}
 
-      {/* Draft trips */}
       {draftTrips.map((trip) => {
         const active = pathname === `/trips/${trip.id}`
         return (
           <Link
             key={trip.id}
             href={`/trips/${trip.id}`}
+            onClick={close}
             className={`${SB_ITEM} ${active ? SB_ACTIVE : ''}`}
           >
             <span className={SB_ICON}>{trip.coverEmoji || '◻'}</span>
@@ -145,27 +152,50 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
         )
       })}
 
-      {/* Empty state — show New Trip prompt */}
       {!hasTrips && status !== 'loading' && session && (
-        <Link href="/trips/new" className={SB_ITEM}>
+        <Link href="/trips/new" onClick={close} className={SB_ITEM}>
           <span className={`${SB_ICON} opacity-40`}>+</span>
           <span className="opacity-40">Start a trip</span>
         </Link>
       )}
 
-      {/* Past trips — collapsible */}
-      <PastTripsToggle trips={completedTrips} />
+      <PastTripsToggle trips={completedTrips} onNav={close} />
 
       {/* ── Account ─────────────────────────────────────────────── */}
       <div className={SB_SECTION}>Account</div>
 
       <Link
         href="/profile"
+        onClick={close}
         className={`${SB_ITEM} ${pathname.startsWith('/profile') ? SB_ACTIVE : ''}`}
       >
         <span className={SB_ICON}>◈</span>
         My Profile
       </Link>
     </aside>
+  )
+
+  return (
+    <>
+      {/* Desktop sidebar — always visible at md+ */}
+      <div className="hidden md:block">
+        {sidebarContent}
+      </div>
+
+      {/* Mobile drawer */}
+      {isOpen && (
+        <div className="md:hidden fixed inset-0 z-[400] flex">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={close}
+          />
+          {/* Drawer panel */}
+          <div className="relative z-10 w-[272px] max-w-[85vw] overflow-y-auto">
+            {sidebarContent}
+          </div>
+        </div>
+      )}
+    </>
   )
 }

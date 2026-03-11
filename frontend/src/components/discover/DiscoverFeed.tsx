@@ -165,13 +165,13 @@ export function DiscoverFeed() {
 
           {/* Card grid */}
           {loading ? (
-            <div className="grid grid-cols-3 gap-[18px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[18px]">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="h-64 bg-white rounded-[18px] border-[1.5px] border-mist animate-pulse" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-[18px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[18px]">
               {cards.map((card, i) => (
                 <CommunityCard
                   key={card.id}
