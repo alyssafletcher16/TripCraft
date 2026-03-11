@@ -2,18 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const VIATOR_API_KEY = process.env.VIATOR_API_KEY ?? ''
 const VIATOR_BASE = 'https://api.viator.com/partner'
-const VIATOR_AFFILIATE_ID = process.env.NEXT_PUBLIC_VIATOR_AFFILIATE_ID ?? ''
 
-function withAffiliateParams(url: string): string {
+function cleanProductUrl(url: string): string {
   try {
     const u = new URL(url)
-    // Strip Viator's internal params that cause redirect to destination browse page
-    u.searchParams.delete('mcid')
-    u.searchParams.delete('medium')
-    u.searchParams.delete('api_version')
-    // Keep only our affiliate ID for commission tracking
-    u.searchParams.set('pid', VIATOR_AFFILIATE_ID)
-    return u.toString()
+    // Remove all query params — Viator redirects to browse page when pid is present
+    return u.origin + u.pathname
   } catch {
     return url
   }
@@ -115,7 +109,7 @@ export async function POST(req: NextRequest) {
         snippet,
         itinerary: [],
         reviews: [],
-        bookingUrl: p.productUrl ? withAffiliateParams(p.productUrl) : null,
+        bookingUrl: p.productUrl ? cleanProductUrl(p.productUrl) : null,
         image: coverImage,
       }
     })
