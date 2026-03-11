@@ -551,6 +551,7 @@ function CompareModal({
   const [freeCancelOnly, setFreeCancelOnly] = useState(false)
   const [pickupOnly, setPickupOnly]       = useState(false)
   const [priceRange, setPriceRange]       = useState<string | null>(null)
+  const [filterOpen, setFilterOpen]       = useState(false)
 
   // Still loading tours
   if (activity.tours.length === 0) {
@@ -714,11 +715,10 @@ function CompareModal({
             <button className={X_BTN} onClick={onClose}>✕</button>
           </div>
 
-          {/* Filter + sort bar */}
-          <div className="px-7 py-3 border-b border-mist flex flex-col gap-2.5 flex-shrink-0 bg-foam/60">
-            {/* Row 1: Sort + Platform */}
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-              {/* Sort dropdown */}
+          {/* Sort + Filter bar */}
+          <div className="px-7 py-3 border-b border-mist flex-shrink-0 bg-foam/60">
+            <div className="flex items-center gap-3">
+              {/* Sort */}
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-mono text-slate uppercase tracking-wider">Sort:</span>
                 <select
@@ -732,121 +732,118 @@ function CompareModal({
                 </select>
               </div>
 
-              {/* Platform filter dropdown */}
-              {companies.length > 1 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono text-slate uppercase tracking-wider">Platform:</span>
-                  <select
-                    value={platformFilter}
-                    onChange={(e) => setPlatformFilter(e.target.value)}
-                    className="border border-mist rounded-lg px-2.5 py-[5px] text-[11px] text-ink bg-white focus:outline-none focus:border-ocean appearance-none cursor-pointer pr-6"
-                  >
-                    <option value="">All platforms</option>
-                    {companies.map((co) => (
-                      <option key={co} value={co}>{co}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {/* Clear all */}
-              {activeFilterCount > 0 && (
+              {/* Filters dropdown button */}
+              <div className="relative">
                 <button
                   type="button"
-                  onClick={clearAllFilters}
-                  className="ml-auto text-[10px] text-terra hover:text-terra-lt font-medium underline"
+                  onClick={() => setFilterOpen((v) => !v)}
+                  className={`flex items-center gap-1.5 px-3 py-[5px] rounded-lg border text-[11px] font-medium transition-colors ${
+                    activeFilterCount > 0
+                      ? 'border-ocean bg-ocean text-white'
+                      : 'border-mist bg-white text-slate hover:border-ocean hover:text-ocean'
+                  }`}
+                >
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="flex-shrink-0">
+                    <path d="M1 2.5h10M3 6h6M5 9.5h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                  Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+                  <span className="text-[9px] opacity-70">{filterOpen ? '▲' : '▼'}</span>
+                </button>
+
+                {filterOpen && (
+                  <div className="absolute left-0 top-full mt-1.5 z-50 bg-white border border-mist rounded-2xl shadow-lg p-4 w-72 flex flex-col gap-4">
+                    {/* Platform */}
+                    {companies.length > 1 && (
+                      <div className="flex flex-col gap-1.5">
+                        <span className="text-[10px] font-mono text-slate uppercase tracking-wider">Platform</span>
+                        <select
+                          value={platformFilter}
+                          onChange={(e) => setPlatformFilter(e.target.value)}
+                          className="border border-mist rounded-lg px-2.5 py-[5px] text-[11px] text-ink bg-white focus:outline-none focus:border-ocean appearance-none cursor-pointer"
+                        >
+                          <option value="">All platforms</option>
+                          {companies.map((co) => (
+                            <option key={co} value={co}>{co}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Price */}
+                    {PRICE_BUCKETS.length > 0 && (
+                      <div className="flex flex-col gap-1.5">
+                        <span className="text-[10px] font-mono text-slate uppercase tracking-wider">Price</span>
+                        <div className="flex gap-1.5 flex-wrap">
+                          {PRICE_BUCKETS.map(({ key, label }) => (
+                            <button key={key} type="button"
+                              onClick={() => setPriceRange(priceRange === key ? null : key)}
+                              className={`py-[4px] px-3 rounded-full border text-[11px] font-medium transition-colors ${priceRange === key ? 'bg-ocean border-ocean text-white' : 'border-mist text-slate hover:border-ocean hover:text-ocean'}`}
+                            >{label}</button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Rating */}
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-[10px] font-mono text-slate uppercase tracking-wider">Min rating</span>
+                      <div className="flex gap-1.5">
+                        {[4.0, 4.5, 4.8].map((r) => (
+                          <button key={r} type="button"
+                            onClick={() => setMinRating(minRating === r ? null : r)}
+                            className={`py-[4px] px-3 rounded-full border text-[11px] font-medium transition-colors ${minRating === r ? 'bg-gold border-gold text-white' : 'border-mist text-slate hover:border-gold hover:text-gold'}`}
+                          >★ {r}+</button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Duration */}
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-[10px] font-mono text-slate uppercase tracking-wider">Duration</span>
+                      <div className="flex gap-1.5 flex-wrap">
+                        {DURATION_BUCKETS.map(({ key, label }) => (
+                          <button key={key} type="button"
+                            onClick={() => setDurationBucket(durationBucket === key ? null : key)}
+                            className={`py-[4px] px-3 rounded-full border text-[11px] font-medium transition-colors ${durationBucket === key ? 'bg-ocean border-ocean text-white' : 'border-mist text-slate hover:border-ocean hover:text-ocean'}`}
+                          >{label}</button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Toggles */}
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-[10px] font-mono text-slate uppercase tracking-wider">Options</span>
+                      <div className="flex gap-1.5 flex-wrap">
+                        <button type="button" onClick={() => setFreeCancelOnly((v) => !v)}
+                          className={`py-[4px] px-3 rounded-full border text-[11px] font-medium transition-colors ${freeCancelOnly ? 'bg-[#2E7D4F] border-[#2E7D4F] text-white' : 'border-mist text-slate hover:border-[#2E7D4F] hover:text-[#2E7D4F]'}`}
+                        >✓ Free cancel</button>
+                        <button type="button" onClick={() => setPickupOnly((v) => !v)}
+                          className={`py-[4px] px-3 rounded-full border text-[11px] font-medium transition-colors ${pickupOnly ? 'bg-[#2E7D4F] border-[#2E7D4F] text-white' : 'border-mist text-slate hover:border-[#2E7D4F] hover:text-[#2E7D4F]'}`}
+                        >Pickup incl.</button>
+                      </div>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="flex items-center justify-between pt-1 border-t border-mist">
+                      <button type="button" onClick={() => { clearAllFilters(); setFilterOpen(false) }}
+                        className="text-[11px] text-terra hover:text-terra-lt font-medium"
+                      >Clear all</button>
+                      <button type="button" onClick={() => setFilterOpen(false)}
+                        className="text-[11px] text-ocean font-semibold hover:opacity-70"
+                      >Done</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Active filter count badge (when dropdown closed) */}
+              {activeFilterCount > 0 && !filterOpen && (
+                <button type="button" onClick={clearAllFilters}
+                  className="text-[10px] text-terra hover:text-terra-lt font-medium underline ml-auto"
                 >
                   Clear all ({activeFilterCount})
                 </button>
               )}
-            </div>
-
-            {/* Row 2: Content filters */}
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-              {/* Price range */}
-              {PRICE_BUCKETS.length > 0 && (
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-[10px] font-mono text-slate uppercase tracking-wider">Price:</span>
-                  {PRICE_BUCKETS.map(({ key, label }) => (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() => setPriceRange(priceRange === key ? null : key)}
-                      className={`py-[4px] px-3 rounded-full border text-[11px] font-medium transition-colors ${
-                        priceRange === key
-                          ? 'bg-ocean border-ocean text-white'
-                          : 'border-mist bg-white text-slate hover:border-ocean hover:text-ocean'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Rating */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-mono text-slate uppercase tracking-wider">Rating:</span>
-                {[4.0, 4.5, 4.8].map((r) => (
-                  <button
-                    key={r}
-                    type="button"
-                    onClick={() => setMinRating(minRating === r ? null : r)}
-                    className={`py-[4px] px-3 rounded-full border text-[11px] font-medium transition-colors ${
-                      minRating === r
-                        ? 'bg-gold border-gold text-white'
-                        : 'border-mist bg-white text-slate hover:border-gold hover:text-gold'
-                    }`}
-                  >
-                    ★ {r}+
-                  </button>
-                ))}
-              </div>
-
-              {/* Duration */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-mono text-slate uppercase tracking-wider">Duration:</span>
-                {DURATION_BUCKETS.map(({ key, label }) => (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => setDurationBucket(durationBucket === key ? null : key)}
-                    className={`py-[4px] px-3 rounded-full border text-[11px] font-medium transition-colors ${
-                      durationBucket === key
-                        ? 'bg-ocean border-ocean text-white'
-                        : 'border-mist bg-white text-slate hover:border-ocean hover:text-ocean'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Toggles */}
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setFreeCancelOnly((v) => !v)}
-                  className={`py-[4px] px-3 rounded-full border text-[11px] font-medium transition-colors ${
-                    freeCancelOnly
-                      ? 'bg-[#2E7D4F] border-[#2E7D4F] text-white'
-                      : 'border-mist bg-white text-slate hover:border-[#2E7D4F] hover:text-[#2E7D4F]'
-                  }`}
-                >
-                  ✓ Free cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPickupOnly((v) => !v)}
-                  className={`py-[4px] px-3 rounded-full border text-[11px] font-medium transition-colors ${
-                    pickupOnly
-                      ? 'bg-[#2E7D4F] border-[#2E7D4F] text-white'
-                      : 'border-mist bg-white text-slate hover:border-[#2E7D4F] hover:text-[#2E7D4F]'
-                  }`}
-                >
-                  🚌 Pickup incl.
-                </button>
-              </div>
             </div>
           </div>
 
