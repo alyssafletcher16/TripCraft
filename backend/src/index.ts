@@ -12,6 +12,7 @@ import { placesRouter } from './routes/places'
 import { intelligenceRouter } from './routes/intelligence'
 import { compareRouter } from './routes/compare'
 import { activitiesRouter } from './routes/activities'
+import { bookingClicksRouter } from './routes/bookingClicks'
 
 dotenv.config()
 
@@ -42,6 +43,7 @@ app.use('/api/places', placesRouter)
 app.use('/api/intelligence', intelligenceRouter)
 app.use('/api/compare', compareRouter)
 app.use('/api/activities', activitiesRouter)
+app.use('/api/booking-clicks', bookingClicksRouter)
 
 app.listen(PORT, () => {
   console.log(`TripCraft API running on http://localhost:${PORT}`)

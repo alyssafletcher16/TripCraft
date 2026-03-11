@@ -18,10 +18,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  trips    Trip[]
-  upvotes  CommunityUpvote[]
-  accounts Account[]
-  sessions Session[]
+  trips         Trip[]
+  upvotes       CommunityUpvote[]
+  accounts      Account[]
+  sessions      Session[]
+  bookingClicks BookingClick[]
 }
 
 model Account {
@@ -242,6 +243,21 @@ model PlaceCache {
   hours       Json?
   lastFetched DateTime
   createdAt   DateTime @default(now())
+}
+
+// ─── Booking Click Tracking ───────────────────────────────────────────────────
+
+model BookingClick {
+  id            String   @id @default(cuid())
+  userId        String
+  tripId        String?
+  blockId       String?
+  activityTitle String
+  platform      String   // "getyourguide" | "viator" | "booking"
+  url           String
+  timestamp     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // ─── Community / Discover ────────────────────────────────────────────────────
