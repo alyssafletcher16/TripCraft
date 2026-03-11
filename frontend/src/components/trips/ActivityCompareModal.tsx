@@ -1250,12 +1250,12 @@ export function ActivityCompareModal({
     if (!destination) return
     setListLoading(true)
     setListError('')
-    fetch(`${API}/api/activities?destination=${encodeURIComponent(destination)}`)
+    fetch(`/api/activities?destination=${encodeURIComponent(destination)}`)
       .then((r) => { if (!r.ok) throw new Error('Failed to load activities'); return r.json() })
       .then((data) => setActivities(data.activities ?? []))
       .catch((err) => setListError(err.message ?? 'Could not load activities'))
       .finally(() => setListLoading(false))
-  }, [destination, API])
+  }, [destination])
 
   // ── Step 2: fetch tour details when user clicks Compare ──────────────────
   async function handleCompare(act: Activity) {
@@ -1264,7 +1264,7 @@ export function ActivityCompareModal({
     setView('compare')
 
     try {
-      const res = await fetch(`${API}/api/activities/tours`, {
+      const res = await fetch(`/api/activities/tours`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ destination, activityName: act.name }),

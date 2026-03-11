@@ -69,8 +69,9 @@ companies = estimated number of tour operators (integer).`
     })
 
     const raw        = msg.content[0].type === 'text' ? msg.content[0].text.trim() : '[]'
-    const match      = raw.match(/\[[\s\S]*\]/)
-    const activities = JSON.parse(match ? match[0] : raw)
+    const stripped   = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '')
+    const match      = stripped.match(/\[[\s\S]*\]/)
+    const activities = JSON.parse(match ? match[0] : stripped)
 
     LIST_CACHE.set(key, { data: activities, fetchedAt: Date.now() })
     res.json({ destination, activities, cached: false })
