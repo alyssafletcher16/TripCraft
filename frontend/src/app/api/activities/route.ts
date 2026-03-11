@@ -20,21 +20,16 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const prompt = `You are a world travel expert. List the 12 most iconic activities/experiences for: "${destination}"
+    const prompt = `You are a world travel expert. List 8 iconic activities/experiences for: "${destination}"
 
-For obscure destinations, only include what genuinely exists there. Do not invent things.
-
-Return ONLY a JSON array — no other text. Each item must have exactly these fields:
+Return ONLY a valid JSON array — no markdown, no extra text. Each item:
 {"name":"string","icon":"single emoji","category":"Nature|Adventure|Cultural|Scenic|Food & Drink|Water|Nightlife|Sports","minPrice":number,"maxPrice":number,"currency":"USD","topRating":number,"totalReviews":number,"companies":number}
 
-minPrice/maxPrice = typical USD price range per person (integers).
-topRating = typical top rating out of 5 (e.g. 4.7).
-totalReviews = estimated total reviews across platforms (integer).
-companies = estimated number of tour operators (integer).`
+Keep names short (max 4 words). All numbers must be integers except topRating (one decimal).`
 
     const msg = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 800,
+      max_tokens: 1200,
       messages: [{ role: 'user', content: prompt }],
     })
 
