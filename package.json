@@ -16,10 +16,6 @@
     "db:studio": "npm run prisma:studio --workspace=backend"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
-    "prisma": "^7.4.2"
-  },
-  "dependencies": {
-    "@prisma/client": "^7.4.2"
+    "concurrently": "^8.2.2"
   }
 }
