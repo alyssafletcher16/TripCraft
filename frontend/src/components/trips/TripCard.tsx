@@ -22,7 +22,7 @@ const statusVariant: Record<TripStatus, 'gold' | 'green' | 'slate' | 'ocean'> = 
 }
 
 export function TripCard({ id, title, destination, status, startDate, endDate, travelers }: TripCardProps) {
-  const photoSrc = `https://source.unsplash.com/featured/800x300?${encodeURIComponent(destination)},travel`
+  const photoSrc = `https://loremflickr.com/800/300/${encodeURIComponent(destination)},travel`
 
   return (
     <Link href={`/trips/${id}`} className="block">

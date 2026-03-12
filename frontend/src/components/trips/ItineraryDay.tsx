@@ -8,10 +8,11 @@ import type { ItineraryDay as DayType } from '@/types'
 interface Props {
   day: DayType
   destination?: string
+  vibes?: string[]
   onBlockAdded?: () => void
 }
 
-export function ItineraryDay({ day, destination, onBlockAdded }: Props) {
+export function ItineraryDay({ day, destination, vibes, onBlockAdded }: Props) {
   const tripId = day.tripId
   const [open, setOpen] = useState(true)
   const [addingBlock, setAddingBlock] = useState(false)
@@ -76,6 +77,7 @@ export function ItineraryDay({ day, destination, onBlockAdded }: Props) {
               dayId={day.id}
               tripId={tripId}
               destination={destination}
+              vibes={vibes}
               onSuccess={() => {
                 setAddingBlock(false)
                 onBlockAdded?.()

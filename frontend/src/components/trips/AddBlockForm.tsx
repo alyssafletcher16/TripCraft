@@ -25,11 +25,12 @@ interface Props {
   dayId: string
   tripId?: string
   destination?: string
+  vibes?: string[]
   onSuccess: () => void
   onCancel: () => void
 }
 
-export function AddBlockForm({ dayId, tripId, destination, onSuccess, onCancel }: Props) {
+export function AddBlockForm({ dayId, tripId, destination, vibes, onSuccess, onCancel }: Props) {
   const { data: session } = useSession()
 
   // Step 1: type not picked yet
@@ -105,6 +106,7 @@ export function AddBlockForm({ dayId, tripId, destination, onSuccess, onCancel }
         dayId={dayId}
         tripId={tripId}
         destination={destination}
+        vibes={vibes}
         onClose={() => setShowBrowse(false)}
         onBlockAdded={onSuccess}
       />
@@ -166,8 +168,8 @@ export function AddBlockForm({ dayId, tripId, destination, onSuccess, onCancel }
           onClick={() => setShowBrowse(true)}
           className="w-full flex items-center gap-4 p-4 rounded-xl border-[1.5px] border-terra/30 bg-white hover:border-terra hover:bg-foam transition-all text-left mb-2.5 group"
         >
-          <div className="w-11 h-11 rounded-[12px] bg-[#EEF0FA] flex items-center justify-center text-xl flex-shrink-0">
-            🔍
+          <div className="w-11 h-11 rounded-[12px] bg-[#EEF0FA] flex items-center justify-center flex-shrink-0">
+            <svg className="w-5 h-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8"/><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35"/></svg>
           </div>
           <div className="flex-1">
             <div className="font-semibold text-ink text-sm group-hover:text-terra transition-colors">

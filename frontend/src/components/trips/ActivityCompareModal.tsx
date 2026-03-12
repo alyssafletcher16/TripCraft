@@ -1078,11 +1078,37 @@ function UrlComparePanel({ onClose }: { onClose: () => void }) {
 }
 
 // ── ActivityModal ─────────────────────────────────────────────────────────────
+// Maps trip vibe keywords (and related terms) to activity categories
+const VIBE_CATEGORY_MAP: Record<string, string[]> = {
+  adventure:   ['Adventure'],
+  foodie:      ['Food & Drink'],
+  cultural:    ['Cultural'],
+  romantic:    ['Scenic', 'Cultural'],
+  hiking:      ['Nature', 'Adventure'],
+  relaxation:  ['Scenic', 'Water'],
+  nightlife:   ['Nightlife'],
+  sports:      ['Sports'],
+  nature:      ['Nature'],
+  water:       ['Water'],
+  scenic:      ['Scenic'],
+}
+
+function getSuggestedCategories(vibes: string[]): Set<string> {
+  const cats = new Set<string>()
+  for (const vibe of vibes) {
+    const key = vibe.toLowerCase()
+    const matched = VIBE_CATEGORY_MAP[key]
+    if (matched) matched.forEach((c) => cats.add(c))
+  }
+  return cats
+}
+
 function ActivityModal({
   destination,
   activities,
   loading,
   error,
+  vibes,
   onClose,
   onCompare,
   onUrlCompare,
@@ -1091,13 +1117,23 @@ function ActivityModal({
   activities: Activity[]
   loading: boolean
   error: string
+  vibes?: string[]
   onClose: () => void
   onCompare: (activity: Activity) => void
   onUrlCompare: () => void
 }) {
-  const categories = ['All', ...Array.from(new Set(activities.map((a) => a.category)))]
-  const [filter, setFilter] = useState('All')
-  const filtered = filter === 'All' ? activities : activities.filter((a) => a.category === filter)
+  const suggestedCategories = getSuggestedCategories(vibes ?? [])
+  const hasSuggested = suggestedCategories.size > 0 && activities.some((a) => suggestedCategories.has(a.category))
+  const categories = [
+    ...(hasSuggested ? ['Suggested'] : []),
+    'All',
+    ...Array.from(new Set(activities.map((a) => a.category))),
+  ]
+  const [filter, setFilter] = useState(hasSuggested ? 'Suggested' : 'All')
+  const filtered =
+    filter === 'All' ? activities :
+    filter === 'Suggested' ? activities.filter((a) => suggestedCategories.has(a.category)) :
+    activities.filter((a) => a.category === filter)
 
   return (
     <div className={OVERLAY} onClick={(e) => e.target === e.currentTarget && onClose()}>
@@ -1148,7 +1184,7 @@ function ActivityModal({
           {loading && (
             <div>
               <div className="text-[13px] text-slate mb-4 flex items-center gap-2">
-                <span className="animate-spin inline-block">⏳</span>
+                <svg className="animate-spin w-4 h-4 text-slate" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
                 Finding top activities in {destination ?? 'your destination'}…
               </div>
               <ActivitySkeleton />
@@ -1172,7 +1208,7 @@ function ActivityModal({
               <div className="flex items-center gap-4">
                 <div className="w-[52px] h-[52px] rounded-[14px] overflow-hidden flex-shrink-0 bg-foam">
                   <img
-                    src={`https://source.unsplash.com/featured/104x104?${encodeURIComponent(act.name)},${encodeURIComponent(destination ?? '')}`}
+                    src={`https://loremflickr.com/104/104/${encodeURIComponent(act.name)},${encodeURIComponent(destination ?? 'travel')}`}
                     alt={act.name}
                     className="w-full h-full object-cover"
                     onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
@@ -1220,6 +1256,7 @@ interface ActivityCompareModalProps {
   dayId: string
   tripId?: string
   destination?: string
+  vibes?: string[]
   onClose: () => void
   onBlockAdded: () => void
 }
@@ -1228,6 +1265,7 @@ export function ActivityCompareModal({
   dayId,
   tripId,
   destination,
+  vibes,
   onClose,
   onBlockAdded,
 }: ActivityCompareModalProps) {
@@ -1330,6 +1368,7 @@ export function ActivityCompareModal({
       activities={activities}
       loading={listLoading}
       error={listError}
+      vibes={vibes}
       onClose={onClose}
       onCompare={handleCompare}
       onUrlCompare={() => setView('url')}

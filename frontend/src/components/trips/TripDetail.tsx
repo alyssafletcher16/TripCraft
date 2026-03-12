@@ -81,7 +81,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
     return <p className="text-slate text-sm">{error || 'Trip not found'}</p>
   }
 
-  const coverPhotoSrc = `https://source.unsplash.com/featured/1200x400?${encodeURIComponent(trip.destination)},travel,city`
+  const coverPhotoSrc = `https://loremflickr.com/1200/400/${encodeURIComponent(trip.destination)},travel,city`
 
   return (
     <>
@@ -208,7 +208,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
         )}
 
         {trip.days.map((day) => (
-          <ItineraryDay key={day.id} day={day} destination={trip.destination} onBlockAdded={fetchTrip} />
+          <ItineraryDay key={day.id} day={day} destination={trip.destination} vibes={trip.vibes.map((v) => v.vibe)} onBlockAdded={fetchTrip} />
         ))}
       </div>
     </div>
