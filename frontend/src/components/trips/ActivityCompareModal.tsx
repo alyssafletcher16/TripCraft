@@ -1106,7 +1106,7 @@ function ActivityModal({
           <div>
             <div className="font-serif text-2xl font-bold text-ink">Find Activities</div>
             <div className="text-xs text-slate mt-[3px] font-mono">
-              {destination ?? 'Your destination'} · GetYourGuide &amp; Viator
+              {destination ?? 'Your destination'}
             </div>
             <div className="flex gap-1.5 mt-3">
               <button
