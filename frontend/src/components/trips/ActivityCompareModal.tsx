@@ -220,6 +220,7 @@ function TourDetailPanel({
   actName,
   allTours,
   destination,
+  date,
   onBack,
   onAdd,
   adding,
@@ -230,6 +231,7 @@ function TourDetailPanel({
   actName: string
   allTours: Tour[]
   destination: string
+  date?: string
   onBack: () => void
   onAdd: () => void
   adding: boolean
@@ -239,8 +241,10 @@ function TourDetailPanel({
   const [showReviewsModal, setShowReviewsModal] = useState(false)
   const [showUSD, setShowUSD] = useState(false)
   const isNonUSD = tour.currency.toUpperCase() !== 'USD'
-  const bookUrl = (tour as { bookingUrl?: string }).bookingUrl
-    || getSearchUrl(tour.bookingCompany, actName, destination, tour.provider)
+  const rawBookUrl = (tour as { bookingUrl?: string }).bookingUrl
+  const bookUrl = rawBookUrl
+    ? withDate(rawBookUrl, date)
+    : getSearchUrl(tour.bookingCompany, actName, destination, tour.provider, date)
 
   return (
     <>
@@ -605,6 +609,7 @@ type SortKey = 'default' | 'price-asc' | 'price-desc' | 'rating' | 'reviews'
 function CompareModal({
   activity,
   destination,
+  date,
   onClose,
   onAdd,
   adding,
@@ -613,6 +618,7 @@ function CompareModal({
 }: {
   activity: Activity
   destination: string
+  date?: string
   onClose: () => void
   onAdd: (tour: Tour, actName: string) => void
   adding: boolean
@@ -744,6 +750,7 @@ function CompareModal({
         actName={activity.name}
         allTours={activity.tours}
         destination={destination}
+        date={date}
         onBack={() => setDetailTour(null)}
         onAdd={() => onAdd(detailTour, activity.name)}
         adding={adding}
@@ -978,12 +985,12 @@ function CompareModal({
                         <td className="px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle">
                           <div className="flex items-center gap-1.5">
                             <a
-                              href={t.bookingUrl || getSearchUrl(t.bookingCompany, activity.name, destination, t.provider)}
+                              href={t.bookingUrl ? withDate(t.bookingUrl, date) : getSearchUrl(t.bookingCompany, activity.name, destination, t.provider, date)}
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => {
                                 e.stopPropagation()
-                                const url = t.bookingUrl || getSearchUrl(t.bookingCompany, activity.name, destination, t.provider)
+                                const url = t.bookingUrl ? withDate(t.bookingUrl, date) : getSearchUrl(t.bookingCompany, activity.name, destination, t.provider, date)
                                 onBookClick(getPlatformKey(t.bookingCompany), url, activity.name)
                               }}
                               className="py-[7px] px-3 rounded-full border-[1.5px] border-terra text-xs text-terra font-medium whitespace-nowrap hover:bg-terra hover:text-white transition-colors"
@@ -1492,6 +1499,7 @@ export function ActivityCompareModal({
       <CompareModal
         activity={selectedActivity}
         destination={destination ?? ''}
+        date={date}
         onClose={initialActivity ? onClose : () => setView('list')}
         onAdd={adding ? () => {} : handleAdd}
         adding={adding}
