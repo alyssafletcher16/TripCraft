@@ -107,8 +107,8 @@ function getPlatformKey(bookingCompany: string): string {
 }
 
 // ── CSS constants ─────────────────────────────────────────────────────────────
-const OVERLAY    = 'fixed inset-0 z-[1000] bg-[rgba(7,24,37,0.82)] backdrop-blur-[5px] flex items-center justify-center p-2 sm:p-6'
-const MODAL      = 'bg-surface rounded-[24px] w-full max-w-[900px] max-h-[92vh] overflow-hidden flex flex-col shadow-[0_48px_96px_rgba(0,0,0,0.5)] border border-white/[0.08]'
+const OVERLAY    = 'fixed inset-0 z-[1000] bg-[rgba(7,24,37,0.82)] backdrop-blur-[5px] flex items-end sm:items-center justify-center p-0 sm:p-6'
+const MODAL      = 'bg-surface rounded-t-[24px] sm:rounded-[24px] w-full max-w-[900px] max-h-[92vh] overflow-hidden flex flex-col shadow-[0_48px_96px_rgba(0,0,0,0.5)] border border-white/[0.08]'
 const MODAL_HD   = 'px-4 sm:px-7 pt-4 sm:pt-[22px] pb-4 border-b border-mist flex items-start justify-between flex-shrink-0'
 const MODAL_BODY = 'overflow-y-auto px-4 sm:px-7 py-4 sm:py-5 flex-1'
 const X_BTN      = 'w-8 h-8 rounded-full border-[1.5px] border-mist bg-transparent text-[15px] text-slate cursor-pointer flex items-center justify-center flex-shrink-0 hover:bg-mist transition-colors'
@@ -259,13 +259,13 @@ function TourDetailPanel({
     <div className={OVERLAY} onClick={(e) => e.target === e.currentTarget && onBack()}>
       <div className={MODAL}>
         <div className={MODAL_HD}>
-          <div className="flex items-start gap-3">
-            <button onClick={onBack} className="mt-1 text-slate hover:text-ink transition-colors text-sm">
+          <div className="flex items-start gap-3 min-w-0 flex-1 mr-3">
+            <button onClick={onBack} className="mt-1 text-slate hover:text-ink transition-colors text-sm flex-shrink-0">
               ← Back
             </button>
-            <div>
-              <div className="font-serif text-2xl font-bold text-ink">{actName}</div>
-              <div className="text-xs text-slate mt-[3px] font-mono">
+            <div className="min-w-0">
+              <div className="font-serif text-lg sm:text-2xl font-bold text-ink leading-tight">{actName}</div>
+              <div className="text-xs text-slate mt-[3px] font-mono truncate">
                 {tour.provider} · via {tour.bookingCompany}
               </div>
             </div>
@@ -395,7 +395,7 @@ function TourDetailPanel({
               ))}
             </div>
 
-            <div className="flex gap-3 mt-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-3">
               <button
                 onClick={() => setShowReviewsModal(true)}
                 className="flex-1 py-2.5 border border-mist rounded-xl text-slate text-[13px] hover:border-gold hover:text-gold transition-colors text-center"
@@ -414,20 +414,20 @@ function TourDetailPanel({
           </div>
 
           {/* CTA */}
-          <div className="flex gap-3 pt-1 flex-wrap">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-1">
             <a
               href={bookUrl}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => onBookClick(getPlatformKey(tour.bookingCompany), bookUrl, actName)}
-              className="flex-1 border-[1.5px] border-terra text-terra py-[11px] px-7 rounded-full text-[13px] font-semibold text-center hover:bg-terra/5 transition-colors whitespace-nowrap"
+              className="flex-1 border-[1.5px] border-terra text-terra py-3 sm:py-[11px] px-7 rounded-full text-[13px] font-semibold text-center hover:bg-terra/5 transition-colors"
             >
               Book on {tour.bookingCompany} ↗
             </a>
             {onSaveForLater && (
               <button
                 onClick={onSaveForLater}
-                className="flex-1 border-[1.5px] border-ocean text-ocean py-[11px] px-7 rounded-full text-[13px] font-semibold cursor-pointer hover:bg-ocean/5 transition-colors whitespace-nowrap"
+                className="flex-1 border-[1.5px] border-ocean text-ocean py-3 sm:py-[11px] px-7 rounded-full text-[13px] font-semibold cursor-pointer hover:bg-ocean/5 transition-colors"
               >
                 Save for later
               </button>
@@ -435,7 +435,7 @@ function TourDetailPanel({
             <button
               onClick={onAdd}
               disabled={adding}
-              className="flex-1 bg-terra text-white border-none py-[11px] px-7 rounded-full text-[13px] font-semibold cursor-pointer hover:bg-terra-lt transition-colors disabled:opacity-50 whitespace-nowrap"
+              className="flex-1 bg-terra text-white border-none py-3 sm:py-[11px] px-7 rounded-full text-[13px] font-semibold cursor-pointer hover:bg-terra-lt transition-colors disabled:opacity-50"
             >
               {adding ? 'Adding…' : onSaveForLater ? 'Add to Day →' : 'Add to itinerary →'}
             </button>
@@ -494,10 +494,10 @@ function AllReviewsModal({
 
   return (
     <div
-      className="fixed inset-0 z-[1100] bg-[rgba(7,24,37,0.65)] backdrop-blur-[3px] flex items-center justify-center p-6"
+      className="fixed inset-0 z-[1100] bg-[rgba(7,24,37,0.65)] backdrop-blur-[3px] flex items-end sm:items-center justify-center p-0 sm:p-6"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="bg-white rounded-2xl w-full max-w-[680px] max-h-[88vh] overflow-hidden flex flex-col shadow-2xl border border-mist">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-[680px] max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border border-mist">
 
         {/* Header */}
         <div className="px-6 pt-5 pb-4 border-b border-mist flex items-start justify-between flex-shrink-0">
@@ -783,8 +783,8 @@ function CompareModal({
         <div className={MODAL}>
           {/* Header */}
           <div className={MODAL_HD}>
-            <div>
-              <div className="font-serif text-2xl font-bold text-ink">Compare: {activity.name}</div>
+            <div className="min-w-0 flex-1 mr-3">
+              <div className="font-serif text-lg sm:text-2xl font-bold text-ink truncate">Compare: {activity.name}</div>
               <div className="text-xs text-slate mt-[3px] font-mono flex items-center gap-3">
                 <span>{activity.tours.length} options · prices per person</span>
                 {hasNonUSD && (
@@ -837,7 +837,7 @@ function CompareModal({
                 </button>
 
                 {filterOpen && (
-                  <div className="absolute left-0 top-full mt-1.5 z-50 bg-white border border-mist rounded-2xl shadow-lg p-4 w-72 flex flex-col gap-4">
+                  <div className="absolute left-0 top-full mt-1.5 z-50 bg-white border border-mist rounded-2xl shadow-lg p-4 w-[min(288px,calc(100vw-32px))] flex flex-col gap-4">
                     {/* Platform */}
                     {companies.length > 1 && (
                       <div className="flex flex-col gap-1.5">
@@ -938,80 +938,159 @@ function CompareModal({
               <p className="text-slate text-sm text-center py-8">No results for the selected filters.</p>
             ) : (
               <>
-                <table className="w-full border-collapse text-[13px] mb-4">
-                  <thead>
-                    <tr>
-                      {['Platform', 'Operator', 'Price', 'Rating', 'Reviews', 'Duration', 'Group', 'Cancellation', ''].map((h, i) => (
-                        <th
-                          key={h || i}
-                          className={`bg-ocean text-white/80 px-[12px] py-[10px] text-left text-[10px] font-medium font-mono tracking-[1px] ${i === 0 ? 'rounded-l-[10px]' : ''} ${i === 8 ? 'rounded-r-[10px]' : ''}`}
+                {/* ── Desktop table (sm+) ──────────────────────────── */}
+                <div className="hidden sm:block">
+                  <table className="w-full border-collapse text-[13px] mb-4">
+                    <thead>
+                      <tr>
+                        {['Platform', 'Operator', 'Price', 'Rating', 'Reviews', 'Duration', 'Group', 'Cancellation', ''].map((h, i) => (
+                          <th
+                            key={h || i}
+                            className={`bg-ocean text-white/80 px-[12px] py-[10px] text-left text-[10px] font-medium font-mono tracking-[1px] ${i === 0 ? 'rounded-l-[10px]' : ''} ${i === 8 ? 'rounded-r-[10px]' : ''}`}
+                          >
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {displayTours.map((t) => (
+                        <tr
+                          key={t.id}
+                          className="group hover:bg-foam transition-colors cursor-pointer"
+                          onClick={() => setDetailTour(t)}
                         >
-                          {h}
-                        </th>
+                          <td className="px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle">
+                            <div className="font-semibold text-ink text-[12px]">{t.bookingCompany}</div>
+                            <TourBadge badge={t.badge} />
+                          </td>
+                          <td className="px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle text-[12px] text-slate">
+                            {t.provider}
+                          </td>
+                          <td className={`px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle font-semibold ${t.price === bestPrice ? 'text-[#2E7D4F]' : 'text-ink'}`}>
+                            {showUSD && t.currency.toUpperCase() !== 'USD'
+                              ? toUSD(t.price, t.currency)
+                              : `${t.currency} ${t.price}`}
+                          </td>
+                          <td className="px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle">
+                            <span className={`font-semibold ${t.rating === bestRating ? 'text-gold' : 'text-ink'}`}>{t.rating}</span>
+                            {t.rating === bestRating && <span className="text-gold ml-0.5">★</span>}
+                          </td>
+                          <td className={`px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle text-[12px] ${t.reviewCount === mostReviews ? 'text-[#2E7D4F] font-semibold' : 'text-slate'}`}>
+                            {t.reviewCount.toLocaleString()}
+                          </td>
+                          <td className="px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle text-slate text-[12px]">{t.duration}</td>
+                          <td className="px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle text-slate text-[12px]">{t.groupSize}</td>
+                          <td className={`px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle text-[11px] ${t.cancel.startsWith('Free') ? 'text-[#2E7D4F]' : 'text-[#C04040]'}`}>
+                            {t.cancel}
+                          </td>
+                          <td className="px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle">
+                            <div className="flex items-center gap-1.5">
+                              <a
+                                href={t.bookingUrl ? withDate(t.bookingUrl, date) : getSearchUrl(t.bookingCompany, activity.name, destination, t.provider, date)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  const url = t.bookingUrl ? withDate(t.bookingUrl, date) : getSearchUrl(t.bookingCompany, activity.name, destination, t.provider, date)
+                                  onBookClick(getPlatformKey(t.bookingCompany), url, activity.name)
+                                }}
+                                className="py-[7px] px-3 rounded-full border-[1.5px] border-terra text-xs text-terra font-medium whitespace-nowrap hover:bg-terra hover:text-white transition-colors"
+                              >
+                                Book ↗
+                              </a>
+                              <button
+                                className="py-[7px] px-3 rounded-full border-[1.5px] border-mist text-xs cursor-pointer transition-all whitespace-nowrap text-slate hover:border-gold hover:text-gold"
+                                onClick={(e) => { e.stopPropagation(); setShowAllReviews(t) }}
+                              >
+                                ★ Reviews
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
                       ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {displayTours.map((t) => (
-                      <tr
+                    </tbody>
+                  </table>
+                  <p className="text-[11px] text-slate text-center mt-2">
+                    Click a row to see full details
+                  </p>
+                </div>
+
+                {/* ── Mobile cards (< sm) ──────────────────────────── */}
+                <div className="flex flex-col gap-3 sm:hidden">
+                  {displayTours.map((t) => {
+                    const bookUrl = t.bookingUrl
+                      ? withDate(t.bookingUrl, date)
+                      : getSearchUrl(t.bookingCompany, activity.name, destination, t.provider, date)
+                    return (
+                      <div
                         key={t.id}
-                        className="group hover:bg-foam transition-colors cursor-pointer"
+                        className="bg-white rounded-2xl border border-mist p-4 active:bg-foam transition-colors cursor-pointer"
                         onClick={() => setDetailTour(t)}
                       >
-                        <td className="px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle">
-                          <div className="font-semibold text-ink text-[12px]">{t.bookingCompany}</div>
-                          <TourBadge badge={t.badge} />
-                        </td>
-                        <td className="px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle text-[12px] text-slate">
-                          {t.provider}
-                        </td>
-                        <td className={`px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle font-semibold ${t.price === bestPrice ? 'text-[#2E7D4F]' : 'text-ink'}`}>
-                          {showUSD && t.currency.toUpperCase() !== 'USD'
-                            ? toUSD(t.price, t.currency)
-                            : `${t.currency} ${t.price}`}
-                        </td>
-                        <td className="px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle">
-                          <span className={`font-semibold ${t.rating === bestRating ? 'text-gold' : 'text-ink'}`}>{t.rating}</span>
-                          {t.rating === bestRating && <span className="text-gold ml-0.5">★</span>}
-                        </td>
-                        <td className={`px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle text-[12px] ${t.reviewCount === mostReviews ? 'text-[#2E7D4F] font-semibold' : 'text-slate'}`}>
-                          {t.reviewCount.toLocaleString()}
-                        </td>
-                        <td className="px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle text-slate text-[12px]">{t.duration}</td>
-                        <td className="px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle text-slate text-[12px]">{t.groupSize}</td>
-                        <td className={`px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle text-[11px] ${t.cancel.startsWith('Free') ? 'text-[#2E7D4F]' : 'text-[#C04040]'}`}>
-                          {t.cancel}
-                        </td>
-                        <td className="px-[12px] py-3 border-b border-mist group-last:border-b-0 align-middle">
-                          <div className="flex items-center gap-1.5">
-                            <a
-                              href={t.bookingUrl ? withDate(t.bookingUrl, date) : getSearchUrl(t.bookingCompany, activity.name, destination, t.provider, date)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                const url = t.bookingUrl ? withDate(t.bookingUrl, date) : getSearchUrl(t.bookingCompany, activity.name, destination, t.provider, date)
-                                onBookClick(getPlatformKey(t.bookingCompany), url, activity.name)
-                              }}
-                              className="py-[7px] px-3 rounded-full border-[1.5px] border-terra text-xs text-terra font-medium whitespace-nowrap hover:bg-terra hover:text-white transition-colors"
-                            >
-                              Book ↗
-                            </a>
-                            <button
-                              className="py-[7px] px-3 rounded-full border-[1.5px] border-mist text-xs cursor-pointer transition-all whitespace-nowrap text-slate hover:border-gold hover:text-gold"
-                              onClick={(e) => { e.stopPropagation(); setShowAllReviews(t) }}
-                            >
-                              ★ Reviews
-                            </button>
+                        {/* Top row: platform + badge + price */}
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div>
+                            <div className="font-semibold text-ink text-[14px] leading-tight">{t.bookingCompany}</div>
+                            <div className="text-[12px] text-slate mt-0.5">{t.provider}</div>
                           </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                <p className="text-[11px] text-slate text-center mt-2">
-                  Click a row to see full details
-                </p>
+                          <div className="text-right flex-shrink-0">
+                            <div className={`font-bold text-[15px] ${t.price === bestPrice ? 'text-[#2E7D4F]' : 'text-ink'}`}>
+                              {showUSD && t.currency.toUpperCase() !== 'USD'
+                                ? toUSD(t.price, t.currency)
+                                : `${t.currency} ${t.price}`}
+                            </div>
+                            <div className="text-[10px] text-slate font-mono">/ person</div>
+                          </div>
+                        </div>
+
+                        {/* Meta row */}
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 mb-3">
+                          <div className="flex items-center gap-1 text-[12px]">
+                            <span className={`font-semibold ${t.rating === bestRating ? 'text-gold' : 'text-ink'}`}>{t.rating}</span>
+                            <span className="text-gold text-[11px]">★</span>
+                            <span className="text-slate">({t.reviewCount.toLocaleString()})</span>
+                          </div>
+                          <span className="text-slate text-[12px]">· {t.duration}</span>
+                          <span className={`text-[11px] font-medium ${t.cancel.startsWith('Free') ? 'text-[#2E7D4F]' : 'text-[#C04040]'}`}>
+                            · {t.cancel}
+                          </span>
+                        </div>
+
+                        {t.badge && (
+                          <div className="mb-2">
+                            <TourBadge badge={t.badge} />
+                          </div>
+                        )}
+
+                        {/* Actions */}
+                        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                          <a
+                            href={bookUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => onBookClick(getPlatformKey(t.bookingCompany), bookUrl, activity.name)}
+                            className="flex-1 py-2 rounded-full border-[1.5px] border-terra text-xs text-terra font-semibold text-center hover:bg-terra hover:text-white transition-colors"
+                          >
+                            Book ↗
+                          </a>
+                          <button
+                            className="flex-1 py-2 rounded-full border-[1.5px] border-mist text-xs text-slate font-medium hover:border-gold hover:text-gold transition-colors"
+                            onClick={() => setShowAllReviews(t)}
+                          >
+                            ★ Reviews
+                          </button>
+                          <button
+                            className="flex-1 py-2 rounded-full bg-foam border border-mist text-xs text-ink font-medium"
+                            onClick={() => setDetailTour(t)}
+                          >
+                            Details →
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
               </>
             )}
           </div>

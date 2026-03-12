@@ -32,6 +32,7 @@ export function NewTripForm() {
   const [customVibes, setCustomVibes] = useState<string[]>([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [budgetType, setBudgetType] = useState<'total' | 'per_person'>('total')
 
   // Date range
   const [dateStart, setDateStart] = useState('')
@@ -107,6 +108,7 @@ export function NewTripForm() {
     const travelers   = parseInt(data.get('travelers') as string) || 1
     const budgetStr   = data.get('budget') as string
     const budget      = budgetStr ? parseFloat(budgetStr) : undefined
+    const budgetTypeVal = budgetType
     const customTitle = data.get('title') as string
     const title       = customTitle.trim() || destination
 
@@ -133,6 +135,7 @@ export function NewTripForm() {
             endDate:   dateEnd || undefined,
             travelers,
             budget,
+            budgetType: budgetTypeVal,
             vibes: [...selectedVibes, ...customVibes],
           }),
         }
@@ -160,10 +163,10 @@ export function NewTripForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="max-w-2xl w-full flex flex-col gap-4 sm:gap-6">
 
       {/* ── Destination ───────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-mist p-7">
+      <div className="bg-white rounded-2xl border border-mist p-4 sm:p-7">
         <h2 className="font-serif text-xl font-bold text-ink mb-5">Destination</h2>
         <div className="flex flex-col gap-4">
 
@@ -223,7 +226,7 @@ export function NewTripForm() {
       </div>
 
       {/* ── Dates & Travelers ─────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-mist p-7">
+      <div className="bg-white rounded-2xl border border-mist p-4 sm:p-7">
         <h2 className="font-serif text-xl font-bold text-ink mb-5">Dates &amp; Travelers</h2>
         <div className="flex flex-col gap-4">
 
@@ -236,9 +239,9 @@ export function NewTripForm() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="travelers" className={LABEL_CLS}>
+              <label htmlFor="travelers" className={`${LABEL_CLS} mb-2`}>
                 Total travelers (including you)
               </label>
               <input
@@ -251,14 +254,34 @@ export function NewTripForm() {
               />
             </div>
             <div>
-              <label htmlFor="budget" className={LABEL_CLS}>Total budget (USD)</label>
+              <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+                <label htmlFor="budget" className="text-slate text-xs font-mono uppercase tracking-wider">
+                  Budget (USD)
+                </label>
+                <div className="flex rounded-lg border border-mist overflow-hidden text-[11px] font-mono">
+                  <button
+                    type="button"
+                    onClick={() => setBudgetType('total')}
+                    className={`px-2.5 py-1 transition-colors ${budgetType === 'total' ? 'bg-ocean text-white' : 'text-slate hover:text-ink'}`}
+                  >
+                    Total
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBudgetType('per_person')}
+                    className={`px-2.5 py-1 border-l border-mist transition-colors ${budgetType === 'per_person' ? 'bg-ocean text-white' : 'text-slate hover:text-ink'}`}
+                  >
+                    Per person
+                  </button>
+                </div>
+              </div>
               <input
                 id="budget"
                 name="budget"
                 type="number"
                 min={0}
                 step={50}
-                placeholder="e.g. 3200"
+                placeholder={budgetType === 'total' ? 'e.g. 3200' : 'e.g. 1600'}
                 className={INPUT_CLS}
               />
             </div>
@@ -267,7 +290,7 @@ export function NewTripForm() {
       </div>
 
       {/* ── Vibes ─────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-mist p-7">
+      <div className="bg-white rounded-2xl border border-mist p-4 sm:p-7">
         <h2 className="font-serif text-xl font-bold text-ink mb-1">Trip vibes</h2>
         <p className="text-slate text-xs mb-4">Select all that apply, or add your own</p>
         <div className="flex flex-wrap gap-2 mb-4">
@@ -331,7 +354,7 @@ export function NewTripForm() {
       <button
         type="submit"
         disabled={loading}
-        className="bg-terra text-white py-3.5 px-8 rounded-full text-sm font-semibold transition-all duration-200 hover:bg-terra-lt disabled:opacity-50 disabled:cursor-not-allowed self-start"
+        className="bg-terra text-white py-3.5 px-8 rounded-full text-sm font-semibold transition-all duration-200 hover:bg-terra-lt disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto sm:self-start"
       >
         {loading ? 'Creating trip…' : 'Create trip →'}
       </button>

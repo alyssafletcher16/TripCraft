@@ -1,5 +1,8 @@
+'use client'
+
 import Link from 'next/link'
 import { Badge } from '@/components/ui/Badge'
+import { useCityPhoto } from '@/hooks/useCityPhoto'
 import type { TripStatus } from '@/types'
 
 interface TripCardProps {
@@ -22,21 +25,23 @@ const statusVariant: Record<TripStatus, 'gold' | 'green' | 'slate' | 'ocean'> = 
 }
 
 export function TripCard({ id, title, destination, status, startDate, endDate, travelers }: TripCardProps) {
-  const photoSrc = `https://loremflickr.com/800/300/${encodeURIComponent(destination)},travel`
+  const photoUrl = useCityPhoto(destination)
 
   return (
     <Link href={`/trips/${id}`} className="block">
       <div className="bg-white rounded-2xl border-[1.5px] border-mist overflow-hidden hover:border-terra/40 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg cursor-pointer">
         {/* Cover photo */}
         <div className="relative h-36 bg-foam overflow-hidden">
-          <img
-            src={photoSrc}
-            alt={destination}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).style.display = 'none'
-            }}
-          />
+          {photoUrl && (
+            <img
+              src={photoUrl}
+              alt={destination}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = 'none'
+              }}
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
           <div className="absolute top-3 right-3">
             <Badge variant={statusVariant[status]}>{status.toLowerCase()}</Badge>

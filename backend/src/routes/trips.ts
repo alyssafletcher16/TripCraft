@@ -33,7 +33,7 @@ tripsRouter.post(
     const errors = validationResult(req)
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() })
 
-    const { title, destination, country, startDate, endDate, travelers, budget, vibes, coverEmoji } =
+    const { title, destination, country, startDate, endDate, travelers, budget, budgetType, vibes, coverEmoji } =
       req.body
     try {
       const trip = await prisma.trip.create({
@@ -46,6 +46,7 @@ tripsRouter.post(
           endDate: endDate ? new Date(endDate) : null,
           travelers: travelers ?? 1,
           budget,
+          budgetType: budgetType ?? 'total',
           coverEmoji,
           vibes: {
             create: (vibes as string[] ?? []).map((vibe) => ({ vibe })),
@@ -88,7 +89,7 @@ tripsRouter.get('/:id', requireAuth, async (req: AuthRequest, res) => {
 
 // PATCH /api/trips/:id
 tripsRouter.patch('/:id', requireAuth, async (req: AuthRequest, res) => {
-  const { title, destination, country, startDate, endDate, travelers, budget, status, isPublic, coverEmoji, vibes } =
+  const { title, destination, country, startDate, endDate, travelers, budget, budgetType, status, isPublic, coverEmoji, vibes } =
     req.body
   try {
     const trip = await prisma.trip.updateMany({
@@ -101,6 +102,7 @@ tripsRouter.patch('/:id', requireAuth, async (req: AuthRequest, res) => {
         endDate: endDate ? new Date(endDate) : undefined,
         travelers,
         budget,
+        budgetType,
         status,
         isPublic,
         coverEmoji,

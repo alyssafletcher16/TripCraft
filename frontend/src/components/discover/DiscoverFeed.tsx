@@ -53,18 +53,31 @@ export function DiscoverFeed() {
   const fetchFeed = useCallback(async () => {
     setLoading(true)
     const vibe = FILTER_VIBE[filter]
-    const url = `${API}/api/discover?sort=popular${vibe ? `&vibe=${encodeURIComponent(vibe)}` : ''}&limit=12`
+    let url = `${API}/api/discover?sort=popular${vibe ? `&vibe=${encodeURIComponent(vibe)}` : ''}&limit=12`
+    if (selectedCity) {
+      url += `&destination=${encodeURIComponent(selectedCity.label)}`
+    }
     try {
       const res = await fetch(url)
       const data = await res.json()
       const trips: DiscoverTrip[] = Array.isArray(data.trips) ? data.trips : []
-      setCards(trips.length > 0 ? trips : STATIC_CARDS)
+      if (trips.length > 0) {
+        setCards(trips)
+      } else if (selectedCity?.itins && selectedCity.itins.length > 0) {
+        setCards(selectedCity.itins.map((i) => STATIC_CARDS[i]).filter(Boolean))
+      } else {
+        setCards(STATIC_CARDS)
+      }
     } catch {
-      setCards(STATIC_CARDS)
+      if (selectedCity?.itins && selectedCity.itins.length > 0) {
+        setCards(selectedCity.itins.map((i) => STATIC_CARDS[i]).filter(Boolean))
+      } else {
+        setCards(STATIC_CARDS)
+      }
     } finally {
       setLoading(false)
     }
-  }, [filter])
+  }, [filter, selectedCity])
 
   useEffect(() => { fetchFeed() }, [fetchFeed])
 
