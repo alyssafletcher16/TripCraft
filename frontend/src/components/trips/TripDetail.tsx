@@ -81,54 +81,70 @@ export function TripDetail({ tripId }: { tripId: string }) {
     return <p className="text-slate text-sm">{error || 'Trip not found'}</p>
   }
 
+  const coverPhotoSrc = `https://source.unsplash.com/featured/1200x400?${encodeURIComponent(trip.destination)},travel,city`
+
   return (
     <>
     <div className="max-w-3xl flex flex-col gap-6">
 
       {/* ── Trip header ─────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-mist p-7">
-        <div className="flex items-start gap-4 mb-4">
-          <span className="text-4xl leading-none">{trip.coverEmoji ?? '✈'}</span>
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <h1 className="font-serif text-2xl font-bold text-ink">{trip.title}</h1>
-              <Badge variant={STATUS_VARIANT[trip.status]}>
-                {STATUS_LABEL[trip.status]}
-              </Badge>
+      <div className="bg-white rounded-2xl border border-mist overflow-hidden">
+        {/* Cover photo */}
+        <div className="relative h-48 bg-foam overflow-hidden">
+          <img
+            src={coverPhotoSrc}
+            alt={trip.destination}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).style.display = 'none'
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+          <div className="absolute bottom-4 left-7 right-7 flex items-end justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                <h1 className="font-serif text-2xl font-bold text-white drop-shadow">{trip.title}</h1>
+                <Badge variant={STATUS_VARIANT[trip.status]}>
+                  {STATUS_LABEL[trip.status]}
+                </Badge>
+              </div>
+              <p className="text-white/80 text-sm drop-shadow">
+                {trip.destination}{trip.country ? `, ${trip.country}` : ''}
+              </p>
             </div>
-            <p className="text-slate text-sm">
-              {trip.destination}{trip.country ? `, ${trip.country}` : ''}
-            </p>
+            <span className="text-3xl leading-none drop-shadow">{trip.coverEmoji ?? '✈'}</span>
           </div>
         </div>
 
-        {/* Meta */}
-        <div className="flex flex-wrap gap-5 text-[11px] font-mono text-slate uppercase tracking-wide mb-4">
-          {trip.startDate && (
-            <span>
-              {new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-              {trip.endDate
-                ? ` – ${new Date(trip.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
-                : ''}
-            </span>
-          )}
-          <span>{trip.travelers} traveler{trip.travelers !== 1 ? 's' : ''}</span>
-          {trip.budget != null && <span>${trip.budget.toLocaleString()} budget</span>}
-        </div>
-
-        {/* Vibes */}
-        {trip.vibes.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {trip.vibes.map((v) => (
-              <span
-                key={v.id}
-                className="bg-ocean/8 text-ocean text-xs px-3 py-1 rounded-full border border-ocean/15"
-              >
-                {v.vibe}
+        <div className="px-7 py-5">
+          {/* Meta */}
+          <div className="flex flex-wrap gap-5 text-[11px] font-mono text-slate uppercase tracking-wide mb-4">
+            {trip.startDate && (
+              <span>
+                {new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                {trip.endDate
+                  ? ` – ${new Date(trip.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+                  : ''}
               </span>
-            ))}
+            )}
+            <span>{trip.travelers} traveler{trip.travelers !== 1 ? 's' : ''}</span>
+            {trip.budget != null && <span>${trip.budget.toLocaleString()} budget</span>}
           </div>
-        )}
+
+          {/* Vibes */}
+          {trip.vibes.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {trip.vibes.map((v) => (
+                <span
+                  key={v.id}
+                  className="bg-ocean/8 text-ocean text-xs px-3 py-1 rounded-full border border-ocean/15"
+                >
+                  {v.vibe}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ── Reflect banner — shown for completed trips ──────────── */}
