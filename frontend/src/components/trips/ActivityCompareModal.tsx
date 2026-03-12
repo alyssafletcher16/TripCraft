@@ -1468,6 +1468,7 @@ export function ActivityCompareModal({
           confCode: null,
           cancelPolicy: tour.cancel,
           cancelSafe: tour.cancel.startsWith('Free'),
+          bookingUrl: tour.bookingUrl ?? null,
           bgColor: '#EEF0FA',
         }),
       })

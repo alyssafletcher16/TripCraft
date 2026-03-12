@@ -91,7 +91,20 @@ export function Block({ block, tripId, destination }: BlockProps) {
           </div>
         )}
 
-        {destination && (block.type === 'ACTIVITY' || block.type === 'STAY') && (
+        {block.bookingUrl && block.status === 'PENDING' && (
+          <div className="pt-2 mt-1.5 border-t border-mist/60">
+            <a
+              href={block.bookingUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-terra text-white text-[11px] font-semibold hover:bg-terra-lt transition-colors"
+            >
+              Book now ↗
+            </a>
+          </div>
+        )}
+
+        {!block.bookingUrl && destination && (block.type === 'ACTIVITY' || block.type === 'STAY') && (
           <BookingCTA block={block} destination={destination} tripId={tripId} />
         )}
       </div>

@@ -73,6 +73,7 @@ model Trip {
   endDate     DateTime?
   travelers   Int        @default(1)
   budget      Float?
+  budgetType  String     @default("total") // "total" | "per_person"
   status      TripStatus @default(PLANNING)
   isPublic    Boolean    @default(false)
   coverEmoji  String?
@@ -136,6 +137,7 @@ model Block {
   confCode     String?
   cancelPolicy String?
   cancelSafe   Boolean       @default(false)
+  bookingUrl   String?
   emoji        String?
   bgColor      String?
   sortOrder    Int           @default(0)

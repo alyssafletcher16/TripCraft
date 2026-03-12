@@ -20,6 +20,7 @@ export interface Trip {
   endDate: string | null
   travelers: number
   budget: number | null
+  budgetType: 'total' | 'per_person'
   status: TripStatus
   isPublic: boolean
   coverEmoji: string | null
@@ -62,6 +63,7 @@ export interface Block {
   confCode: string | null
   cancelPolicy: string | null
   cancelSafe: boolean
+  bookingUrl: string | null
   emoji: string | null
   bgColor: string | null
   sortOrder: number

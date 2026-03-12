@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useCityPhoto } from '@/hooks/useCityPhoto'
 import { useSession } from 'next-auth/react'
 import { ItineraryDay } from './ItineraryDay'
 import { ReflectionModal } from './ReflectionModal'
@@ -106,6 +107,7 @@ function ResearchDayPicker({
 export function TripDetail({ tripId }: { tripId: string }) {
   const { data: session, status: sessionStatus } = useSession()
   const [trip, setTrip] = useState<Trip | null>(null)
+  const cityPhoto = useCityPhoto(trip?.destination ?? '')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reflecting, setReflecting] = useState(false)
@@ -220,6 +222,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
           confCode: null,
           cancelPolicy: item.tour.cancel,
           cancelSafe: item.tour.cancel.startsWith('Free'),
+          bookingUrl: item.tour.bookingUrl ?? null,
           bgColor: '#EEF0FA',
         }),
       })
@@ -240,7 +243,6 @@ export function TripDetail({ tripId }: { tripId: string }) {
     return <p className="text-slate text-sm">{error || 'Trip not found'}</p>
   }
 
-  const coverPhotoSrc = `https://loremflickr.com/1200/400/${encodeURIComponent(trip.destination)},travel,city`
   const tripDays = trip.days.map((d) => ({ id: d.id, dayNum: d.dayNum, name: d.name, date: d.date }))
 
   return (
@@ -252,7 +254,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
         {/* Cover photo */}
         <div className="relative h-48 bg-foam overflow-hidden">
           <img
-            src={coverPhotoSrc}
+            src={cityPhoto ?? undefined}
             alt={trip.destination}
             className="w-full h-full object-cover"
             onError={(e) => {
@@ -288,7 +290,23 @@ export function TripDetail({ tripId }: { tripId: string }) {
               </span>
             )}
             <span>{trip.travelers} traveler{trip.travelers !== 1 ? 's' : ''}</span>
-            {trip.budget != null && <span>${trip.budget.toLocaleString()} budget</span>}
+            {trip.budget != null && (
+              <span>
+                {trip.budgetType === 'per_person'
+                  ? `$${trip.budget.toLocaleString()}/person`
+                  : `$${trip.budget.toLocaleString()} total`}
+                {trip.travelers > 1 && trip.budgetType === 'per_person' && (
+                  <span className="text-slate/60 ml-1 normal-case tracking-normal font-sans lowercase">
+                    (${(trip.budget * trip.travelers).toLocaleString()} total)
+                  </span>
+                )}
+                {trip.travelers > 1 && trip.budgetType !== 'per_person' && (
+                  <span className="text-slate/60 ml-1 normal-case tracking-normal font-sans lowercase">
+                    (${Math.round(trip.budget / trip.travelers).toLocaleString()}/person)
+                  </span>
+                )}
+              </span>
+            )}
           </div>
 
           {/* Vibes */}

@@ -33,7 +33,7 @@ blocksRouter.post(
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() })
 
     const { dayId } = req.params
-    const { type, title, detail, price, priceValue, status, confCode, cancelPolicy, cancelSafe, emoji, bgColor, sortOrder } =
+    const { type, title, detail, price, priceValue, status, confCode, cancelPolicy, cancelSafe, bookingUrl, emoji, bgColor, sortOrder } =
       req.body
     try {
       const block = await prisma.block.create({
@@ -48,6 +48,7 @@ blocksRouter.post(
           confCode,
           cancelPolicy,
           cancelSafe: cancelSafe ?? false,
+          bookingUrl,
           emoji,
           bgColor,
           sortOrder: sortOrder ?? 0,
@@ -64,12 +65,12 @@ blocksRouter.post(
 // PATCH /api/days/:dayId/blocks/:blockId
 blocksRouter.patch('/:blockId', requireAuth, async (req: AuthRequest, res) => {
   const { blockId } = req.params
-  const { title, detail, price, priceValue, status, confCode, cancelPolicy, cancelSafe, emoji, bgColor, sortOrder } =
+  const { title, detail, price, priceValue, status, confCode, cancelPolicy, cancelSafe, bookingUrl, emoji, bgColor, sortOrder } =
     req.body
   try {
     const block = await prisma.block.update({
       where: { id: blockId },
-      data: { title, detail, price, priceValue, status, confCode, cancelPolicy, cancelSafe, emoji, bgColor, sortOrder },
+      data: { title, detail, price, priceValue, status, confCode, cancelPolicy, cancelSafe, bookingUrl, emoji, bgColor, sortOrder },
     })
     return res.json(block)
   } catch (err) {
