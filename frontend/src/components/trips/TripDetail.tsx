@@ -4,8 +4,39 @@ import { useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { ItineraryDay } from './ItineraryDay'
 import { ReflectionModal } from './ReflectionModal'
+import { GlobalItinerarySearch } from './GlobalItinerarySearch'
+import { ActivityCompareModal, type Tour } from './ActivityCompareModal'
 import { Badge } from '@/components/ui/Badge'
 import type { Trip, TripStatus } from '@/types'
+
+type ResearchItem = {
+  id: string
+  activityName: string
+  tour: {
+    provider: string
+    bookingCompany: string
+    price: number
+    currency: string
+    duration: string
+    groupSize: string
+    pickupDetails: string
+    cancel: string
+    bookingUrl?: string
+  }
+  savedAt: string
+}
+
+type SearchActivity = {
+  name: string
+  icon: string
+  category: string
+  minPrice: number
+  maxPrice: number
+  currency: string
+  topRating: number
+  totalReviews: number
+  companies: number
+}
 
 const STATUS_LABEL: Record<TripStatus, string> = {
   PLANNING: 'Planning', ACTIVE: 'Active', COMPLETED: 'Completed', DRAFT: 'Draft',
@@ -16,6 +47,61 @@ const STATUS_VARIANT: Record<TripStatus, 'gold' | 'green' | 'ocean' | 'slate'> =
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
 
+// ── Research Day Picker ────────────────────────────────────────────────────────
+function ResearchDayPicker({
+  days,
+  adding,
+  onPick,
+  onCancel,
+}: {
+  days: Array<{ id: string; dayNum: number; name: string | null; date: string | null }>
+  adding: boolean
+  onPick: (dayId: string) => void
+  onCancel: () => void
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-[1100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={(e) => e.target === e.currentTarget && onCancel()}
+    >
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xs p-6">
+        <div className="font-serif text-lg font-bold text-ink mb-1">Add to which day?</div>
+        <div className="text-xs text-slate mb-4">Choose the day to add this activity.</div>
+        <div className="flex flex-col gap-1.5 max-h-64 overflow-y-auto">
+          {days.map((day) => (
+            <button
+              key={day.id}
+              onClick={() => onPick(day.id)}
+              disabled={adding}
+              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl border border-mist hover:border-terra hover:bg-foam text-left transition-colors disabled:opacity-50"
+            >
+              <span className="w-7 h-7 rounded-full bg-ocean text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+                {day.dayNum}
+              </span>
+              <div>
+                <div className="text-sm font-medium text-ink">{day.name || `Day ${day.dayNum}`}</div>
+                {day.date && (
+                  <div className="text-[11px] text-slate">
+                    {new Date(day.date + 'T00:00:00').toLocaleDateString('en-US', {
+                      weekday: 'short', month: 'short', day: 'numeric',
+                    })}
+                  </div>
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={onCancel}
+          className="mt-3 w-full py-2 border border-mist rounded-xl text-sm text-slate hover:text-ink transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ── Main trip detail view ──────────────────────────────────────────────────────
 export function TripDetail({ tripId }: { tripId: string }) {
   const { data: session, status: sessionStatus } = useSession()
@@ -23,6 +109,12 @@ export function TripDetail({ tripId }: { tripId: string }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reflecting, setReflecting] = useState(false)
+
+  // ── Global search + research state ──────────────────────────────────────
+  const [searchActivity, setSearchActivity] = useState<SearchActivity | null>(null)
+  const [researchItems, setResearchItems] = useState<ResearchItem[]>([])
+  const [researchAddPending, setResearchAddPending] = useState<ResearchItem | null>(null)
+  const [researchAdding, setResearchAdding] = useState(false)
 
   const fetchTrip = useCallback(() => {
     if (!session?.accessToken) return
@@ -73,6 +165,73 @@ export function TripDetail({ tripId }: { tripId: string }) {
     if (sessionStatus !== 'loading') fetchTrip()
   }, [fetchTrip, sessionStatus])
 
+  // Load research items from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(`tripcraft_research_${tripId}`)
+      if (stored) setResearchItems(JSON.parse(stored))
+    } catch {}
+  }, [tripId])
+
+  function saveForLater(tour: Tour, actName: string) {
+    const item: ResearchItem = {
+      id: `${Date.now()}`,
+      activityName: actName,
+      tour: {
+        provider: tour.provider,
+        bookingCompany: tour.bookingCompany,
+        price: tour.price,
+        currency: tour.currency,
+        duration: tour.duration,
+        groupSize: tour.groupSize,
+        pickupDetails: tour.pickupDetails,
+        cancel: tour.cancel,
+        bookingUrl: tour.bookingUrl,
+      },
+      savedAt: new Date().toISOString(),
+    }
+    const updated = [...researchItems, item]
+    setResearchItems(updated)
+    localStorage.setItem(`tripcraft_research_${tripId}`, JSON.stringify(updated))
+    setSearchActivity(null)
+  }
+
+  function removeResearchItem(id: string) {
+    const updated = researchItems.filter((i) => i.id !== id)
+    setResearchItems(updated)
+    localStorage.setItem(`tripcraft_research_${tripId}`, JSON.stringify(updated))
+  }
+
+  async function addResearchItemToDay(item: ResearchItem, dayId: string) {
+    setResearchAdding(true)
+    try {
+      const res = await fetch(`${API}/api/days/${dayId}/blocks`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.accessToken}`,
+        },
+        body: JSON.stringify({
+          type: 'ACTIVITY',
+          title: `${item.activityName} · ${item.tour.provider}`,
+          detail: `${item.tour.duration} · ${item.tour.groupSize} · via ${item.tour.bookingCompany}. ${item.tour.pickupDetails}`,
+          price: `${item.tour.currency} ${item.tour.price}/person`,
+          status: 'PENDING',
+          confCode: null,
+          cancelPolicy: item.tour.cancel,
+          cancelSafe: item.tour.cancel.startsWith('Free'),
+          bgColor: '#EEF0FA',
+        }),
+      })
+      if (!res.ok) throw new Error('Failed to add block')
+      removeResearchItem(item.id)
+      setResearchAddPending(null)
+      fetchTrip()
+    } catch {} finally {
+      setResearchAdding(false)
+    }
+  }
+
   if (loading || sessionStatus === 'loading') {
     return <div className="animate-pulse bg-white rounded-2xl border border-mist h-64" />
   }
@@ -82,6 +241,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
   }
 
   const coverPhotoSrc = `https://loremflickr.com/1200/400/${encodeURIComponent(trip.destination)},travel,city`
+  const tripDays = trip.days.map((d) => ({ id: d.id, dayNum: d.dayNum, name: d.name, date: d.date }))
 
   return (
     <>
@@ -147,6 +307,12 @@ export function TripDetail({ tripId }: { tripId: string }) {
         </div>
       </div>
 
+      {/* ── Global itinerary search ──────────────────────────────── */}
+      <GlobalItinerarySearch
+        destination={trip.destination}
+        onSelectActivity={(act) => setSearchActivity(act as SearchActivity)}
+      />
+
       {/* ── Reflect banner — shown for completed trips ──────────── */}
       {trip.status === 'COMPLETED' && !trip.reflection && (
         <div className="rounded-2xl p-5 flex items-center gap-4 border border-gold/20"
@@ -211,7 +377,93 @@ export function TripDetail({ tripId }: { tripId: string }) {
           <ItineraryDay key={day.id} day={day} destination={trip.destination} vibes={trip.vibes.map((v) => v.vibe)} onBlockAdded={fetchTrip} />
         ))}
       </div>
+
+      {/* ── Research tab ────────────────────────────────────────── */}
+      {researchItems.length > 0 && (
+        <div className="bg-white rounded-2xl border border-mist overflow-hidden">
+          <div className="px-7 py-4 border-b border-mist flex items-center gap-2">
+            <span className="text-[10px] font-mono text-slate uppercase tracking-wider">Research</span>
+            <span className="bg-ocean/10 text-ocean text-[10px] font-bold px-2 py-0.5 rounded-full">
+              {researchItems.length}
+            </span>
+            <span className="text-[11px] text-slate ml-1">· saved for later</span>
+          </div>
+          <div className="divide-y divide-mist">
+            {researchItems.map((item) => (
+              <div key={item.id} className="px-7 py-4 flex items-center gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-ink text-sm truncate">{item.activityName}</div>
+                  <div className="text-[11px] text-slate mt-0.5">
+                    {item.tour.provider} · {item.tour.bookingCompany} · {item.tour.duration}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-[12px] font-semibold text-[#2E7D4F]">
+                      {item.tour.currency} {item.tour.price}/person
+                    </span>
+                    {item.tour.cancel.startsWith('Free') && (
+                      <span className="text-[10px] text-[#2E7D4F] border border-[#2E7D4F]/30 rounded-full px-2 py-px">
+                        Free cancel
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {item.tour.bookingUrl && (
+                    <a
+                      href={item.tour.bookingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 rounded-full border border-terra text-terra text-xs font-medium hover:bg-terra/5 transition-colors whitespace-nowrap"
+                    >
+                      Book ↗
+                    </a>
+                  )}
+                  <button
+                    onClick={() => setResearchAddPending(item)}
+                    className="px-3 py-1.5 rounded-full bg-terra text-white text-xs font-medium hover:bg-terra-lt transition-colors whitespace-nowrap"
+                  >
+                    Add to Day
+                  </button>
+                  <button
+                    onClick={() => removeResearchItem(item.id)}
+                    className="p-1.5 text-slate hover:text-terra transition-colors"
+                    title="Remove"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
+
+    {/* ── Global search compare modal ──────────────────────────── */}
+    {searchActivity && (
+      <ActivityCompareModal
+        destination={trip.destination}
+        vibes={trip.vibes.map((v) => v.vibe)}
+        days={tripDays}
+        initialActivity={searchActivity as never}
+        tripId={trip.id}
+        onClose={() => setSearchActivity(null)}
+        onBlockAdded={() => { setSearchActivity(null); fetchTrip() }}
+        onSaveForLater={saveForLater}
+      />
+    )}
+
+    {/* ── Research: day picker ─────────────────────────────────── */}
+    {researchAddPending && tripDays.length > 0 && (
+      <ResearchDayPicker
+        days={tripDays}
+        adding={researchAdding}
+        onPick={(dayId) => addResearchItemToDay(researchAddPending, dayId)}
+        onCancel={() => setResearchAddPending(null)}
+      />
+    )}
 
     {/* ── Reflection modal ────────────────────────────────────── */}
     {reflecting && (

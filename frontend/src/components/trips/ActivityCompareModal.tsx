@@ -13,7 +13,7 @@ type Review = {
   date: string
 }
 
-type Tour = {
+export type Tour = {
   id: number
   bookingCompany: string
   provider: string
@@ -148,6 +148,61 @@ function ActivitySkeleton() {
   )
 }
 
+// ── Day Picker Overlay ────────────────────────────────────────────────────────
+function DayPickerOverlay({
+  days,
+  adding,
+  onPick,
+  onCancel,
+}: {
+  days: Array<{ id: string; dayNum: number; name: string | null; date: string | null }>
+  adding: boolean
+  onPick: (dayId: string) => void
+  onCancel: () => void
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-[1100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={(e) => e.target === e.currentTarget && onCancel()}
+    >
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xs p-6">
+        <div className="font-serif text-lg font-bold text-ink mb-1">Add to which day?</div>
+        <div className="text-xs text-slate mb-4">Choose the day to add this activity.</div>
+        <div className="flex flex-col gap-1.5 max-h-64 overflow-y-auto">
+          {days.map((day) => (
+            <button
+              key={day.id}
+              onClick={() => onPick(day.id)}
+              disabled={adding}
+              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl border border-mist hover:border-terra hover:bg-foam text-left transition-colors disabled:opacity-50"
+            >
+              <span className="w-7 h-7 rounded-full bg-ocean text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+                {day.dayNum}
+              </span>
+              <div>
+                <div className="text-sm font-medium text-ink">{day.name || `Day ${day.dayNum}`}</div>
+                {day.date && (
+                  <div className="text-[11px] text-slate">
+                    {new Date(day.date + 'T00:00:00').toLocaleDateString('en-US', {
+                      weekday: 'short', month: 'short', day: 'numeric',
+                    })}
+                  </div>
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={onCancel}
+          className="mt-3 w-full py-2 border border-mist rounded-xl text-sm text-slate hover:text-ink transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ── TourDetailPanel ───────────────────────────────────────────────────────────
 function TourDetailPanel({
   tour,
@@ -158,6 +213,7 @@ function TourDetailPanel({
   onAdd,
   adding,
   onBookClick,
+  onSaveForLater,
 }: {
   tour: Tour
   actName: string
@@ -167,6 +223,7 @@ function TourDetailPanel({
   onAdd: () => void
   adding: boolean
   onBookClick: (platform: string, url: string, title: string) => void
+  onSaveForLater?: () => void
 }) {
   const [showReviewsModal, setShowReviewsModal] = useState(false)
   const [showUSD, setShowUSD] = useState(false)
@@ -342,22 +399,30 @@ function TourDetailPanel({
           </div>
 
           {/* CTA */}
-          <div className="flex gap-3 pt-1">
+          <div className="flex gap-3 pt-1 flex-wrap">
             <a
               href={bookUrl}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => onBookClick(getPlatformKey(tour.bookingCompany), bookUrl, actName)}
-              className="flex-1 border-[1.5px] border-terra text-terra py-[11px] px-7 rounded-full text-[13px] font-semibold text-center hover:bg-terra/5 transition-colors"
+              className="flex-1 border-[1.5px] border-terra text-terra py-[11px] px-7 rounded-full text-[13px] font-semibold text-center hover:bg-terra/5 transition-colors whitespace-nowrap"
             >
               Book on {tour.bookingCompany} ↗
             </a>
+            {onSaveForLater && (
+              <button
+                onClick={onSaveForLater}
+                className="flex-1 border-[1.5px] border-ocean text-ocean py-[11px] px-7 rounded-full text-[13px] font-semibold cursor-pointer hover:bg-ocean/5 transition-colors whitespace-nowrap"
+              >
+                Save for later
+              </button>
+            )}
             <button
               onClick={onAdd}
               disabled={adding}
-              className="flex-1 bg-terra text-white border-none py-[11px] px-7 rounded-full text-[13px] font-semibold cursor-pointer hover:bg-terra-lt transition-colors disabled:opacity-50"
+              className="flex-1 bg-terra text-white border-none py-[11px] px-7 rounded-full text-[13px] font-semibold cursor-pointer hover:bg-terra-lt transition-colors disabled:opacity-50 whitespace-nowrap"
             >
-              {adding ? 'Adding…' : 'Add to itinerary →'}
+              {adding ? 'Adding…' : onSaveForLater ? 'Add to Day →' : 'Add to itinerary →'}
             </button>
           </div>
         </div>
@@ -533,6 +598,7 @@ function CompareModal({
   onAdd,
   adding,
   onBookClick,
+  onSaveForLater,
 }: {
   activity: Activity
   destination: string
@@ -540,6 +606,7 @@ function CompareModal({
   onAdd: (tour: Tour, actName: string) => void
   adding: boolean
   onBookClick: (platform: string, url: string, title: string) => void
+  onSaveForLater?: (tour: Tour, actName: string) => void
 }) {
   const [detailTour, setDetailTour]         = useState<Tour | null>(null)
   const [showAllReviews, setShowAllReviews] = useState<Tour | null>(null)
@@ -670,6 +737,7 @@ function CompareModal({
         onAdd={() => onAdd(detailTour, activity.name)}
         adding={adding}
         onBookClick={onBookClick}
+        onSaveForLater={onSaveForLater ? () => onSaveForLater(detailTour, activity.name) : undefined}
       />
     )
   }
@@ -1253,12 +1321,16 @@ function ActivityModal({
 
 // ── Main export ───────────────────────────────────────────────────────────────
 interface ActivityCompareModalProps {
-  dayId: string
+  dayId?: string
   tripId?: string
   destination?: string
   vibes?: string[]
+  date?: string
+  days?: Array<{ id: string; dayNum: number; name: string | null; date: string | null }>
+  initialActivity?: Activity
   onClose: () => void
   onBlockAdded: () => void
+  onSaveForLater?: (tour: Tour, actName: string) => void
 }
 
 export function ActivityCompareModal({
@@ -1266,8 +1338,12 @@ export function ActivityCompareModal({
   tripId,
   destination,
   vibes,
+  date,
+  days,
+  initialActivity,
   onClose,
   onBlockAdded,
+  onSaveForLater,
 }: ActivityCompareModalProps) {
   const { data: session } = useSession()
   const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
@@ -1275,6 +1351,7 @@ export function ActivityCompareModal({
   const [view, setView]                         = useState<'list' | 'compare' | 'url'>('list')
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
   const [adding, setAdding]                     = useState(false)
+  const [dayPickerPending, setDayPickerPending] = useState<{ tour: Tour; actName: string } | null>(null)
 
   // ── Step 1: fetch lightweight activity list ──────────────────────────────
   const [activities, setActivities]     = useState<Activity[]>([])
@@ -1292,6 +1369,26 @@ export function ActivityCompareModal({
       .finally(() => setListLoading(false))
   }, [destination])
 
+  // ── If launched with a specific activity (global search), jump to compare ──
+  useEffect(() => {
+    if (!initialActivity) return
+    setSelectedActivity({ ...initialActivity, tours: [] })
+    setView('compare')
+    fetch(`/api/activities/tours`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ destination, activityName: initialActivity.name, date }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        setSelectedActivity((prev) =>
+          prev ? { ...prev, tours: data.tours ?? [], companies: data.tours?.length ?? prev.companies } : prev
+        )
+      })
+      .catch(() => {})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // ── Step 2: fetch tour details when user clicks Compare ──────────────────
   async function handleCompare(act: Activity) {
     // Show the compare modal immediately with loading state
@@ -1302,7 +1399,7 @@ export function ActivityCompareModal({
       const res = await fetch(`/api/activities/tours`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ destination, activityName: act.name }),
+        body: JSON.stringify({ destination, activityName: act.name, date }),
       })
       if (!res.ok) throw new Error('Failed to load tours')
       const data = await res.json()
@@ -1317,9 +1414,28 @@ export function ActivityCompareModal({
   }
 
   async function handleAdd(tour: Tour, actName: string) {
+    if (!dayId) {
+      if (days?.length) {
+        setDayPickerPending({ tour, actName })
+      } else {
+        onSaveForLater?.(tour, actName)
+      }
+      return
+    }
+    await doAddBlock(dayId, tour, actName)
+  }
+
+  async function handleAddToDay(pickedDayId: string) {
+    if (!dayPickerPending) return
+    const { tour, actName } = dayPickerPending
+    setDayPickerPending(null)
+    await doAddBlock(pickedDayId, tour, actName)
+  }
+
+  async function doAddBlock(targetDayId: string, tour: Tour, actName: string) {
     setAdding(true)
     try {
-      const res = await fetch(`${API}/api/days/${dayId}/blocks`, {
+      const res = await fetch(`${API}/api/days/${targetDayId}/blocks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1349,15 +1465,27 @@ export function ActivityCompareModal({
 
   if (view === 'url') return <UrlComparePanel onClose={onClose} />
 
+  if (dayPickerPending && days?.length) {
+    return (
+      <DayPickerOverlay
+        days={days}
+        adding={adding}
+        onPick={handleAddToDay}
+        onCancel={() => setDayPickerPending(null)}
+      />
+    )
+  }
+
   if (view === 'compare' && selectedActivity) {
     return (
       <CompareModal
         activity={selectedActivity}
         destination={destination ?? ''}
-        onClose={() => setView('list')}
+        onClose={initialActivity ? onClose : () => setView('list')}
         onAdd={adding ? () => {} : handleAdd}
         adding={adding}
         onBookClick={handleBookClick}
+        onSaveForLater={onSaveForLater}
       />
     )
   }

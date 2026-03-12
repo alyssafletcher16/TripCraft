@@ -78,6 +78,7 @@ export function ItineraryDay({ day, destination, vibes, onBlockAdded }: Props) {
               tripId={tripId}
               destination={destination}
               vibes={vibes}
+              date={day.date ?? undefined}
               onSuccess={() => {
                 setAddingBlock(false)
                 onBlockAdded?.()

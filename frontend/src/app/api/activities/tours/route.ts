@@ -87,12 +87,12 @@ Rules: rating 4.1–4.9 (one decimal), reviewCount 50–8000, price realistic fo
 }
 
 export async function POST(req: NextRequest) {
-  const { destination, activityName } = await req.json() as { destination?: string; activityName?: string }
+  const { destination, activityName, date } = await req.json() as { destination?: string; activityName?: string; date?: string }
   if (!destination || !activityName) {
     return NextResponse.json({ error: 'destination and activityName required' }, { status: 400 })
   }
 
-  const key = `tours:${destination.toLowerCase()}:${activityName.toLowerCase()}`
+  const key = `tours:${destination.toLowerCase()}:${activityName.toLowerCase()}:${date ?? 'any'}`
   const cached = CACHE.get(key)
   if (cached && Date.now() - cached.fetchedAt < TTL) {
     return NextResponse.json({ tours: cached.data, cached: true })
@@ -109,6 +109,7 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           searchTerm,
           currency: 'USD',
+          ...(date ? { dateRange: { startDate: date, endDate: date } } : {}),
           searchTypes: [{ searchType: 'PRODUCTS', pagination: { start: 1, count: 20 } }],
         }),
       }),

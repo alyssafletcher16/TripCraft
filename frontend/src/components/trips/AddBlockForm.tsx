@@ -26,11 +26,12 @@ interface Props {
   tripId?: string
   destination?: string
   vibes?: string[]
+  date?: string
   onSuccess: () => void
   onCancel: () => void
 }
 
-export function AddBlockForm({ dayId, tripId, destination, vibes, onSuccess, onCancel }: Props) {
+export function AddBlockForm({ dayId, tripId, destination, vibes, date, onSuccess, onCancel }: Props) {
   const { data: session } = useSession()
 
   // Step 1: type not picked yet
@@ -107,6 +108,7 @@ export function AddBlockForm({ dayId, tripId, destination, vibes, onSuccess, onC
         tripId={tripId}
         destination={destination}
         vibes={vibes}
+        date={date}
         onClose={() => setShowBrowse(false)}
         onBlockAdded={onSuccess}
       />
