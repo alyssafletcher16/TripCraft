@@ -68,19 +68,30 @@ function toUSD(price: number, currency: string): string {
 }
 
 // ── Search URL builder (never uses AI-hallucinated URLs) ──────────────────────
-function getSearchUrl(bookingCompany: string, activityName: string, destination: string, provider?: string): string {
+function getSearchUrl(bookingCompany: string, activityName: string, destination: string, provider?: string, date?: string): string {
   const co    = bookingCompany.toLowerCase()
   // Include provider name so results land on (or very near) the specific operator
   const terms = provider ? `${activityName} ${provider} ${destination}` : `${activityName} ${destination}`
   const q     = encodeURIComponent(terms)
-  if (co.includes('getyourguide')) return `https://www.getyourguide.com/s/?q=${q}&partner_id=${AFFILIATES.GYG_ID}`
-  if (co.includes('viator'))       return `https://www.viator.com/search/${q}?pid=${AFFILIATES.VIATOR_ID}&mcid=42383&medium=api`
+  const d     = date ?? ''
+  if (co.includes('getyourguide')) return `https://www.getyourguide.com/s/?q=${q}&partner_id=${AFFILIATES.GYG_ID}${d ? `&date_from=${d}&date_to=${d}` : ''}`
+  if (co.includes('viator'))       return `https://www.viator.com/search/${q}?pid=${AFFILIATES.VIATOR_ID}&mcid=42383&medium=api${d ? `&startDate=${d}` : ''}`
   if (co.includes('klook'))        return `https://www.klook.com/en-US/search/?keyword=${q}`
   if (co.includes('airbnb'))       return `https://www.airbnb.com/experiences?query=${q}`
   if (co.includes('tripadvisor'))  return `https://www.tripadvisor.com/Search?q=${q}`
   if (co.includes('musement'))     return `https://www.musement.com/us/search/#?query=${q}`
   // Fallback: Google search targeted at the specific platform
   return `https://www.google.com/search?q=${encodeURIComponent(`${activityName} ${provider ?? ''} ${destination} site:${co.replace(/\s/g, '')}.com`)}`
+}
+
+// ── Append date param to a direct product URL ─────────────────────────────────
+function withDate(url: string, date?: string): string {
+  if (!date || !url) return url
+  const sep = url.includes('?') ? '&' : '?'
+  // Viator product URLs use startDate; GYG product URLs use date_from
+  if (url.includes('viator.com'))       return `${url}${sep}startDate=${date}`
+  if (url.includes('getyourguide.com')) return `${url}${sep}date_from=${date}&date_to=${date}`
+  return url
 }
 
 // ── Derive platform key from booking company name (for tracking) ──────────────
