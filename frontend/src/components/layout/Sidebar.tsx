@@ -17,7 +17,7 @@ const SB_SECTION = 'font-mono text-[9px] text-slate tracking-[2px] uppercase pt-
 export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
   const pathname = usePathname()
   const { data: session, status } = useSession()
-  const { isOpen, close } = useSidebar()
+  const { isOpen, close, refreshKey } = useSidebar()
   const [trips, setTrips] = useState<Trip[]>([])
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
       .then((r) => r.json())
       .then((data) => setTrips(Array.isArray(data) ? data : []))
       .catch(() => {})
-  }, [session?.accessToken])
+  }, [session?.accessToken, refreshKey])
 
   // Close sidebar when route changes on mobile
   useEffect(() => {

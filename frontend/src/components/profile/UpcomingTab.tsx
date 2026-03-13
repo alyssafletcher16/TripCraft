@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import type { Trip, TripStatus } from '@/types'
+import { useCityPhoto } from '@/hooks/useCityPhoto'
+import { useSidebar } from '@/components/layout/SidebarContext'
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
 
@@ -19,6 +21,32 @@ function dateRange(startDate: string | null, endDate: string | null) {
   return s ?? e ?? null
 }
 
+// Sub-component so each row can call useCityPhoto as a hook
+function TripCover({ destination, coverEmoji }: { destination: string; coverEmoji?: string | null }) {
+  const photoUrl = useCityPhoto(destination)
+  return (
+    <div className="w-11 h-11 rounded-xl bg-foam overflow-hidden flex-shrink-0 relative">
+      {photoUrl ? (
+        <>
+          <img
+            src={photoUrl}
+            alt={destination}
+            className="w-full h-full object-cover"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+          />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+            <span className="text-lg drop-shadow">{coverEmoji || '◻'}</span>
+          </div>
+        </>
+      ) : (
+        <div className="w-full h-full flex items-center justify-center text-xl">
+          {coverEmoji || '◻'}
+        </div>
+      )}
+    </div>
+  )
+}
+
 interface UpcomingTabProps {
   onTripCompleted: () => void
 }
@@ -26,11 +54,14 @@ interface UpcomingTabProps {
 export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
   const { data: session, status } = useSession()
   const token = (session as { accessToken?: string })?.accessToken
+  const { incrementRefreshKey } = useSidebar()
 
   const [trips, setTrips] = useState<Trip[]>([])
   const [loading, setLoading] = useState(true)
   const [pendingCompleteId, setPendingCompleteId] = useState<string | null>(null)
   const [confirming, setConfirming] = useState(false)
+  const [shareWithCommunity, setShareWithCommunity] = useState(false)
+  const [shareScope, setShareScope] = useState<'friends' | 'everyone'>('everyone')
 
   useEffect(() => {
     if (status === 'loading') return
@@ -49,6 +80,8 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
 
   async function handleStatusChange(tripId: string, newStatus: string) {
     if (newStatus === 'COMPLETED') {
+      setShareWithCommunity(false)
+      setShareScope('everyone')
       setPendingCompleteId(tripId)
       return
     }
@@ -70,9 +103,17 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ status: 'COMPLETED' }),
     })
+    if (shareWithCommunity) {
+      await fetch(`${API}/api/trips/${tripId}/community`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ isPublic: shareScope === 'everyone', friendsOnly: shareScope === 'friends' }),
+      }).catch(() => {})
+    }
     setTrips((prev) => prev.filter((t) => t.id !== tripId))
     setPendingCompleteId(null)
     setConfirming(false)
+    incrementRefreshKey()
     onTripCompleted()
   }
 
@@ -110,16 +151,14 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
             const isPending = pendingCompleteId === trip.id
             return (
               <div key={trip.id}>
-                <div className={`flex items-center gap-3 sm:gap-4 bg-white rounded-2xl border px-4 py-3 transition-colors ${isPending ? 'border-green/30' : 'border-mist'}`}>
+                <div className={`flex items-center gap-3 sm:gap-4 bg-white rounded-2xl border px-4 py-3 transition-colors ${isPending ? 'border-success/30' : 'border-mist'}`}>
                   {/* Rank */}
                   <span className="text-xs font-mono text-slate/40 w-5 text-center flex-shrink-0">
                     #{index + 1}
                   </span>
 
-                  {/* Cover */}
-                  <div className="w-11 h-11 rounded-xl bg-foam flex items-center justify-center text-xl flex-shrink-0">
-                    {trip.coverEmoji || '◻'}
-                  </div>
+                  {/* Cover photo */}
+                  <TripCover destination={trip.destination} coverEmoji={trip.coverEmoji} />
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
@@ -150,21 +189,58 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
 
                 {/* Confirm complete prompt */}
                 {isPending && (
-                  <div className="mx-4 mb-1 px-4 py-3 rounded-b-xl bg-green/5 border border-t-0 border-green/20 flex items-center gap-3">
-                    <p className="text-sm text-ink flex-1">Mark as done? You can add a reflection anytime.</p>
-                    <button
-                      disabled={confirming}
-                      onClick={() => confirmComplete(trip.id)}
-                      className="text-sm font-semibold text-white bg-green px-3 py-1.5 rounded-lg disabled:opacity-60"
-                    >
-                      Confirm
-                    </button>
-                    <button
-                      onClick={() => setPendingCompleteId(null)}
-                      className="text-sm text-slate hover:text-ink"
-                    >
-                      Cancel
-                    </button>
+                  <div className="mx-4 mb-1 px-4 py-3 rounded-b-xl bg-success/5 border border-t-0 border-success/20 space-y-3">
+                    <p className="text-sm text-ink">Mark as done? You can add a reflection anytime.</p>
+
+                    {/* Community sharing option */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-slate">Share this trip with the community?</span>
+                        <button
+                          type="button"
+                          onClick={() => setShareWithCommunity((v) => !v)}
+                          className={`relative w-9 h-5 rounded-full transition-colors focus:outline-none ${shareWithCommunity ? 'bg-ocean' : 'bg-mist'}`}
+                          aria-pressed={shareWithCommunity}
+                        >
+                          <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${shareWithCommunity ? 'translate-x-4' : ''}`} />
+                        </button>
+                      </div>
+
+                      {shareWithCommunity && (
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setShareScope('everyone')}
+                            className={`text-[11px] px-3 py-1 rounded-lg border transition-colors ${shareScope === 'everyone' ? 'border-ocean text-ocean bg-ocean/5' : 'border-mist text-slate hover:border-ocean/50'}`}
+                          >
+                            Everyone
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShareScope('friends')}
+                            className={`text-[11px] px-3 py-1 rounded-lg border transition-colors ${shareScope === 'friends' ? 'border-ocean text-ocean bg-ocean/5' : 'border-mist text-slate hover:border-ocean/50'}`}
+                          >
+                            Friends only
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <button
+                        disabled={confirming}
+                        onClick={() => confirmComplete(trip.id)}
+                        className="text-sm font-semibold text-white bg-success px-3 py-1.5 rounded-lg disabled:opacity-60"
+                      >
+                        Confirm
+                      </button>
+                      <button
+                        onClick={() => setPendingCompleteId(null)}
+                        className="text-sm text-slate hover:text-ink"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>

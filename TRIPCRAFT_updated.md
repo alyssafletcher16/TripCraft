@@ -182,7 +182,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - [ ] **Community feed** — backend connected (currently UI only)
 - [ ] **Friends feed** — backend connected (currently UI only)
 - [ ] **Discover map** — backend connected (currently UI only)
-- [ ] **Sharing flow** — trigger modal on COMPLETED, post to community as anon or @handle
+- [x] **Sharing flow** — trigger modal on COMPLETED, post to community as anon or @handle
 - [ ] **Fork trip** — copy any community itinerary to your own trips
 
 ---

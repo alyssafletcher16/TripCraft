@@ -192,7 +192,7 @@ export function CompletedTab({ refreshKey }: CompletedTabProps) {
                     <p className="text-slate/50 text-[10px] font-mono uppercase mt-0.5">{range}</p>
                   )}
                   {trip.reflection ? (
-                    <span className="text-[10px] text-green/70 font-medium">Reflected</span>
+                    <span className="text-[10px] text-success/70 font-medium">Reflected</span>
                   ) : (
                     <Link
                       href={`/trips/${trip.id}`}
