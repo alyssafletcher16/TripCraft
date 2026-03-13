@@ -6,7 +6,6 @@ import { useSession, signOut } from 'next-auth/react'
 import { useSidebar } from './SidebarContext'
 
 const NAV_LINKS = [
-  { href: '/trips',    label: 'My Trips' },
   { href: '/discover', label: 'Discover' },
   { href: '/profile',  label: 'Profile'  },
 ]
