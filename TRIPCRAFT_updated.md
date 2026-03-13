@@ -224,7 +224,9 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - Breadcrumb + back button on trip detail page — breadcrumb shows Home › Profile › Active|Completed › [destination]; back button calls router.push('/profile') (not router.back()) so it always returns to profile regardless of navigation origin
 - Stats banner on home page — hidden until real data is available (STATS constant removed)
 - Mobile hamburger + sign-in: home page gets `<Sidebar hideDesktop />` so the drawer works on all pages; sidebar shows Sign In / Get Started links for unauthenticated users
-- Home page sidebar: when logged in, home page renders full sidebar (Discover, My Profile, Active Itineraries) in the standard 272px grid layout; logged-out users see the marketing landing page with mobile-only drawer
+- Home page sidebar: when logged in, home page renders full sidebar (Discover, My Profile, Active Itineraries) in the standard grid layout; logged-out users see the marketing landing page with mobile-only drawer
+- Sidebar collapse toggle: desktop sidebar has a ‹/› chevron button on its right edge (top-aligned); clicking collapses to a 20px orange strip (still visible/clickable); all pages use grid-cols-[auto_1fr] so layout reflows correctly
+- Sidebar color: terra orange background with white text; active state is white/15 ring; toggle button is terra-lt, turns white on hover
 
 ---
 
