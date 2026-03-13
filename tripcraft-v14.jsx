@@ -3178,8 +3178,7 @@ export default function App() {
         <div className="nav-logo" onClick={()=>setShowHero(true)} style={{cursor:"pointer"}}>trip<span>craft</span></div>
         <div className="nav-links">
           <button className={`nav-link ${tab==="discover"&&inApp?"active":""}`} onClick={()=>{setShowHero(false);setTab("discover")}}>Discover</button>
-          <button className={`nav-link ${tab==="sicily"&&inApp?"active":""}`} onClick={()=>{setShowHero(false);setTab("sicily")}}>My Trips</button>
-          <button className={`nav-link ${tab==="profile"&&inApp?"active":""}`} onClick={()=>{setShowHero(false);setTab("profile")}}>Profile</button>
+<button className={`nav-link ${tab==="profile"&&inApp?"active":""}`} onClick={()=>{setShowHero(false);setTab("profile")}}>Profile</button>
         </div>
         <button className="nav-cta" onClick={()=>{setShowHero(false);setTab("new")}}>+ New trip</button>
       </nav>
