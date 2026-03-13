@@ -133,11 +133,11 @@ export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hid
           <div className={`w-[272px] overflow-hidden transition-opacity duration-200 ${desktopCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
             {sidebarContent}
           </div>
-          {/* Collapse/expand arrow — always visible at the right boundary */}
+          {/* Collapse/expand arrow — pinned near top at boundary */}
           <button
             type="button"
             onClick={toggleDesktop}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 w-5 h-9 flex items-center justify-center bg-deep border border-white/10 rounded-full text-white/30 hover:text-white/70 hover:border-white/25 transition-colors text-[11px]"
+            className="absolute right-0 top-8 translate-x-1/2 z-10 w-6 h-6 flex items-center justify-center bg-tide border border-white/20 rounded-full text-white/80 hover:text-white hover:bg-terra hover:border-terra transition-all duration-150 text-[13px] shadow-md"
             aria-label="Toggle sidebar"
           >
             {desktopCollapsed ? '›' : '‹'}
