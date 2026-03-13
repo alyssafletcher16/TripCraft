@@ -153,8 +153,8 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 
 ## 🔴 Trip Planning — Core (do these first)
 
-- [ ] **Edit block** — click any block to edit all fields inline
-- [ ] **Delete block** — trash icon on hover, confirm before delete
+- [x] **Edit block** — click any block to edit all fields inline
+- [x] **Delete block** — trash icon on hover, confirm before delete
 - [ ] **Destination autocomplete** — single "City, Country" field, Google Places API
 - [ ] **Activity entry: type in OR browse** — currently only browse exists; add manual text entry path
 - [ ] **Hotel entry: type in OR search** — same dual-entry pattern
@@ -206,6 +206,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - Auth: email/password register + login
 - Trip creation form (dest, dates, travelers, budget, vibes, theme)
 - Itinerary builder: day cards, block types (transport/stay/activity/food/note)
+- Edit block (pencil on hover) + delete block (trash on hover, optimistic UI)
 - Add block form: type picker + activity compare modal browse path
 - Activity compare modal (GetYourGuide / Viator)
 - Smart To Do tab — backend connected (toggle, add, delete)
