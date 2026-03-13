@@ -229,7 +229,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - Sidebar collapse toggle: desktop sidebar has a ‹/› chevron button on its right edge (top-aligned); clicking collapses to a 20px orange strip (still visible/clickable); all pages use grid-cols-[auto_1fr] so layout reflows correctly
 - Sidebar color: terra orange background with white text; active state is white/15 ring; toggle button is terra-lt, turns white on hover
 - Mobile responsiveness: all pages and components responsive; tab bar scrolls horizontally; itinerary suggestions panel desktop-only (lg+); Modal/Block/DateRangePicker/ProfileHeader/auth forms all mobile-optimized; edit buttons always visible on touch; hamburger 44px tap target; drag handles hidden on mobile
-- Sidebar sign out: authenticated users see a Sign Out button pinned to the bottom of the sidebar (mt-auto); works on both desktop and mobile drawer; redirects to /login on sign out
+- Sidebar sign out: authenticated users see a Sign Out button pinned to the bottom of the sidebar (mt-auto); works on both desktop and mobile drawer; redirects to /login on sign out; navbar sign out removed (sidebar is the only sign out entry point)
 
 ---
 

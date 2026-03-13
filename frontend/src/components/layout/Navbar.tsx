@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useSession, signOut } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { useSidebar } from './SidebarContext'
 
 export function Navbar() {
@@ -41,14 +41,7 @@ export function Navbar() {
             <span className="hidden sm:inline">+ New Trip</span>
           </Link>
         )}
-        {session ? (
-          <button
-            onClick={() => signOut({ callbackUrl: '/' })}
-            className="hidden sm:block text-white/50 text-sm hover:text-white transition-colors"
-          >
-            Sign out
-          </button>
-        ) : (
+        {!session && (
           <>
             <Link href="/login" className="text-white/50 text-sm hover:text-white transition-colors">
               Sign in
