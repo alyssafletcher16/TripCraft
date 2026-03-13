@@ -118,7 +118,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - **Profile Completed tab:** drag to reorder = permanent life ranking (#1 of my life, #2 overall…)
 - **Share toggle (ANON):** Completed tab only — trips are always in Community, always shown with username to friends. Toggle controls anonymity: on = anonymous in community feed, off = shows @handle
 - **Imported trips:** always private on upload, "Imported" badge, auto-COMPLETED if past date
-- **Sidebar:** flat "My Itineraries" list, all upcoming + 3 recent completed, capped at 8, "See all" link
+- **Sidebar:** "Active Itineraries" section — shows only PLANNING/ACTIVE trips; completed trips not listed; trip city shown beneath name; no status indicators
 - **Cancellation UI:** green ✓ (free) · amber ⚠ (deadline) · structured tiers
 - **Conf #:** show as `CONF #XXXXX`, only visible when status = BOOKED
 - **Cover photo:** user picks from trip photos; defaults to emoji icon if none
@@ -234,7 +234,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - **Profile Completed tab:** drag to reorder = permanent life ranking (#1 of my life, #2 overall…)
 - **Share toggle (ANON):** Completed tab only — trips are always in Community, always shown with username to friends. Toggle controls anonymity: on = anonymous in community feed, off = shows @handle
 - **Imported trips:** always private on upload, "Imported" badge, auto-COMPLETED if past date
-- **Sidebar:** flat "My Itineraries" list, all upcoming + 3 recent completed, capped at 8, "See all" link
+- **Sidebar:** "Active Itineraries" section — shows only PLANNING/ACTIVE trips; completed trips not listed; trip city shown beneath name; no status indicators
 - **Cancellation UI:** green ✓ (free) · amber ⚠ (deadline) · structured tiers (see URL paste spec)
 - **Conf #:** show as `CONF #XXXXX`, only visible when status = BOOKED
 - **Cover photo:** user picks from trip photos; defaults to emoji icon if none

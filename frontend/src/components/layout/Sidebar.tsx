@@ -35,14 +35,8 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
     close()
   }, [pathname]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const upcomingTrips = trips.filter((t) => t.status === 'PLANNING' || t.status === 'ACTIVE')
-  const recentCompleted = trips
-    .filter((t) => t.status === 'COMPLETED')
-    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-    .slice(0, 3)
-
-  const sidebarTrips = [...upcomingTrips, ...recentCompleted].slice(0, 8)
-  const hasMore = trips.length > sidebarTrips.length
+  const sidebarTrips = trips.filter((t) => t.status === 'PLANNING' || t.status === 'ACTIVE')
+  const hasMore = trips.filter((t) => t.status !== 'PLANNING' && t.status !== 'ACTIVE').length > 0
 
   const sidebarContent = (
     <aside className="bg-deep px-[18px] py-7 flex flex-col gap-1 border-r border-white/[0.06] h-full">
@@ -66,8 +60,14 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
         Discover
       </Link>
 
-      {/* ── My Itineraries ──────────────────────────────────────── */}
-      <div className={SB_SECTION}>My Itineraries</div>
+      {/* ── Active Itineraries ──────────────────────────────────── */}
+      <Link
+        href="/profile"
+        onClick={close}
+        className={`${SB_SECTION} hover:text-white/60 transition-colors cursor-pointer`}
+      >
+        My Itineraries
+      </Link>
 
       {sidebarTrips.map((trip) => {
         const active = pathname === `/trips/${trip.id}`
@@ -78,16 +78,15 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
             onClick={close}
             className={`${SB_ITEM} ${active ? SB_ACTIVE : ''}`}
           >
-            <span className={SB_ICON}>{trip.coverEmoji || '◻'}</span>
-            <span className="flex-1 truncate">{trip.title}</span>
-            {(trip.status === 'ACTIVE' || trip.status === 'PLANNING') && (
-              <span className="ml-auto text-[10px] text-gold flex-shrink-0">active</span>
+            {trip.coverEmoji && (
+              <span className={SB_ICON}>{trip.coverEmoji}</span>
             )}
-            {trip.status === 'COMPLETED' && (
-              <span className="ml-auto text-[10px] text-white/25 flex-shrink-0 truncate max-w-[64px]">
-                {trip.destination}
-              </span>
-            )}
+            <span className="flex-1 min-w-0">
+              <span className="block truncate">{trip.title}</span>
+              {trip.destination && (
+                <span className="block truncate text-[11px] text-white/30">{trip.destination}</span>
+              )}
+            </span>
           </Link>
         )
       })}
