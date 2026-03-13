@@ -61,7 +61,13 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
       </Link>
 
       {/* ── Active Itineraries ──────────────────────────────────── */}
-      <div className={SB_SECTION}>My Itineraries</div>
+      <Link
+        href="/profile"
+        onClick={close}
+        className={`${SB_SECTION} hover:text-white/60 transition-colors cursor-pointer`}
+      >
+        My Itineraries
+      </Link>
 
       {sidebarTrips.map((trip) => {
         const active = pathname === `/trips/${trip.id}`
