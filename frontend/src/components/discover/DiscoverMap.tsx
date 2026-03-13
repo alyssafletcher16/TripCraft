@@ -158,7 +158,7 @@ const CLUSTERS: MapCluster[] = [
   // Europe cities
   { ...geoXY(-9,  39),  count:  89, label: 'Lisbon',   zoom: 'europe',   region: 'europe',  itins: [4] },
   { ...geoXY(2,   49),  count: 124, label: 'Paris',    zoom: 'europe',   region: 'europe',  itins: [0, 4] },
-  { ...geoXY(12,  42),  count:  98, label: 'Rome',     zoom: 'europe',   region: 'europe',  itins: [0] },
+  { ...geoXY(12,  42),  count:  98, label: 'Rome',     zoom: 'europe',   region: 'europe',  itins: [0], matchTerms: ['rome','italy','amalfi','florence','venice','naples','sicily','milan','turin','sardinia','puglia','cinque terre'] },
   { ...geoXY(14,  50),  count:  67, label: 'Prague',   zoom: 'europe',   region: 'europe',  itins: [0, 4] },
   { ...geoXY(2,   41),  count:  55, label: 'Barcelona',zoom: 'europe',   region: 'europe',  itins: [0, 4] },
   // Asia cities
