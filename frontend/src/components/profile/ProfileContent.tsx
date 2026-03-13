@@ -4,11 +4,11 @@ import { useState } from 'react'
 import { UpcomingTab } from '@/components/profile/UpcomingTab'
 import { CompletedTab } from '@/components/profile/CompletedTab'
 
-const TABS = ['Upcoming', 'Completed'] as const
+const TABS = ['Active', 'Completed'] as const
 type Tab = typeof TABS[number]
 
 export function ProfileContent() {
-  const [activeTab, setActiveTab] = useState<Tab>('Upcoming')
+  const [activeTab, setActiveTab] = useState<Tab>('Active')
   const [completedRefreshKey, setCompletedRefreshKey] = useState(0)
 
   function handleTripCompleted() {
@@ -36,7 +36,7 @@ export function ProfileContent() {
         </div>
       </div>
 
-      {activeTab === 'Upcoming' && (
+      {activeTab === 'Active' && (
         <UpcomingTab onTripCompleted={handleTripCompleted} />
       )}
 

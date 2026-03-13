@@ -26,11 +26,11 @@ interface TripCardProps {
 const statusVariant: Record<TripStatus, 'gold' | 'green' | 'slate' | 'ocean'> = {
   ACTIVE:    'gold',
   COMPLETED: 'green',
-  PLANNING:  'ocean',
+  PLANNING:  'gold',
 }
 
 const STATUS_LABELS: Record<TripStatus, string> = {
-  PLANNING:  'Planning',
+  PLANNING:  'Active',
   ACTIVE:    'Active',
   COMPLETED: 'Completed',
 }
@@ -83,7 +83,7 @@ export function TripCard({ id, title, destination, status, startDate, endDate, t
                   onChange={(e) => { onStatusChange(id, e.target.value as TripStatus) }}
                   className="text-[11px] font-mono border border-mist rounded-full px-2.5 py-1 bg-white text-ink focus:outline-none focus:border-ocean cursor-pointer"
                 >
-                  {(['PLANNING', 'ACTIVE', 'COMPLETED', 'DRAFT'] as TripStatus[]).map((s) => (
+                  {(['ACTIVE', 'COMPLETED'] as TripStatus[]).map((s) => (
                     <option key={s} value={s}>{STATUS_LABELS[s]}</option>
                   ))}
                 </select>
@@ -165,7 +165,7 @@ export function TripCard({ id, title, destination, status, startDate, endDate, t
                     onChange={(e) => { e.preventDefault(); onStatusChange(id, e.target.value as TripStatus) }}
                     className="text-[11px] font-mono border border-mist rounded-full px-2.5 py-1 bg-white text-ink focus:outline-none focus:border-ocean cursor-pointer"
                   >
-                    {(['PLANNING', 'ACTIVE', 'COMPLETED', 'DRAFT'] as TripStatus[]).map((s) => (
+                    {(['ACTIVE', 'COMPLETED'] as TripStatus[]).map((s) => (
                       <option key={s} value={s}>{STATUS_LABELS[s]}</option>
                     ))}
                   </select>

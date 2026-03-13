@@ -6,6 +6,7 @@ import Link from 'next/link'
 import type { Trip, TripStatus } from '@/types'
 import { useCityPhoto } from '@/hooks/useCityPhoto'
 import { useSidebar } from '@/components/layout/SidebarContext'
+import { UploadItineraryModal } from '@/components/itinerary/UploadItineraryModal'
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
 
@@ -129,8 +130,8 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
 
   return (
     <div className="p-4 sm:p-8 md:p-12 max-w-3xl">
-      <p className="eyebrow mb-2">Upcoming</p>
-      <h2 className="font-serif text-2xl md:text-3xl font-bold text-ink mb-6">Your upcoming trips</h2>
+      <p className="eyebrow mb-2">Active</p>
+      <h2 className="font-serif text-2xl md:text-3xl font-bold text-ink mb-6">Your active trips</h2>
 
       {trips.length === 0 ? (
         <div className="bg-white rounded-2xl border border-mist p-8 text-center max-w-md">
@@ -175,13 +176,12 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
                     )}
                   </div>
 
-                  {/* Status dropdown */}
+                  {/* Status pill */}
                   <select
-                    value={trip.status}
+                    value={trip.status === 'PLANNING' ? 'ACTIVE' : trip.status}
                     onChange={(e) => handleStatusChange(trip.id, e.target.value)}
-                    className="text-xs border border-mist rounded-lg px-2 py-1.5 text-ink bg-white focus:outline-none focus:border-ocean flex-shrink-0 cursor-pointer"
+                    className="text-xs font-semibold px-3 py-1 rounded-full border cursor-pointer focus:outline-none transition-colors flex-shrink-0 bg-gold/10 text-gold border-gold/30"
                   >
-                    <option value="PLANNING">Planning</option>
                     <option value="ACTIVE">Active</option>
                     <option value="COMPLETED">Completed</option>
                   </select>

@@ -80,11 +80,8 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
           >
             <span className={SB_ICON}>{trip.coverEmoji || '◻'}</span>
             <span className="flex-1 truncate">{trip.title}</span>
-            {trip.status === 'ACTIVE' && (
-              <span className="ml-auto text-[10px] text-success flex-shrink-0">active</span>
-            )}
-            {trip.status === 'PLANNING' && (
-              <span className="ml-auto text-[10px] text-gold flex-shrink-0">planning</span>
+            {(trip.status === 'ACTIVE' || trip.status === 'PLANNING') && (
+              <span className="ml-auto text-[10px] text-gold flex-shrink-0">active</span>
             )}
             {trip.status === 'COMPLETED' && (
               <span className="ml-auto text-[10px] text-white/25 flex-shrink-0 truncate max-w-[64px]">

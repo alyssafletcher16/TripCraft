@@ -88,10 +88,10 @@ type SavedLink = {
 }
 
 const STATUS_LABEL: Record<TripStatus, string> = {
-  PLANNING: 'Planning', ACTIVE: 'Active', COMPLETED: 'Completed',
+  PLANNING: 'Active', ACTIVE: 'Active', COMPLETED: 'Completed',
 }
 const STATUS_VARIANT: Record<TripStatus, 'gold' | 'green' | 'ocean' | 'slate'> = {
-  ACTIVE: 'gold', COMPLETED: 'green', PLANNING: 'ocean',
+  ACTIVE: 'gold', COMPLETED: 'green', PLANNING: 'gold',
 }
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
@@ -1223,7 +1223,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
                     onChange={(e) => handleStatusChange(e.target.value as TripStatus)}
                     className="text-[11px] font-mono border border-white/30 rounded-full px-2.5 py-1 bg-black/30 text-white backdrop-blur-sm focus:outline-none focus:border-white/60 cursor-pointer"
                   >
-                    {(['PLANNING', 'ACTIVE', 'COMPLETED', 'DRAFT'] as TripStatus[]).map((s) => (
+                    {(['ACTIVE', 'COMPLETED'] as TripStatus[]).map((s) => (
                       <option key={s} value={s} className="text-ink bg-white">{STATUS_LABEL[s]}</option>
                     ))}
                   </select>

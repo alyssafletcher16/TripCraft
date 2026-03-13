@@ -94,7 +94,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 | Model | Key Fields |
 |---|---|
 | User | id, name, email, passwordHash |
-| Trip | id, userId, dest, dates, days, travelers, budget, theme, status (PLANNING/ACTIVE/COMPLETED) |
+| Trip | id, userId, dest, dates, days, travelers, budget, theme, status (ACTIVE/COMPLETED; PLANNING legacy) |
 | TripVibe | tripId, vibe |
 | ItineraryDay | id, tripId, dayNum, name, theme, date, stayingIn |
 | Block | id, dayId, type, title, detail, price, status (BOOKED/PENDING), confCode, cancelPolicy (JSON tiered), participants |
@@ -110,11 +110,11 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 
 ## Locked Product Decisions
 
-- **Status enum:** PLANNING · ACTIVE · COMPLETED only (no DRAFT)
+- **Status enum:** ACTIVE · COMPLETED only (UI exposes 2 statuses; PLANNING exists in DB mapped to ACTIVE for legacy compat)
 - **Travelers field:** always labeled "Total number of travelers (including yourself)"
 - **Vibes:** multi-select chips + custom text input
 - **Sharing:** anonymous = no name in Community, real name in Friends; public = @handle in Community (clickable → profile)
-- **Profile Upcoming tab:** numbered list, no drag, always private
+- **Profile Active tab:** numbered list, no drag, always private (was "Upcoming")
 - **Profile Completed tab:** drag to reorder = permanent life ranking (#1 of my life, #2 overall…)
 - **Share toggle (ANON):** Completed tab only — trips are always in Community, always shown with username to friends. Toggle controls anonymity: on = anonymous in community feed, off = shows @handle
 - **Imported trips:** always private on upload, "Imported" badge, auto-COMPLETED if past date
@@ -218,18 +218,18 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - Map tab — SVG world map with destination pin + itinerary sequence
 - Profile: Upcoming / Completed tabs, draggable rankings, share toggle
 - PDF itinerary upload + auto-route by parsed date
-- Trip status system: PLANNING / ACTIVE / COMPLETED
+- Trip status system: ACTIVE / COMPLETED (2 statuses in UI; PLANNING in DB maps to ACTIVE)
 - Google Places API + PlaceCache + intelligence service (built, needs credits)
 
 ---
 
 ## Locked Product Decisions
 
-- **Status enum:** PLANNING · ACTIVE · COMPLETED only (no DRAFT)
+- **Status enum:** ACTIVE · COMPLETED only (UI exposes 2 statuses; PLANNING exists in DB mapped to ACTIVE for legacy compat)
 - **Travelers field:** always labeled "Total number of travelers (including yourself)"
 - **Vibes:** multi-select chips + custom text input
 - **Sharing:** anonymous = no name in Community, real name in Friends; public = @handle in Community (clickable → profile)
-- **Profile Upcoming tab:** numbered list, no drag, always private
+- **Profile Active tab:** numbered list, no drag, always private (was "Upcoming")
 - **Profile Completed tab:** drag to reorder = permanent life ranking (#1 of my life, #2 overall…)
 - **Share toggle (ANON):** Completed tab only — trips are always in Community, always shown with username to friends. Toggle controls anonymity: on = anonymous in community feed, off = shows @handle
 - **Imported trips:** always private on upload, "Imported" badge, auto-COMPLETED if past date
