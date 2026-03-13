@@ -114,7 +114,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - **Travelers field:** always labeled "Total number of travelers (including yourself)"
 - **Vibes:** multi-select chips + custom text input
 - **Sharing:** anonymous = no name in Community, real name in Friends; public = @handle in Community (clickable → profile)
-- **Profile Active tab:** numbered list, no drag, always private (was "Upcoming")
+- **Profile page:** shows Completed tab only — Active tab removed (active trips are in the sidebar)
 - **Profile Completed tab:** drag to reorder = permanent life ranking (#1 of my life, #2 overall…)
 - **Share toggle (ANON):** Completed tab only — trips are always in Community, always shown with username to friends. Toggle controls anonymity: on = anonymous in community feed, off = shows @handle
 - **Imported trips:** always private on upload, "Imported" badge, auto-COMPLETED if past date
@@ -217,7 +217,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - "Book now ↗" CTA on pending activity/stay blocks
 - Post-trip reflection modal — backend connected
 - Map tab — SVG world map with destination pin + itinerary sequence
-- Profile: Upcoming / Completed tabs, draggable rankings, share toggle
+- Profile: Completed tab only (Active tab removed), draggable rankings, share toggle
 - PDF/DOCX/XLSX/CSV/TXT itinerary import — Claude parses → review → save; "Import itinerary" button on Completed tab; auto-COMPLETED if past date; "Imported" badge; routes: POST /api/itinerary/upload, POST /api/itinerary/save
 - Trip status system: ACTIVE / COMPLETED (2 statuses in UI; PLANNING in DB maps to ACTIVE)
 - Google Places API + PlaceCache + intelligence service (built, needs credits)
@@ -230,7 +230,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - **Travelers field:** always labeled "Total number of travelers (including yourself)"
 - **Vibes:** multi-select chips + custom text input
 - **Sharing:** anonymous = no name in Community, real name in Friends; public = @handle in Community (clickable → profile)
-- **Profile Active tab:** numbered list, no drag, always private (was "Upcoming")
+- **Profile page:** shows Completed tab only — Active tab removed (active trips are in the sidebar)
 - **Profile Completed tab:** drag to reorder = permanent life ranking (#1 of my life, #2 overall…)
 - **Share toggle (ANON):** Completed tab only — trips are always in Community, always shown with username to friends. Toggle controls anonymity: on = anonymous in community feed, off = shows @handle
 - **Imported trips:** always private on upload, "Imported" badge, auto-COMPLETED if past date
