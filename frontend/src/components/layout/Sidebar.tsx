@@ -8,10 +8,10 @@ import { useSidebar } from './SidebarContext'
 import type { Trip } from '@/types'
 
 const SB_ITEM =
-  'flex items-center gap-[11px] px-3 py-[10px] rounded-[10px] transition-all duration-150 text-white/70 text-[13px] hover:bg-white/10 hover:text-white'
+  'flex items-center gap-[11px] px-3 py-[10px] rounded-[10px] transition-all duration-150 text-white/70 text-[15px] hover:bg-white/10 hover:text-white'
 const SB_ACTIVE = 'bg-white/15 text-white ring-1 ring-inset ring-white/25'
-const SB_ICON = 'text-[15px] w-5 text-center flex-shrink-0'
-const SB_SECTION = 'font-mono text-[9px] text-white/40 tracking-[2px] uppercase pt-[18px] px-[10px] pb-2'
+const SB_ICON = 'text-[17px] w-5 text-center flex-shrink-0'
+const SB_SECTION = 'font-mono text-[11px] text-white/40 tracking-[2px] uppercase pt-[18px] px-[10px] pb-2'
 
 // ── Sidebar ──────────────────────────────────────────────────────────────────
 export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hideDesktop?: boolean } = {}) {
@@ -94,7 +94,7 @@ export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hid
             <span className="flex-1 min-w-0">
               <span className="block truncate">{trip.title}</span>
               {trip.destination && (
-                <span className="block truncate text-[11px] text-white/50">{trip.destination}</span>
+                <span className="block truncate text-[13px] text-white/50">{trip.destination}</span>
               )}
             </span>
           </Link>

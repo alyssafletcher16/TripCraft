@@ -31,18 +31,18 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-terra text-white px-8 py-3.5 rounded-full text-sm font-semibold
+    @apply bg-terra text-white px-8 py-3.5 rounded-full text-base font-semibold
            transition-all duration-200 hover:bg-terra-lt hover:-translate-y-0.5
            hover:shadow-[0_10px_28px_rgba(196,96,58,0.4)];
   }
 
   .btn-ghost {
-    @apply text-white/60 text-sm border border-white/15 px-6 py-3 rounded-full
+    @apply text-white/60 text-base border border-white/15 px-6 py-3 rounded-full
            transition-all duration-200 hover:border-white/35 hover:text-white;
   }
 
   .btn-outline {
-    @apply border-[1.5px] border-mist bg-white text-ink px-5 py-2 rounded-full text-sm
+    @apply border-[1.5px] border-mist bg-white text-ink px-5 py-2 rounded-full text-base
            font-medium transition-all duration-150 hover:border-terra hover:text-terra;
   }
 
@@ -51,7 +51,7 @@
   }
 
   .nav-link {
-    @apply px-4 py-2 rounded-full text-sm font-medium text-white/60 transition-all
+    @apply px-4 py-2 rounded-full text-base font-medium text-white/60 transition-all
            duration-150 hover:text-white hover:bg-white/[0.07];
   }
 
@@ -61,7 +61,7 @@
 
   .sidebar-item {
     @apply flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all
-           duration-150 text-white/50 text-sm border border-transparent w-full text-left
+           duration-150 text-white/50 text-base border border-transparent w-full text-left
            hover:bg-white/[0.06] hover:text-white/85;
   }
 
@@ -101,7 +101,7 @@
   }
 
   .eyebrow {
-    @apply font-mono text-[10px] text-slate tracking-[2px] uppercase;
+    @apply font-mono text-[11px] text-slate tracking-[2px] uppercase;
   }
 
   .page-title {
