@@ -96,7 +96,6 @@ enum TripStatus {
   PLANNING
   ACTIVE
   COMPLETED
-  DRAFT
 }
 
 model TripVibe {

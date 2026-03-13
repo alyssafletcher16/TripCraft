@@ -13,59 +13,6 @@ const SB_ACTIVE = 'bg-terra/15 text-terra-lt ring-1 ring-inset ring-terra/20'
 const SB_ICON = 'text-[15px] w-5 text-center flex-shrink-0'
 const SB_SECTION = 'font-mono text-[9px] text-slate tracking-[2px] uppercase pt-[18px] px-[10px] pb-2'
 
-// ── Past trips collapsible ───────────────────────────────────────────────────
-function PastTripsToggle({ trips, onNav }: { trips: Trip[]; onNav: () => void }) {
-  const [open, setOpen] = useState(false)
-  const pathname = usePathname()
-
-  if (trips.length === 0) return null
-
-  return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className={`${SB_ITEM} justify-between w-full`}
-      >
-        <div className="flex items-center gap-[11px]">
-          <span className={`${SB_ICON} opacity-50`}>🗂</span>
-          <span>Past trips</span>
-          <span className="text-[9px] bg-white/10 rounded-full px-[7px] py-px text-white/50">
-            {trips.length}
-          </span>
-        </div>
-        <span
-          className="text-[11px] text-white/30 transition-transform duration-200"
-          style={{ transform: open ? 'rotate(180deg)' : 'none' }}
-        >
-          ▾
-        </span>
-      </button>
-
-      {open && (
-        <div className="ml-3 border-l border-white/[0.08] pl-2 flex flex-col gap-0.5 mb-1">
-          {trips.map((trip) => {
-            const active = pathname === `/trips/${trip.id}`
-            return (
-              <Link
-                key={trip.id}
-                href={`/trips/${trip.id}`}
-                onClick={onNav}
-                className={`flex items-center gap-[11px] px-[10px] py-2 rounded-[10px] transition-all duration-150 text-white/50 text-[12px] hover:bg-white/[0.06] hover:text-white/85 ${active ? SB_ACTIVE : ''}`}
-              >
-                <span className="text-[14px] w-5 text-center flex-shrink-0">
-                  {trip.coverEmoji || '◻'}
-                </span>
-                <span className="flex-1 truncate">{trip.title}</span>
-              </Link>
-            )
-          })}
-        </div>
-      )}
-    </>
-  )
-}
-
 // ── Sidebar ──────────────────────────────────────────────────────────────────
 export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
   const pathname = usePathname()
@@ -88,10 +35,14 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
     close()
   }, [pathname]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const activeTrips    = trips.filter((t) => t.status === 'ACTIVE' || t.status === 'PLANNING')
-  const draftTrips     = trips.filter((t) => t.status === 'DRAFT')
-  const completedTrips = trips.filter((t) => t.status === 'COMPLETED')
-  const hasTrips       = trips.length > 0
+  const upcomingTrips = trips.filter((t) => t.status === 'PLANNING' || t.status === 'ACTIVE')
+  const recentCompleted = trips
+    .filter((t) => t.status === 'COMPLETED')
+    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    .slice(0, 3)
+
+  const sidebarTrips = [...upcomingTrips, ...recentCompleted].slice(0, 8)
+  const hasMore = trips.length > sidebarTrips.length
 
   const sidebarContent = (
     <aside className="bg-deep px-[18px] py-7 flex flex-col gap-1 border-r border-white/[0.06] h-full">
@@ -118,7 +69,7 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
       {/* ── My Itineraries ──────────────────────────────────────── */}
       <div className={SB_SECTION}>My Itineraries</div>
 
-      {activeTrips.map((trip) => {
+      {sidebarTrips.map((trip) => {
         const active = pathname === `/trips/${trip.id}`
         return (
           <Link
@@ -129,37 +80,38 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
           >
             <span className={SB_ICON}>{trip.coverEmoji || '◻'}</span>
             <span className="flex-1 truncate">{trip.title}</span>
-            <span className="ml-auto text-[10px] text-gold flex-shrink-0">
-              {trip.status === 'ACTIVE' ? 'active' : 'planning'}
-            </span>
+            {trip.status === 'ACTIVE' && (
+              <span className="ml-auto text-[10px] text-green flex-shrink-0">active</span>
+            )}
+            {trip.status === 'PLANNING' && (
+              <span className="ml-auto text-[10px] text-gold flex-shrink-0">planning</span>
+            )}
+            {trip.status === 'COMPLETED' && (
+              <span className="ml-auto text-[10px] text-white/25 flex-shrink-0 truncate max-w-[64px]">
+                {trip.destination}
+              </span>
+            )}
           </Link>
         )
       })}
 
-      {draftTrips.map((trip) => {
-        const active = pathname === `/trips/${trip.id}`
-        return (
-          <Link
-            key={trip.id}
-            href={`/trips/${trip.id}`}
-            onClick={close}
-            className={`${SB_ITEM} ${active ? SB_ACTIVE : ''}`}
-          >
-            <span className={SB_ICON}>{trip.coverEmoji || '◻'}</span>
-            <span className="flex-1 truncate">{trip.title}</span>
-            <span className="text-[10px] opacity-40 flex-shrink-0">draft</span>
-          </Link>
-        )
-      })}
-
-      {!hasTrips && status !== 'loading' && session && (
+      {trips.length === 0 && status !== 'loading' && session && (
         <Link href="/trips/new" onClick={close} className={SB_ITEM}>
           <span className={`${SB_ICON} opacity-40`}>+</span>
           <span className="opacity-40">Start a trip</span>
         </Link>
       )}
 
-      <PastTripsToggle trips={completedTrips} onNav={close} />
+      {hasMore && (
+        <Link
+          href="/profile"
+          onClick={close}
+          className="flex items-center gap-[11px] px-3 py-[8px] rounded-[10px] text-white/30 text-[12px] hover:text-white/60 transition-colors"
+        >
+          <span className={`${SB_ICON} text-[12px] opacity-40`}>→</span>
+          See all
+        </Link>
+      )}
 
       {/* ── Account ─────────────────────────────────────────────── */}
       <div className={SB_SECTION}>Account</div>

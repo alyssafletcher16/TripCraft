@@ -1,4 +1,4 @@
-export type TripStatus = 'PLANNING' | 'ACTIVE' | 'COMPLETED' | 'DRAFT'
+export type TripStatus = 'PLANNING' | 'ACTIVE' | 'COMPLETED'
 export type BlockType = 'TRANSPORT' | 'STAY' | 'ACTIVITY' | 'FOOD' | 'NOTE'
 export type BookingStatus = 'BOOKED' | 'PENDING' | 'CANCELLED'
 export type InsightType = 'INFO' | 'WARNING' | 'DANGER'
@@ -30,7 +30,9 @@ export interface Trip {
   reflection?: TripReflection
   insights: TripInsight[]
   checklist: ChecklistItem[]
-  _count?: { upvotes: number }
+  _count?: { upvotes: number; days?: number }
+  community?: { isPublic: boolean; friendsOnly: boolean } | null
+  itineraryImport?: { id: string } | null
   createdAt: string
   updatedAt: string
 }

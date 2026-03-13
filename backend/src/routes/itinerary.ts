@@ -49,15 +49,16 @@ itineraryRouter.post('/upload', requireAuth, upload.single('file'), async (req: 
 })
 
 // POST /api/itinerary/save
-// Saves the confirmed parsed itinerary to the database with visibility setting
+// Saves the confirmed parsed itinerary to the database, always private.
+// Status is auto-assigned: COMPLETED if start date is in the past, PLANNING otherwise.
 itineraryRouter.post('/save', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const { parsed, fileName, visibility } = req.body
+    const { parsed, fileName } = req.body
     const userId = req.userId!
 
-    // visibility: "private" | "friends" | "public"
-    const isPublic = visibility === 'public'
-    const friendsOnly = visibility === 'friends'
+    const status = parsed.startDate && new Date(parsed.startDate) < new Date()
+      ? 'COMPLETED'
+      : 'PLANNING'
 
     const trip = await prisma.trip.create({
       data: {
@@ -68,8 +69,8 @@ itineraryRouter.post('/save', requireAuth, async (req: AuthRequest, res: Respons
         endDate: parsed.endDate ? new Date(parsed.endDate) : null,
         travelers: parsed.totalTravelers ?? 1,
         budget: parsed.estimatedBudget ?? null,
-        status: 'COMPLETED',
-        isPublic,
+        status,
+        isPublic: false,
         vibes: parsed.vibes?.length
           ? { create: parsed.vibes.map((v: string) => ({ vibe: v.toLowerCase() })) }
           : undefined,
@@ -92,7 +93,7 @@ itineraryRouter.post('/save', requireAuth, async (req: AuthRequest, res: Respons
           }))
         },
         community: {
-          create: { isPublic, friendsOnly, upvotes: 0 }
+          create: { isPublic: false, friendsOnly: false, upvotes: 0 }
         },
         itineraryImport: {
           create: {

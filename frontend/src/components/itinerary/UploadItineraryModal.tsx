@@ -5,8 +5,6 @@ import { useSession } from 'next-auth/react'
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
 
-type Visibility = 'private' | 'friends' | 'public'
-
 interface ParsedBlock {
   type: string
   title: string
@@ -44,6 +42,8 @@ interface UploadItineraryModalProps {
 
 type Step = 'upload' | 'parsing' | 'review' | 'saving' | 'done'
 
+
+
 export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
   const router = useRouter()
   const { data: session } = useSession()
@@ -53,7 +53,6 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
   const [file, setFile] = useState<File | null>(null)
   const [parsed, setParsed] = useState<ParsedItinerary | null>(null)
   const [fileName, setFileName] = useState('')
-  const [visibility, setVisibility] = useState<Visibility>('private')
   const [error, setError] = useState('')
   const [dragOver, setDragOver] = useState(false)
 
@@ -111,7 +110,7 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ parsed, fileName, visibility }),
+        body: JSON.stringify({ parsed, fileName }),
       })
 
       if (!res.ok) {
@@ -259,38 +258,9 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
 
             <div style={{ height: 1, background: '#D6E4EE', margin: '20px 0' }} />
 
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#0A1F30', marginBottom: 12 }}>Who can see this trip?</div>
-
-            {([
-              { key: 'private', label: 'Just me', desc: 'Only visible on your profile' },
-              { key: 'friends', label: 'Friends only', desc: 'Visible to people you follow' },
-              { key: 'public', label: 'Share with community', desc: 'Added to Discover feed and archive' }
-            ] as { key: Visibility; label: string; desc: string }[]).map(opt => (
-              <div
-                key={opt.key}
-                onClick={() => setVisibility(opt.key)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 14,
-                  padding: '14px 16px', borderRadius: 12, marginBottom: 8,
-                  border: `1.5px solid ${visibility === opt.key ? '#C4603A' : '#D6E4EE'}`,
-                  background: visibility === opt.key ? 'rgba(196,96,58,0.05)' : '#fff',
-                  cursor: 'pointer', transition: 'all 0.15s'
-                }}
-              >
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#0A1F30' }}>{opt.label}</div>
-                  <div style={{ fontSize: 11, color: '#5B7A8E' }}>{opt.desc}</div>
-                </div>
-                <div style={{
-                  width: 18, height: 18, borderRadius: '50%', flexShrink: 0,
-                  border: `2px solid ${visibility === opt.key ? '#C4603A' : '#D6E4EE'}`,
-                  background: visibility === opt.key ? '#C4603A' : 'transparent',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}>
-                  {visibility === opt.key && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />}
-                </div>
-              </div>
-            ))}
+            <div style={{ fontSize: 13, color: '#5B7A8E', padding: '12px 16px', background: '#EEF4F8', borderRadius: 12 }}>
+              This trip will be saved to your profile. You can share it after marking it complete.
+            </div>
 
             {error && (
               <div style={{ background: 'rgba(192,64,64,0.08)', border: '1px solid rgba(192,64,64,0.3)', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#C04040', margin: '16px 0' }}>
@@ -306,7 +276,7 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
                 border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer'
               }}
             >
-              Save to profile
+              Save to my trips
             </button>
           </>
         )}

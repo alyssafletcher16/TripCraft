@@ -181,15 +181,18 @@ Build and polish the trip planning experience first before expanding other areas
 
 ---
 
-### 🟢 AREA 7 — Profile & Archive
+### 🟢 AREA 7 — Profile & Lifecycle
 *Lower priority until users have trips to archive.*
 
 | # | Feature | Status | Notes |
 |---|---|---|---|
 | 7.1 | World map header with visited city pins | ☐ | |
-| 7.2 | Draggable trip rankings | ☐ | |
+| 7.2 | Draggable trip rankings (Completed tab) | ✅ | Drag to reorder permanent life ranking |
 | 7.3 | Trip detail modal (photos, thoughts, itinerary) | ☐ | |
 | 7.4 | Post-trip reflection flow (8 questions) | ☐ | |
+| 7.5 | Unified Upcoming / Completed tab structure | ✅ | Replaces My Trips / Archive tabs |
+| 7.6 | Share toggle on Completed tab cards | ✅ | Friends only / Everyone inline choice |
+| 7.7 | Auto-route uploaded trips by parsed date | ✅ | COMPLETED if past, PLANNING if future/null |
 
 ---
 
@@ -314,17 +317,21 @@ Session 16: 2.12       — Mobile reference view
 ---
 
 ## Product Decisions (Locked)
-- **Imported trips** default to private on save. User must opt in to friends or public visibility.
-- **Imported trips** show a source badge on the profile card (e.g. "Imported from PDF") — tracked via ItineraryImport model.
+- **Trip lifecycle** — all trips (built or uploaded) live in one unified place. Two tabs on profile: Upcoming (PLANNING + ACTIVE) and Completed (COMPLETED).
+- **Upcoming tab** — PLANNING and ACTIVE trips. Numbered list showing excitement/priority order. No drag reorder. No share toggle — upcoming trips are always private.
+- **Completed tab** — COMPLETED trips only. Drag to reorder = permanent life ranking. Rank labels: "#1 of my life", "#2 overall", "#3 overall", etc.
+- **Share toggle** only appears on Completed tab cards. Toggle off = private (isPublic: false, friendsOnly: false). Toggle on = inline choice: "Friends only" or "Everyone".
+- **Imported trips** always saved as private on upload. User opts into sharing from the Completed tab after marking done. Privacy selector removed from upload flow.
+- **Imported trips** show a small "Imported" badge in muted text on completed cards — no other special treatment.
+- **Uploaded trips** auto-assigned COMPLETED if parsed start date is in the past, PLANNING if future or null. Logic lives in both itinerary.ts save and trips.ts import/confirm endpoints.
 - **Community model** has a `friendsOnly` boolean: `isPublic=false` + `friendsOnly=true` means friends feed only.
-
-
+- **TripStatus enum** — three values only: PLANNING, ACTIVE, COMPLETED. DRAFT removed.
+- **Sidebar** — one flat "My Itineraries" list. All upcoming trips + 3 most recent completed, capped at 8 total. Status labels: gold "planning", green "active", muted destination text for completed. "See all" link if more than 8.
 - **Travelers field** always labeled "Total number of travelers (including yourself)"
 - **Vibes** are multi-select chips — user can select any combination
 - **Cancellation deadlines** shown green ✓ (free/safe) or amber ⚠ (deadline/non-refundable) per block
 - **Confirmation numbers** displayed as `CONF #XXXXX` on booked blocks
 - **Discover map** — Europe/Asia/Americas zoom to city-level pins; Africa/S.America select directly and filter cards
-- **Profile rankings** are drag-to-reorder; ranks auto-update (#1 of my life, #2 overall, etc.)
 - **Non-Tripcraft trips** can upload a PDF/Word itinerary doc
 - **Trip details** (dest, dates, travelers, budget, theme, vibes) are editable at any time via ✏ Edit details button
 - **Post-trip reflection** has 8 steps: ranking slider, expectation match, future-you note, what to change, best decision, skip next time, rebook ratings, title + photos
@@ -390,14 +397,16 @@ Session 16: 2.12       — Mobile reference view
 - [ ] Friends feed
 - [ ] Interactive map
 
-### Profile & Archive
+### Profile & Lifecycle
+- [x] Profile page — unified trip lifecycle (Upcoming / Completed tabs)
+- [x] Profile page — draggable rankings on Completed tab
+- [x] Share toggle on Completed tab cards (Friends only / Everyone)
+- [x] Uploaded trips auto-routed by date to correct tab
 - [ ] World map header
-- [ ] Draggable rankings
 - [ ] Trip detail modal
 - [ ] Post-trip reflection flow
 - [ ] Photo upload
 - [x] PDF itinerary upload
-- [x] Privacy selector on save (private / friends / public)
 
 ## How to Use This File
 

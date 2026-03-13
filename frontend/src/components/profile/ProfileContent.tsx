@@ -1,14 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import { TripsList } from '@/components/trips/TripsList'
-import { ArchiveTab } from '@/components/profile/ArchiveTab'
+import { UpcomingTab } from '@/components/profile/UpcomingTab'
+import { CompletedTab } from '@/components/profile/CompletedTab'
 
-const TABS = ['My Trips', 'Archive'] as const
+const TABS = ['Upcoming', 'Completed'] as const
 type Tab = typeof TABS[number]
 
 export function ProfileContent() {
-  const [activeTab, setActiveTab] = useState<Tab>('My Trips')
+  const [activeTab, setActiveTab] = useState<Tab>('Upcoming')
+  const [completedRefreshKey, setCompletedRefreshKey] = useState(0)
+
+  function handleTripCompleted() {
+    setCompletedRefreshKey((k) => k + 1)
+  }
 
   return (
     <>
@@ -31,16 +36,13 @@ export function ProfileContent() {
         </div>
       </div>
 
-      {/* Tab panels */}
-      {activeTab === 'My Trips' && (
-        <div className="p-4 sm:p-8 md:p-12">
-          <p className="eyebrow mb-2">My Trips</p>
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-ink mb-6 md:mb-8">Your itineraries</h2>
-          <TripsList />
-        </div>
+      {activeTab === 'Upcoming' && (
+        <UpcomingTab onTripCompleted={handleTripCompleted} />
       )}
 
-      {activeTab === 'Archive' && <ArchiveTab />}
+      {activeTab === 'Completed' && (
+        <CompletedTab refreshKey={completedRefreshKey} />
+      )}
     </>
   )
 }

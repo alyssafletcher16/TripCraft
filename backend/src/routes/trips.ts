@@ -120,7 +120,7 @@ tripsRouter.post('/import/confirm', requireAuth, async (req: AuthRequest, res) =
             endDate: t.endDate ? new Date(t.endDate) : null,
             travelers: t.travelers ?? 1,
             budget: t.budget ?? null,
-            status: 'COMPLETED',
+            status: (t.startDate && new Date(t.startDate) < new Date()) ? 'COMPLETED' : 'PLANNING',
             coverEmoji: '✈️',
           },
         })
@@ -155,7 +155,13 @@ tripsRouter.get('/', requireAuth, async (req: AuthRequest, res) => {
   try {
     const trips = await prisma.trip.findMany({
       where: { userId: req.userId },
-      include: { vibes: true, _count: { select: { days: true, upvotes: true } } },
+      include: {
+        vibes: true,
+        _count: { select: { days: true, upvotes: true } },
+        community: { select: { isPublic: true, friendsOnly: true } },
+        itineraryImport: { select: { id: true } },
+        reflection: { select: { id: true } },
+      },
       orderBy: { updatedAt: 'desc' },
     })
     return res.json(trips)
@@ -268,6 +274,24 @@ tripsRouter.patch('/:id', requireAuth, async (req: AuthRequest, res) => {
       include: { vibes: true },
     })
     return res.json(updated)
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// PATCH /api/trips/:id/community — upsert share visibility
+tripsRouter.patch('/:id/community', requireAuth, async (req: AuthRequest, res) => {
+  const { isPublic, friendsOnly } = req.body
+  try {
+    const trip = await prisma.trip.findFirst({ where: { id: req.params.id, userId: req.userId } })
+    if (!trip) return res.status(404).json({ error: 'Trip not found' })
+    const community = await prisma.community.upsert({
+      where: { tripId: req.params.id },
+      create: { tripId: req.params.id, isPublic: Boolean(isPublic), friendsOnly: Boolean(friendsOnly), upvotes: 0 },
+      update: { isPublic: Boolean(isPublic), friendsOnly: Boolean(friendsOnly) },
+    })
+    return res.json(community)
   } catch (err) {
     console.error(err)
     return res.status(500).json({ error: 'Internal server error' })
