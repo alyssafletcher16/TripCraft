@@ -176,15 +176,13 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
                     )}
                   </div>
 
-                  {/* Status pill */}
-                  <select
-                    value={trip.status === 'PLANNING' ? 'ACTIVE' : trip.status}
-                    onChange={(e) => handleStatusChange(trip.id, e.target.value)}
-                    className="text-xs font-semibold px-3 py-1 rounded-full border cursor-pointer focus:outline-none transition-colors flex-shrink-0 bg-gold/10 text-gold border-gold/30"
+                  {/* Mark complete button */}
+                  <button
+                    onClick={() => handleStatusChange(trip.id, 'COMPLETED')}
+                    className="text-xs font-semibold px-3 py-1.5 rounded-full border cursor-pointer focus:outline-none transition-colors flex-shrink-0 bg-gold/10 text-gold border-gold/30 hover:bg-gold/20"
                   >
-                    <option value="ACTIVE">Active</option>
-                    <option value="COMPLETED">Completed</option>
-                  </select>
+                    Mark complete
+                  </button>
                 </div>
 
                 {/* Confirm complete prompt */}

@@ -114,7 +114,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - **Travelers field:** always labeled "Total number of travelers (including yourself)"
 - **Vibes:** multi-select chips + custom text input
 - **Sharing:** anonymous = no name in Community, real name in Friends; public = @handle in Community (clickable → profile)
-- **Profile Active tab:** numbered list, no drag, always private (was "Upcoming")
+- **Profile Active tab:** numbered list, no drag, always private (was "Upcoming"); "Mark complete" button per trip (replaces dropdown) — clicking opens confirm panel with community sharing option
 - **Profile Completed tab:** drag to reorder = permanent life ranking (#1 of my life, #2 overall…)
 - **Share toggle (ANON):** Completed tab only — trips are always in Community, always shown with username to friends. Toggle controls anonymity: on = anonymous in community feed, off = shows @handle
 - **Imported trips:** always private on upload, "Imported" badge, auto-COMPLETED if past date
@@ -230,7 +230,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - **Travelers field:** always labeled "Total number of travelers (including yourself)"
 - **Vibes:** multi-select chips + custom text input
 - **Sharing:** anonymous = no name in Community, real name in Friends; public = @handle in Community (clickable → profile)
-- **Profile Active tab:** numbered list, no drag, always private (was "Upcoming")
+- **Profile Active tab:** numbered list, no drag, always private (was "Upcoming"); "Mark complete" button per trip (replaces dropdown) — clicking opens confirm panel with community sharing option
 - **Profile Completed tab:** drag to reorder = permanent life ranking (#1 of my life, #2 overall…)
 - **Share toggle (ANON):** Completed tab only — trips are always in Community, always shown with username to friends. Toggle controls anonymity: on = anonymous in community feed, off = shows @handle
 - **Imported trips:** always private on upload, "Imported" badge, auto-COMPLETED if past date
