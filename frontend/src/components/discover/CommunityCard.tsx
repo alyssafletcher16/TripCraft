@@ -1,5 +1,7 @@
 'use client'
 
+import { useCityPhoto } from '@/hooks/useCityPhoto'
+
 const AVATAR_COLORS = ['#4A6FA5', '#3A7D5A', '#8A4F3A', '#6A4F8A', '#4A7A6A', '#3A5A8A']
 
 const VIBE_BG: Record<string, string> = {
@@ -45,6 +47,7 @@ interface Props {
 }
 
 export function CommunityCard({ card, index, upvoted, onUpvote }: Props) {
+  const photoUrl = useCityPhoto(card.destination)
   const firstVibe = card.vibes[0]?.vibe ?? ''
   const highlight = VIBE_BG[firstVibe] ?? '#EEF4F8'
   const photoEmojis = card.vibes.slice(0, 3).map((v) => VIBE_EMOJI[v.vibe] ?? '✈')
@@ -71,7 +74,11 @@ export function CommunityCard({ card, index, upvoted, onUpvote }: Props) {
         className="h-[140px] relative overflow-hidden flex items-center justify-center text-[52px]"
         style={{ background: highlight }}
       >
-        {card.coverEmoji ?? '✈'}
+        {photoUrl ? (
+          <img src={photoUrl} alt={card.destination} className="absolute inset-0 w-full h-full object-cover" />
+        ) : (
+          card.coverEmoji ?? '✈'
+        )}
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent from-[40%] to-[rgba(13,43,69,0.75)]" />
         {/* Destination + votes overlay */}
