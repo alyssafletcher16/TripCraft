@@ -129,19 +129,19 @@ export function CompletedTab({ refreshKey }: CompletedTabProps) {
     return !!trip.community?.isAnonymous
   }
 
-  async function handleAnonToggle(trip: Trip) {
-    const next = !isAnonymous(trip)
+  async function handleSetAnon(trip: Trip, makeAnon: boolean) {
+    if (isAnonymous(trip) === makeAnon) return
     setTrips((prev) =>
       prev.map((t) =>
         t.id === trip.id
-          ? { ...t, community: { isPublic: false, friendsOnly: false, ...t.community, isAnonymous: next } }
+          ? { ...t, community: { isPublic: false, friendsOnly: false, ...t.community, isAnonymous: makeAnon } }
           : t
       )
     )
     await fetch(`${API}/api/trips/${trip.id}/community`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ isAnonymous: next }),
+      body: JSON.stringify({ isAnonymous: makeAnon }),
     }).catch(() => {})
   }
 
@@ -156,7 +156,7 @@ export function CompletedTab({ refreshKey }: CompletedTabProps) {
   }
 
   return (
-    <div className="p-4 sm:p-8 md:p-12 max-w-3xl">
+    <div className="p-4 pt-2 sm:p-8 sm:pt-4 md:p-12 md:pt-6 max-w-3xl">
       {showImport && <UploadItineraryModal onClose={() => setShowImport(false)} />}
       <h2 className="font-serif text-2xl md:text-3xl font-bold text-ink mb-2">Past Trips</h2>
       <button
@@ -228,21 +228,21 @@ export function CompletedTab({ refreshKey }: CompletedTabProps) {
                   )}
                 </div>
 
-                {/* Anonymous toggle */}
-                <div className="flex items-center gap-2 flex-shrink-0 select-none">
-                  <span className="text-[9px] text-slate/40 uppercase tracking-wider font-mono">ANON</span>
+                {/* Public / Anon pill toggle */}
+                <div className="flex rounded-full border border-mist bg-foam text-[10px] font-semibold overflow-hidden flex-shrink-0 select-none">
                   <button
-                    onClick={() => handleAnonToggle(trip)}
-                    className={`relative w-9 h-5 rounded-full transition-colors focus:outline-none ${
-                      anon ? 'bg-ocean' : 'bg-mist'
-                    }`}
-                    aria-label={anon ? 'Anonymous — click to show your name' : 'Named — click to post anonymously'}
+                    type="button"
+                    onClick={() => handleSetAnon(trip, false)}
+                    className={`px-2.5 py-1 transition-colors ${!anon ? 'bg-ocean text-white' : 'text-slate hover:text-ink'}`}
                   >
-                    <span
-                      className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${
-                        anon ? 'translate-x-4' : ''
-                      }`}
-                    />
+                    Public
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSetAnon(trip, true)}
+                    className={`px-2.5 py-1 transition-colors ${anon ? 'bg-ocean text-white' : 'text-slate hover:text-ink'}`}
+                  >
+                    Anon
                   </button>
                 </div>
               </div>

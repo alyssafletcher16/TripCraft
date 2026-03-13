@@ -80,8 +80,7 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
 
   async function handleStatusChange(tripId: string, newStatus: string) {
     if (newStatus === 'COMPLETED') {
-      setShareWithCommunity(false)
-      setShareScope('everyone')
+      setShareAnonymous(false)
       setPendingCompleteId(tripId)
       return
     }
@@ -103,13 +102,11 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ status: 'COMPLETED' }),
     })
-    if (shareWithCommunity) {
-      await fetch(`${API}/api/trips/${tripId}/community`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ isPublic: shareScope === 'everyone', friendsOnly: shareScope === 'friends' }),
-      }).catch(() => {})
-    }
+    await fetch(`${API}/api/trips/${tripId}/community`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ isPublic: true, isAnonymous: shareAnonymous }),
+    }).catch(() => {})
     setTrips((prev) => prev.filter((t) => t.id !== tripId))
     setPendingCompleteId(null)
     setConfirming(false)
@@ -128,7 +125,7 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
   }
 
   return (
-    <div className="p-4 sm:p-8 md:p-12 max-w-3xl">
+    <div className="p-4 pt-2 sm:p-8 sm:pt-4 md:p-12 md:pt-6 max-w-3xl">
       <h2 className="font-serif text-2xl md:text-3xl font-bold text-ink mb-6">Your active trips</h2>
 
       {trips.length === 0 ? (
@@ -185,54 +182,36 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
 
                 {/* Confirm complete prompt */}
                 {isPending && (
-                  <div className="mx-4 mb-1 px-4 py-3 rounded-b-xl bg-success/5 border border-t-0 border-success/20 space-y-3">
-                    <p className="text-sm text-ink">Mark as done? You can add a reflection anytime.</p>
-
-                    {/* Community sharing option */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-slate">Share this trip with the community?</span>
+                  <div className="mx-4 mb-1 px-4 py-2.5 rounded-b-xl bg-success/5 border border-t-0 border-success/20">
+                    <p className="text-[11px] text-slate mb-2">This trip will be added to the community. Public or anonymous?</p>
+                    <div className="flex items-center gap-3">
+                      {/* Public / Anon pill toggle */}
+                      <div className="flex rounded-full border border-mist bg-foam text-[11px] font-semibold overflow-hidden flex-shrink-0">
                         <button
                           type="button"
-                          onClick={() => setShareWithCommunity((v) => !v)}
-                          className={`relative w-9 h-5 rounded-full transition-colors focus:outline-none ${shareWithCommunity ? 'bg-ocean' : 'bg-mist'}`}
-                          aria-pressed={shareWithCommunity}
+                          onClick={() => setShareAnonymous(false)}
+                          className={`px-3 py-1 transition-colors ${!shareAnonymous ? 'bg-ocean text-white' : 'text-slate hover:text-ink'}`}
                         >
-                          <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${shareWithCommunity ? 'translate-x-4' : ''}`} />
+                          Public
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShareAnonymous(true)}
+                          className={`px-3 py-1 transition-colors ${shareAnonymous ? 'bg-ocean text-white' : 'text-slate hover:text-ink'}`}
+                        >
+                          Anon
                         </button>
                       </div>
-
-                      {shareWithCommunity && (
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setShareScope('everyone')}
-                            className={`text-[11px] px-3 py-1 rounded-lg border transition-colors ${shareScope === 'everyone' ? 'border-ocean text-ocean bg-ocean/5' : 'border-mist text-slate hover:border-ocean/50'}`}
-                          >
-                            Everyone
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setShareScope('friends')}
-                            className={`text-[11px] px-3 py-1 rounded-lg border transition-colors ${shareScope === 'friends' ? 'border-ocean text-ocean bg-ocean/5' : 'border-mist text-slate hover:border-ocean/50'}`}
-                          >
-                            Friends only
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-3">
                       <button
                         disabled={confirming}
                         onClick={() => confirmComplete(trip.id)}
-                        className="text-sm font-semibold text-white bg-success px-3 py-1.5 rounded-lg disabled:opacity-60"
+                        className="text-xs font-semibold text-white bg-success px-3 py-1.5 rounded-lg disabled:opacity-60"
                       >
                         Confirm
                       </button>
                       <button
                         onClick={() => setPendingCompleteId(null)}
-                        className="text-sm text-slate hover:text-ink"
+                        className="text-xs text-slate hover:text-ink"
                       >
                         Cancel
                       </button>
