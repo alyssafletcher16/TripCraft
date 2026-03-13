@@ -207,7 +207,7 @@ export default function HomePage() {
     <div className="min-h-screen">
       <Navbar />
       {session ? (
-        <div className="md:grid md:grid-cols-[272px_1fr] min-h-[calc(100vh-62px)]">
+        <div className="md:grid md:grid-cols-[auto_1fr] min-h-[calc(100vh-62px)]">
           <Sidebar />
           <main className="overflow-y-auto">
             <MarketingContent />

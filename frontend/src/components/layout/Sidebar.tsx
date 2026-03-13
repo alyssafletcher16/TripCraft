@@ -17,7 +17,7 @@ const SB_SECTION = 'font-mono text-[9px] text-slate tracking-[2px] uppercase pt-
 export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hideDesktop?: boolean } = {}) {
   const pathname = usePathname()
   const { data: session, status } = useSession()
-  const { isOpen, close, refreshKey } = useSidebar()
+  const { isOpen, close, desktopCollapsed, refreshKey } = useSidebar()
   const [trips, setTrips] = useState<Trip[]>([])
 
   useEffect(() => {
@@ -127,9 +127,11 @@ export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hid
 
   return (
     <>
-      {/* Desktop sidebar — always visible at md+, unless hideDesktop */}
+      {/* Desktop sidebar — collapsible */}
       {!hideDesktop && (
-        <div className="hidden md:block">
+        <div
+          className={`hidden md:block overflow-hidden transition-[width] duration-200 ${desktopCollapsed ? 'w-0' : 'w-[272px]'}`}
+        >
           {sidebarContent}
         </div>
       )}

@@ -9,7 +9,7 @@ export default function TripsPage() {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <div className="md:grid md:grid-cols-[272px_1fr] min-h-[calc(100vh-62px)]">
+      <div className="md:grid md:grid-cols-[auto_1fr] min-h-[calc(100vh-62px)]">
         <Sidebar activeTab="trips" />
         <main className="p-4 sm:p-8 md:p-12 bg-surface">
           <p className="eyebrow mb-2">My Itineraries</p>
