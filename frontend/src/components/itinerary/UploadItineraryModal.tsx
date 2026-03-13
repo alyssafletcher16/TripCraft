@@ -42,8 +42,6 @@ interface UploadItineraryModalProps {
 
 type Step = 'upload' | 'parsing' | 'review' | 'saving' | 'done'
 
-
-
 export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
   const router = useRouter()
   const { data: session } = useSession()

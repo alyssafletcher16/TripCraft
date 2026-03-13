@@ -88,10 +88,10 @@ type SavedLink = {
 }
 
 const STATUS_LABEL: Record<TripStatus, string> = {
-  PLANNING: 'Planning', ACTIVE: 'Active', COMPLETED: 'Completed', DRAFT: 'Draft',
+  PLANNING: 'Planning', ACTIVE: 'Active', COMPLETED: 'Completed',
 }
 const STATUS_VARIANT: Record<TripStatus, 'gold' | 'green' | 'ocean' | 'slate'> = {
-  ACTIVE: 'gold', COMPLETED: 'green', PLANNING: 'ocean', DRAFT: 'slate',
+  ACTIVE: 'gold', COMPLETED: 'green', PLANNING: 'ocean',
 }
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
