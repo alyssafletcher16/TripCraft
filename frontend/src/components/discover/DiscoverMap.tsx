@@ -11,6 +11,7 @@ export interface MapCluster {
   zoom: string
   region: string
   itins?: number[]
+  matchTerms?: string[]
 }
 
 interface Props {
@@ -152,8 +153,8 @@ const CLUSTERS: MapCluster[] = [
   { ...geoXY(-100, 45), count: 248, label: 'Americas', zoom: 'out',      region: 'americas' },
   { ...geoXY(15,   48), count: 512, label: 'Europe',   zoom: 'out',      region: 'europe'   },
   { ...geoXY(95,   40), count: 381, label: 'Asia',     zoom: 'out',      region: 'asia'     },
-  { ...geoXY(-60, -20), count:  87, label: 'S. America',zoom: 'out',     region: 'sameric', itins: [2, 5] },
-  { ...geoXY(20,    5), count:  62, label: 'Africa',   zoom: 'out',      region: 'africa',  itins: [1, 4] },
+  { ...geoXY(-60, -20), count:  87, label: 'S. America',zoom: 'out',     region: 'sameric', matchTerms: ['brazil','argentina','chile','colombia','venezuela','peru','bolivia','ecuador','paraguay','uruguay'], itins: [2, 5] },
+  { ...geoXY(20,    5), count:  62, label: 'Africa',   zoom: 'out',      region: 'africa',  matchTerms: ['kenya','nigeria','south africa','egypt','ethiopia','ghana','tanzania','morocco','senegal','uganda'], itins: [1, 4] },
   // Europe cities
   { ...geoXY(-9,  39),  count:  89, label: 'Lisbon',   zoom: 'europe',   region: 'europe',  itins: [4] },
   { ...geoXY(2,   49),  count: 124, label: 'Paris',    zoom: 'europe',   region: 'europe',  itins: [0, 4] },
@@ -165,7 +166,7 @@ const CLUSTERS: MapCluster[] = [
   { ...geoXY(140, 36),  count: 112, label: 'Tokyo',    zoom: 'asia',     region: 'asia',    itins: [3] },
   { ...geoXY(115, -8),  count:  88, label: 'Bali',     zoom: 'asia',     region: 'asia',    itins: [3] },
   // Americas cities
-  { ...geoXY(-74, 41),  count: 134, label: 'NYC',      zoom: 'americas', region: 'americas',itins: [2, 5] },
+  { ...geoXY(-74, 41),  count: 134, label: 'New York',  zoom: 'americas', region: 'americas',itins: [2, 5] },
   { ...geoXY(-77,-12),  count:  93, label: 'Lima',     zoom: 'americas', region: 'americas',itins: [2] },
 ]
 
@@ -184,24 +185,31 @@ const REGION_TO_ZOOM: Record<string, string> = {
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
-// Sum destination counts for all DB destinations that contain a cluster label
+// Sum destination counts for all DB destinations that match a cluster label.
+// Uses bidirectional contains so "New York City" matches "New York" and vice versa.
 function countForCluster(label: string, counts: Record<string, number>): number {
   const lower = label.toLowerCase()
   return Object.entries(counts)
-    .filter(([dest]) => dest.toLowerCase().includes(lower))
+    .filter(([dest]) => {
+      const d = dest.toLowerCase()
+      return d.includes(lower) || lower.includes(d)
+    })
     .reduce((sum, [, n]) => sum + n, 0)
 }
 
 // Sum real counts for a region by aggregating its city children
-function countForRegion(label: string, counts: Record<string, number>): number {
-  const childZoom = REGION_TO_ZOOM[label]
+function countForRegion(cluster: MapCluster, counts: Record<string, number>): number {
+  const childZoom = REGION_TO_ZOOM[cluster.label]
   if (childZoom) {
     return CLUSTERS
       .filter((c) => c.zoom === childZoom)
       .reduce((sum, c) => sum + countForCluster(c.label, counts), 0)
   }
-  // For regions with no city children (S. America, Africa), match destinations directly
-  return countForCluster(label, counts)
+  // For regions with no city children (S. America, Africa), match via matchTerms or label
+  if (cluster.matchTerms) {
+    return cluster.matchTerms.reduce((sum, term) => sum + countForCluster(term, counts), 0)
+  }
+  return countForCluster(cluster.label, counts)
 }
 
 export function DiscoverMap({ onCitySelect, selectedCity, destinationCounts }: Props) {
@@ -239,7 +247,7 @@ export function DiscoverMap({ onCitySelect, selectedCity, destinationCounts }: P
     }
     if (c.zoom === 'out') {
       // Region-level: hide if no trips across all cities in this region
-      return countForRegion(c.label, destinationCounts) > 0
+      return countForRegion(c, destinationCounts) > 0
     }
     return true
   }).map((c) => {
@@ -248,7 +256,7 @@ export function DiscoverMap({ onCitySelect, selectedCity, destinationCounts }: P
       return { ...c, count: countForCluster(c.label, destinationCounts) }
     }
     if (c.zoom === 'out') {
-      return { ...c, count: countForRegion(c.label, destinationCounts) }
+      return { ...c, count: countForRegion(c, destinationCounts) }
     }
     return c
   })
