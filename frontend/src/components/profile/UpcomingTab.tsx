@@ -61,8 +61,7 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
   const [loading, setLoading] = useState(true)
   const [pendingCompleteId, setPendingCompleteId] = useState<string | null>(null)
   const [confirming, setConfirming] = useState(false)
-  const [shareWithCommunity, setShareWithCommunity] = useState(false)
-  const [shareScope, setShareScope] = useState<'friends' | 'everyone'>('everyone')
+  const [shareAnonymous, setShareAnonymous] = useState(false)
 
   useEffect(() => {
     if (status === 'loading') return
@@ -130,7 +129,6 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
 
   return (
     <div className="p-4 sm:p-8 md:p-12 max-w-3xl">
-      <p className="eyebrow mb-2">Active</p>
       <h2 className="font-serif text-2xl md:text-3xl font-bold text-ink mb-6">Your active trips</h2>
 
       {trips.length === 0 ? (
