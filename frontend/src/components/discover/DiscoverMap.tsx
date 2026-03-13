@@ -176,6 +176,13 @@ const REGION_LABELS: Record<string, string> = {
 
 const CITY_REGIONS = ['europe', 'asia', 'americas']
 
+// Maps region cluster labels to the zoom level whose city children belong to them
+const REGION_TO_ZOOM: Record<string, string> = {
+  'Americas': 'americas',
+  'Europe':   'europe',
+  'Asia':     'asia',
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 // Sum destination counts for all DB destinations that contain a cluster label
 function countForCluster(label: string, counts: Record<string, number>): number {
@@ -183,6 +190,18 @@ function countForCluster(label: string, counts: Record<string, number>): number 
   return Object.entries(counts)
     .filter(([dest]) => dest.toLowerCase().includes(lower))
     .reduce((sum, [, n]) => sum + n, 0)
+}
+
+// Sum real counts for a region by aggregating its city children
+function countForRegion(label: string, counts: Record<string, number>): number {
+  const childZoom = REGION_TO_ZOOM[label]
+  if (childZoom) {
+    return CLUSTERS
+      .filter((c) => c.zoom === childZoom)
+      .reduce((sum, c) => sum + countForCluster(c.label, counts), 0)
+  }
+  // For regions with no city children (S. America, Africa), match destinations directly
+  return countForCluster(label, counts)
 }
 
 export function DiscoverMap({ onCitySelect, selectedCity, destinationCounts }: Props) {
@@ -210,19 +229,29 @@ export function DiscoverMap({ onCitySelect, selectedCity, destinationCounts }: P
 
   const hasRealData = Object.keys(destinationCounts).length > 0
 
-  // For city-level clusters, use real counts; hide cities with 0 trips
+  // Hide clusters with no real itineraries; show real counts when data is available
   const visible = CLUSTERS.filter((c) => {
     if (c.zoom !== zoom) return false
-    if (hasRealData && CITY_REGIONS.includes(c.zoom)) {
+    if (!hasRealData) return true
+    if (CITY_REGIONS.includes(c.zoom)) {
+      // City-level: hide if no trips in DB for this city
       return countForCluster(c.label, destinationCounts) > 0
     }
+    if (c.zoom === 'out') {
+      // Region-level: hide if no trips across all cities in this region
+      return countForRegion(c.label, destinationCounts) > 0
+    }
     return true
-  }).map((c) => ({
-    ...c,
-    count: hasRealData && CITY_REGIONS.includes(c.zoom)
-      ? countForCluster(c.label, destinationCounts)
-      : c.count,
-  }))
+  }).map((c) => {
+    if (!hasRealData) return c
+    if (CITY_REGIONS.includes(c.zoom)) {
+      return { ...c, count: countForCluster(c.label, destinationCounts) }
+    }
+    if (c.zoom === 'out') {
+      return { ...c, count: countForRegion(c.label, destinationCounts) }
+    }
+    return c
+  })
 
   const totalCount = visible.reduce((a, c) => a + c.count, 0)
 
