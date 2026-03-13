@@ -116,7 +116,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - **Sharing:** anonymous = no name in Community, real name in Friends; public = @handle in Community (clickable → profile)
 - **Profile Active tab:** numbered list, no drag, always private (was "Upcoming"); no eyebrow label; reduced top padding; "Mark complete" button per trip (replaces dropdown) — clicking opens confirm panel with community sharing option
 - **Profile Completed tab:** titled "Past Trips"; drag to reorder = permanent life ranking (rank shown as #1, #2… with no sub-label); city photo cover (same as Active tab); Import itinerary button left-aligned below title; no "Completed" eyebrow
-- **Share toggle (ANON):** Completed tab only — trips are always in Community, always shown with username to friends. Toggle controls anonymity: on = anonymous in community feed, off = shows @handle
+- **Share toggle (Public/Anon):** On both Active and Completed tabs. Trips are always added to Community on completion. At completion, confirm panel asks "Do you want your account to be shared publicly or anonymously?" with a Public | Anon pill toggle (default: Public). On Completed tab, same pill toggle per trip to change after the fact. Public = @handle shown in community feed; Anon = no name shown.
 - **Imported trips:** always private on upload, "Imported" badge, auto-COMPLETED if past date
 - **Sidebar:** "Active Itineraries" section — shows only PLANNING/ACTIVE trips; completed trips not listed; trip city shown beneath name; no status indicators
 - **Cancellation UI:** green ✓ (free) · amber ⚠ (deadline) · structured tiers
@@ -182,7 +182,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - [ ] **Community feed** — backend connected (currently UI only)
 - [ ] **Friends feed** — backend connected (currently UI only)
 - [ ] **Discover map** — backend connected (currently UI only)
-- [x] **Sharing flow** — trigger modal on COMPLETED, post to community as anon or @handle
+- [x] **Sharing flow** — on COMPLETED, confirm panel always posts to community; Public/Anon pill toggle (default Public); same pill on Completed tab to change after the fact
 - [ ] **Fork trip** — copy any community itinerary to your own trips
 
 ---
@@ -232,7 +232,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - **Sharing:** anonymous = no name in Community, real name in Friends; public = @handle in Community (clickable → profile)
 - **Profile Active tab:** numbered list, no drag, always private (was "Upcoming"); no eyebrow label; reduced top padding; "Mark complete" button per trip (replaces dropdown) — clicking opens confirm panel with community sharing option
 - **Profile Completed tab:** titled "Past Trips"; drag to reorder = permanent life ranking (rank shown as #1, #2… with no sub-label); city photo cover (same as Active tab); Import itinerary button left-aligned below title; no "Completed" eyebrow
-- **Share toggle (ANON):** Completed tab only — trips are always in Community, always shown with username to friends. Toggle controls anonymity: on = anonymous in community feed, off = shows @handle
+- **Share toggle (Public/Anon):** On both Active and Completed tabs. Trips are always added to Community on completion. At completion, confirm panel asks "Do you want your account to be shared publicly or anonymously?" with a Public | Anon pill toggle (default: Public). On Completed tab, same pill toggle per trip to change after the fact. Public = @handle shown in community feed; Anon = no name shown.
 - **Imported trips:** always private on upload, "Imported" badge, auto-COMPLETED if past date
 - **Sidebar:** "Active Itineraries" section — shows only PLANNING/ACTIVE trips; completed trips not listed; trip city shown beneath name; no status indicators
 - **Cancellation UI:** green ✓ (free) · amber ⚠ (deadline) · structured tiers (see URL paste spec)
