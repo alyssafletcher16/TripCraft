@@ -165,7 +165,8 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - [ ] **URL paste comparison** — paste 2–3 tour URLs → Claude API extracts + diffs key details
 - [ ] **Shareable read-only link** — `/trips/[id]/view` public route
 - [ ] **Calendar sync** — export blocks as Google Calendar + Apple Calendar events
-- [ ] **Mobile reference view** — read-only, time-ordered, phone-optimized
+- [x] **Mobile responsiveness sweep** — full audit + fixes: tab bar scrolls on mobile, itinerary layout stacks vertically (suggestions rail lg-only), Modal padding responsive, Block edit/delete buttons always visible on touch, DateRangePicker single-month on mobile, ProfileHeader padding responsive, hamburger meets 44px tap target, drag handle hidden on touch, all hover-only buttons made touch-accessible
+- [ ] **Mobile reference view** — read-only, time-ordered, phone-optimized (`/trips/[id]/view`)
 
 ---
 
@@ -227,6 +228,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - Home page sidebar: when logged in, home page renders full sidebar (Discover, My Profile, Active Itineraries) in the standard grid layout; logged-out users see the marketing landing page with mobile-only drawer
 - Sidebar collapse toggle: desktop sidebar has a ‹/› chevron button on its right edge (top-aligned); clicking collapses to a 20px orange strip (still visible/clickable); all pages use grid-cols-[auto_1fr] so layout reflows correctly
 - Sidebar color: terra orange background with white text; active state is white/15 ring; toggle button is terra-lt, turns white on hover
+- Mobile responsiveness: all pages and components responsive; tab bar scrolls horizontally; itinerary suggestions panel desktop-only (lg+); Modal/Block/DateRangePicker/ProfileHeader/auth forms all mobile-optimized; edit buttons always visible on touch; hamburger 44px tap target; drag handles hidden on mobile
 
 ---
 
