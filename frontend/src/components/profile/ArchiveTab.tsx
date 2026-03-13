@@ -69,7 +69,7 @@ function UploadZone({ onFile, disabled }: { onFile: (f: File) => void; disabled:
       <input
         ref={inputRef}
         type="file"
-        accept=".xlsx,.xls,.csv,.pdf"
+        accept=".xlsx,.xls,.csv,.pdf,.docx"
         className="hidden"
         disabled={disabled}
         onChange={(e) => {
@@ -80,7 +80,7 @@ function UploadZone({ onFile, disabled }: { onFile: (f: File) => void; disabled:
       />
       <div className="text-4xl mb-3">📂</div>
       <p className="font-medium text-ink mb-1">Drop your trip file here</p>
-      <p className="text-slate text-sm">Excel (.xlsx, .xls), CSV, or PDF</p>
+      <p className="text-slate text-sm">Excel (.xlsx, .xls), CSV, PDF, or Word (.docx)</p>
       <p className="text-xs text-slate/70 mt-2">Up to 15 MB</p>
       <div className="mt-5 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-ocean text-white text-sm font-medium">
         Browse file
@@ -89,23 +89,6 @@ function UploadZone({ onFile, disabled }: { onFile: (f: File) => void; disabled:
   )
 }
 
-// ── Template hint ─────────────────────────────────────────────────────────────
-function TemplateHint() {
-  return (
-    <div className="mt-4 p-4 rounded-xl bg-foam/60 border border-mist">
-      <p className="text-xs font-medium text-ink mb-1">Excel column guide</p>
-      <p className="text-xs text-slate">
-        Use any of these column headers (flexible spelling accepted):
-      </p>
-      <div className="mt-2 flex flex-wrap gap-1">
-        {['Title', 'Destination', 'Country', 'Start Date', 'End Date', 'Budget', 'Travelers', 'Notes'].map((h) => (
-          <span key={h} className="px-2 py-0.5 rounded bg-white border border-mist text-xs text-slate font-mono">{h}</span>
-        ))}
-      </div>
-      <p className="text-xs text-slate mt-2">Each row = one trip. PDFs are parsed automatically by AI.</p>
-    </div>
-  )
-}
 
 // ── Preview card ──────────────────────────────────────────────────────────────
 function PreviewCard({
@@ -213,8 +196,8 @@ export function ArchiveTab() {
 
   const handleFile = useCallback(async (file: File) => {
     const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
-    if (!['xlsx', 'xls', 'csv', 'pdf'].includes(ext)) {
-      setError('Please upload an Excel (.xlsx, .xls, .csv) or PDF file.')
+    if (!['xlsx', 'xls', 'csv', 'pdf', 'docx'].includes(ext)) {
+      setError('Please upload an Excel (.xlsx, .xls), CSV, PDF, or Word (.docx) file.')
       return
     }
     setError(null)
@@ -286,7 +269,6 @@ export function ArchiveTab() {
         <>
           <p className="text-sm font-semibold text-ink mb-3">Import itinerary</p>
           <UploadZone onFile={handleFile} disabled={false} />
-          <TemplateHint />
         </>
       )}
 

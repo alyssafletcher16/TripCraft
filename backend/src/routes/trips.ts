@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator'
 import multer from 'multer'
 import * as XLSX from 'xlsx'
 import * as pdfParseLib from 'pdf-parse'
+import mammoth from 'mammoth'
 import Anthropic from '@anthropic-ai/sdk'
 import { prisma } from '../lib/prisma'
 import { requireAuth, AuthRequest } from '../middleware/auth'
@@ -39,10 +40,16 @@ tripsRouter.post('/import', requireAuth, upload.single('file'), async (req: Auth
   try {
     let trips: ParsedTrip[] = []
 
-    if (ext === 'pdf') {
-      const pdfParse = (pdfParseLib as unknown as { default: (buf: Buffer) => Promise<{ text: string }> }).default ?? pdfParseLib
-      const parsed = await pdfParse(req.file.buffer)
-      const text = parsed.text.slice(0, 12000)
+    if (ext === 'pdf' || ext === 'docx') {
+      let text: string
+      if (ext === 'pdf') {
+        const pdfParse = (pdfParseLib as unknown as { default: (buf: Buffer) => Promise<{ text: string }> }).default ?? pdfParseLib
+        const parsed = await pdfParse(req.file.buffer)
+        text = parsed.text.slice(0, 12000)
+      } else {
+        const result = await mammoth.extractRawText({ buffer: req.file.buffer })
+        text = result.value.slice(0, 12000)
+      }
       const anthropic = new Anthropic()
       const msg = await anthropic.messages.create({
         model: 'claude-opus-4-6',
