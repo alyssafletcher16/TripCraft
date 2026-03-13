@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
 import { Block } from './Block'
 import { AddBlockForm } from './AddBlockForm'
-import type { ItineraryDay as DayType } from '@/types'
+import { EditBlockModal } from './EditBlockModal'
+import type { Block as BlockType, ItineraryDay as DayType } from '@/types'
 
 interface Props {
   day: DayType
@@ -14,8 +16,31 @@ interface Props {
 
 export function ItineraryDay({ day, destination, vibes, onBlockAdded }: Props) {
   const tripId = day.tripId
+  const { data: session } = useSession()
   const [open, setOpen] = useState(true)
   const [addingBlock, setAddingBlock] = useState(false)
+  const [blocks, setBlocks] = useState<BlockType[]>(day.blocks)
+  const [editingBlock, setEditingBlock] = useState<BlockType | null>(null)
+
+  useEffect(() => {
+    setBlocks(day.blocks)
+  }, [day.blocks])
+
+  async function handleDelete(blockId: string) {
+    setBlocks((prev) => prev.filter((b) => b.id !== blockId))
+    await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'}/api/days/${day.id}/blocks/${blockId}`,
+      {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${session?.accessToken}` },
+      }
+    ).catch(() => {})
+  }
+
+  function handleSaved(updated: BlockType) {
+    setBlocks((prev) => prev.map((b) => (b.id === updated.id ? updated : b)))
+    setEditingBlock(null)
+  }
 
   return (
     <div className="bg-white rounded-2xl border-[1.5px] border-mist overflow-hidden hover:border-terra/30 transition-colors">
@@ -62,11 +87,18 @@ export function ItineraryDay({ day, destination, vibes, onBlockAdded }: Props) {
             </div>
           )}
 
-          {day.blocks.map((block) => (
-            <Block key={block.id} block={block} tripId={tripId} destination={destination} />
+          {blocks.map((block) => (
+            <Block
+              key={block.id}
+              block={block}
+              tripId={tripId}
+              destination={destination}
+              onEdit={() => setEditingBlock(block)}
+              onDelete={() => handleDelete(block.id)}
+            />
           ))}
 
-          {day.blocks.length === 0 && !addingBlock && (
+          {blocks.length === 0 && !addingBlock && (
             <p className="text-slate text-sm py-2 text-center">
               No blocks yet — add flights, hotels, or activities.
             </p>
@@ -94,6 +126,14 @@ export function ItineraryDay({ day, destination, vibes, onBlockAdded }: Props) {
             </button>
           )}
         </div>
+      )}
+
+      {editingBlock && (
+        <EditBlockModal
+          block={editingBlock}
+          onClose={() => setEditingBlock(null)}
+          onSaved={handleSaved}
+        />
       )}
     </div>
   )
