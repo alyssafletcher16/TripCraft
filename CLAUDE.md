@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-See TRIPCRAFT.md in the repo root for full product context, feature priorities, build order, and all product decisions.
+See TRIPCRAFT_updated.md in the repo root for full product context, feature priorities, build order, and all product decisions.
 
 ## Commands
 
