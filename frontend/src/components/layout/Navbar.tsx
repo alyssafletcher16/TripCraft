@@ -6,7 +6,7 @@ import { useSidebar } from './SidebarContext'
 
 export function Navbar() {
   const { data: session } = useSession()
-  const { toggle, toggleDesktop } = useSidebar()
+  const { toggle } = useSidebar()
 
   return (
     <nav className="flex items-center justify-between px-4 sm:px-8 md:px-12 h-[62px] bg-deep sticky top-0 z-[300] border-b border-gold/15">
@@ -23,18 +23,6 @@ export function Navbar() {
           <span className="block w-full h-[1.5px] bg-white/70 rounded-full" />
           <span className="block w-5 h-[1.5px] bg-white/70 rounded-full" />
         </button>
-        {session && (
-          <button
-            type="button"
-            onClick={toggleDesktop}
-            className="hidden md:flex flex-col justify-center gap-[5px] w-8 h-8 p-1 rounded-lg hover:bg-white/10 transition-colors"
-            aria-label="Toggle sidebar"
-          >
-            <span className="block w-full h-[1.5px] bg-white/70 rounded-full" />
-            <span className="block w-full h-[1.5px] bg-white/70 rounded-full" />
-            <span className="block w-5 h-[1.5px] bg-white/70 rounded-full" />
-          </button>
-        )}
 
         <Link href="/" className="font-serif text-[22px] font-black text-foam tracking-[-0.5px] flex items-center">
           trip<span className="text-terra italic">craft</span>
