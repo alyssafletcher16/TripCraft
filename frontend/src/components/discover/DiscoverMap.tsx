@@ -203,7 +203,7 @@ function countForRegion(cluster: MapCluster, counts: Record<string, number>): nu
   if (childZoom) {
     return CLUSTERS
       .filter((c) => c.zoom === childZoom)
-      .reduce((sum, c) => sum + countForCluster(c.label, counts), 0)
+      .reduce((sum, c) => sum + countForCluster(c.label, counts, c.matchTerms), 0)
   }
   // For regions with no city children (S. America, Africa), match via matchTerms or label
   if (cluster.matchTerms) {
@@ -243,7 +243,7 @@ export function DiscoverMap({ onCitySelect, selectedCity, destinationCounts }: P
     if (!hasRealData) return true
     if (CITY_REGIONS.includes(c.zoom)) {
       // City-level: hide if no trips in DB for this city
-      return countForCluster(c.label, destinationCounts) > 0
+      return countForCluster(c.label, destinationCounts, c.matchTerms) > 0
     }
     if (c.zoom === 'out') {
       // Region-level: hide if no trips across all cities in this region
@@ -253,7 +253,7 @@ export function DiscoverMap({ onCitySelect, selectedCity, destinationCounts }: P
   }).map((c) => {
     if (!hasRealData) return c
     if (CITY_REGIONS.includes(c.zoom)) {
-      return { ...c, count: countForCluster(c.label, destinationCounts) }
+      return { ...c, count: countForCluster(c.label, destinationCounts, c.matchTerms) }
     }
     if (c.zoom === 'out') {
       return { ...c, count: countForRegion(c, destinationCounts) }
