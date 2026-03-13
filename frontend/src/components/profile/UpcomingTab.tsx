@@ -184,7 +184,7 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
                 {isPending && (
                   <div className="mx-4 mb-1 px-4 py-2.5 rounded-b-xl bg-success/5 border border-t-0 border-success/20">
                     <div className="flex items-center justify-between gap-3 mb-2">
-                      <p className="text-[11px] text-slate">Do you want your account to be shared publicly or anonymously?</p>
+                      <p className="text-[11px] text-slate">This trip will be shared with the community. Do you want your itinerary to be shared publicly or anonymously?</p>
                       {/* Public / Anon pill toggle */}
                       <div className="flex rounded-full border border-mist bg-foam text-[11px] font-semibold overflow-hidden flex-shrink-0">
                         <button

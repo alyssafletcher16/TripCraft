@@ -116,7 +116,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - **Sharing:** anonymous = no name in Community, real name in Friends; public = @handle in Community (clickable → profile)
 - **Profile Active tab:** numbered list, no drag, always private (was "Upcoming"); no eyebrow label; reduced top padding; "Mark complete" button per trip (replaces dropdown) — clicking opens confirm panel with community sharing option
 - **Profile Completed tab:** titled "Past Trips"; drag to reorder = permanent life ranking (rank shown as #1, #2… with no sub-label); city photo cover (same as Active tab); Import itinerary button left-aligned below title; no "Completed" eyebrow
-- **Share toggle (Public/Anon):** On both Active and Completed tabs. Trips are always added to Community on completion. At completion, confirm panel asks "Do you want your account to be shared publicly or anonymously?" with a Public | Anon pill toggle (default: Public). On Completed tab, same pill toggle per trip to change after the fact. Public = @handle shown in community feed; Anon = no name shown.
+- **Share toggle (Public/Anon):** On both Active and Completed tabs. Trips are always added to Community on completion. At completion, confirm panel asks "This trip will be shared with the community. Do you want your itinerary to be shared publicly or anonymously?" with a Public | Anon pill toggle (default: Public). On Completed tab, same pill toggle per trip to change after the fact. Public = @handle shown in community feed; Anon = no name shown.
 - **Imported trips:** always private on upload, "Imported" badge, auto-COMPLETED if past date
 - **Sidebar:** Top-level links: Discover, My Profile. Below those, "Active Itineraries" sub-section — shows only PLANNING/ACTIVE trips; completed trips not listed; trip city shown beneath name; no status indicators. Top navbar has no center nav links (Discover/Profile removed — sidebar handles those).
 - **Cancellation UI:** green ✓ (free) · amber ⚠ (deadline) · structured tiers
@@ -221,6 +221,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - PDF/DOCX/XLSX/CSV/TXT itinerary import — Claude parses → review → save; "Import itinerary" button on Completed tab; auto-COMPLETED if past date; "Imported" badge; routes: POST /api/itinerary/upload, POST /api/itinerary/save
 - Trip status system: ACTIVE / COMPLETED (2 statuses in UI; PLANNING in DB maps to ACTIVE)
 - Google Places API + PlaceCache + intelligence service (built, needs credits)
+- Back button on trip detail page — top-left, calls router.back() to return to previous page (Active tab, sidebar nav, etc.)
 
 ---
 
@@ -232,7 +233,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - **Sharing:** anonymous = no name in Community, real name in Friends; public = @handle in Community (clickable → profile)
 - **Profile Active tab:** numbered list, no drag, always private (was "Upcoming"); no eyebrow label; reduced top padding; "Mark complete" button per trip (replaces dropdown) — clicking opens confirm panel with community sharing option
 - **Profile Completed tab:** titled "Past Trips"; drag to reorder = permanent life ranking (rank shown as #1, #2… with no sub-label); city photo cover (same as Active tab); Import itinerary button left-aligned below title; no "Completed" eyebrow
-- **Share toggle (Public/Anon):** On both Active and Completed tabs. Trips are always added to Community on completion. At completion, confirm panel asks "Do you want your account to be shared publicly or anonymously?" with a Public | Anon pill toggle (default: Public). On Completed tab, same pill toggle per trip to change after the fact. Public = @handle shown in community feed; Anon = no name shown.
+- **Share toggle (Public/Anon):** On both Active and Completed tabs. Trips are always added to Community on completion. At completion, confirm panel asks "This trip will be shared with the community. Do you want your itinerary to be shared publicly or anonymously?" with a Public | Anon pill toggle (default: Public). On Completed tab, same pill toggle per trip to change after the fact. Public = @handle shown in community feed; Anon = no name shown.
 - **Imported trips:** always private on upload, "Imported" badge, auto-COMPLETED if past date
 - **Sidebar:** Top-level links: Discover, My Profile. Below those, "Active Itineraries" sub-section — shows only PLANNING/ACTIVE trips; completed trips not listed; trip city shown beneath name; no status indicators. Top navbar has no center nav links (Discover/Profile removed — sidebar handles those).
 - **Cancellation UI:** green ✓ (free) · amber ⚠ (deadline) · structured tiers (see URL paste spec)
