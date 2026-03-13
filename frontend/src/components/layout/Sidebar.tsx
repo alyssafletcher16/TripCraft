@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { useSidebar } from './SidebarContext'
 import type { Trip } from '@/types'
 
@@ -45,7 +45,7 @@ export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hid
     })
 
   const sidebarContent = (
-    <aside className="bg-terra px-[18px] py-7 flex flex-col gap-1 border-r border-white/[0.12] h-full">
+    <aside className="bg-terra px-[18px] py-7 flex flex-col gap-1 border-r border-white/[0.12] h-full overflow-y-auto">
       {/* Close button — mobile only */}
       <button
         type="button"
@@ -108,7 +108,7 @@ export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hid
         </Link>
       )}
 
-      {/* ── Sign in — unauthenticated mobile only ────────────────── */}
+      {/* ── Sign in — unauthenticated ────────────────────────────── */}
       {!session && status !== 'loading' && (
         <>
           <div className={SB_SECTION}>Account</div>
@@ -121,6 +121,20 @@ export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hid
             Get started
           </Link>
         </>
+      )}
+
+      {/* ── Sign out — authenticated ─────────────────────────────── */}
+      {session && (
+        <div className="mt-auto pt-4">
+          <button
+            type="button"
+            onClick={() => signOut({ callbackUrl: '/login' })}
+            className={`${SB_ITEM} w-full text-left`}
+          >
+            <span className={SB_ICON}>←</span>
+            Sign out
+          </button>
+        </div>
       )}
     </aside>
   )
