@@ -235,7 +235,7 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
               {parsed.estimatedBudget ? `  ·  $${parsed.estimatedBudget.toLocaleString()} ${parsed.currency}` : ''}
             </div>
 
-            {parsed.days.slice(0, 3).map(day => (
+            {(showAllDays ? parsed.days : parsed.days.slice(0, 3)).map(day => (
               <div key={day.dayNumber} style={{ marginBottom: 16, borderLeft: '2px solid #D6E4EE', paddingLeft: 14 }}>
                 <div style={{ fontSize: 12, fontWeight: 600, color: '#0A1F30', marginBottom: 6 }}>
                   Day {day.dayNumber}{day.name ? ` — ${day.name}` : ''}
@@ -247,15 +247,21 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
                   </div>
                 ))}
                 {day.blocks.length > 3 && (
-                  <div style={{ fontSize: 11, color: '#5B7A8E' }}>+{day.blocks.length - 3} more</div>
+                  <div style={{ fontSize: 11, color: '#5B7A8E' }}>+{day.blocks.length - 3} more blocks</div>
                 )}
               </div>
             ))}
 
             {parsed.days.length > 3 && (
-              <div style={{ fontSize: 12, color: '#5B7A8E', marginBottom: 20 }}>
-                + {parsed.days.length - 3} more days parsed
-              </div>
+              <button
+                onClick={() => setShowAllDays(prev => !prev)}
+                style={{
+                  background: 'none', border: 'none', padding: '4px 0', marginBottom: 16,
+                  fontSize: 12, color: '#C4603A', cursor: 'pointer', textDecoration: 'underline'
+                }}
+              >
+                {showAllDays ? 'Show less' : `+ ${parsed.days.length - 3} more days — click to expand`}
+              </button>
             )}
 
             {parsed.parseNotes && (

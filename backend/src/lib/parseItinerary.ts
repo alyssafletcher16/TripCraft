@@ -76,7 +76,9 @@ Rules:
 - Infer block types: flights and trains map to flight, accommodation maps to hotel, restaurants and cafes map to food, tours and sights map to activity
 - If budget is in a foreign currency, convert to USD and note it in parseNotes
 - confidence reflects how complete and certain the parse is
-- vibes should be inferred from context: Foodie, Hiking, Cultural, Budget, Luxury, Romantic, Adventure, Slow Travel`,
+- vibes should be inferred from context: Foodie, Hiking, Cultural, Budget, Luxury, Romantic, Adventure, Slow Travel
+- Day numbers MUST be unique and sequential starting at 1. Never emit two days with the same dayNumber. If the source document labels multiple sections as "Day 0" or uses repeated labels, merge them into a single day or renumber them sequentially so the output has no duplicate dayNumbers
+- The first day of the trip is Day 1, not Day 0`,
     messages: [
       {
         role: 'user',
@@ -86,5 +88,20 @@ Rules:
   })
 
   const text = response.content[0].type === 'text' ? response.content[0].text : ''
-  return JSON.parse(text) as ParsedItinerary
+  const result = JSON.parse(text) as ParsedItinerary
+
+  // Deduplicate days: merge blocks from duplicate dayNumbers, then renumber sequentially
+  const dayMap = new Map<number, ParsedDay>()
+  for (const day of result.days) {
+    if (dayMap.has(day.dayNumber)) {
+      dayMap.get(day.dayNumber)!.blocks.push(...day.blocks)
+    } else {
+      dayMap.set(day.dayNumber, { ...day })
+    }
+  }
+  result.days = Array.from(dayMap.values())
+    .sort((a, b) => a.dayNumber - b.dayNumber)
+    .map((day, i) => ({ ...day, dayNumber: i + 1 }))
+
+  return result
 }

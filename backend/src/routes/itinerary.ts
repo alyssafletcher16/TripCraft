@@ -72,25 +72,27 @@ itineraryRouter.post('/save', requireAuth, async (req: AuthRequest, res: Respons
         status,
         isPublic: false,
         vibes: parsed.vibes?.length
-          ? { create: parsed.vibes.map((v: string) => ({ vibe: v.toLowerCase() })) }
+          ? { create: [...new Set<string>(parsed.vibes.map((v: string) => v.toLowerCase()))].map(vibe => ({ vibe })) }
           : undefined,
         days: {
-          create: parsed.days.map((day: any) => ({
-            dayNum: day.dayNumber,
-            name: day.name || `Day ${day.dayNumber}`,
-            date: day.date ? new Date(day.date) : null,
-            blocks: {
-              create: day.blocks.map((block: ParsedBlock) => ({
-                type: mapBlockType(block.type),
-                title: block.title,
-                detail: block.detail || '',
-                priceValue: block.price,
-                price: block.price != null ? `$${block.price}` : null,
-                status: mapBookingStatus(block.status),
-                confCode: block.confirmationNo,
-              }))
-            }
-          }))
+          create: parsed.days
+            .filter((day: any, idx: number, arr: any[]) => arr.findIndex(d => d.dayNumber === day.dayNumber) === idx)
+            .map((day: any) => ({
+              dayNum: day.dayNumber,
+              name: day.name || `Day ${day.dayNumber}`,
+              date: day.date ? new Date(day.date) : null,
+              blocks: {
+                create: day.blocks.map((block: ParsedBlock) => ({
+                  type: mapBlockType(block.type),
+                  title: block.title,
+                  detail: block.detail || '',
+                  priceValue: block.price,
+                  price: block.price != null ? `$${block.price}` : null,
+                  status: mapBookingStatus(block.status),
+                  confCode: block.confirmationNo,
+                }))
+              }
+            }))
         },
         community: {
           create: { isPublic: false, friendsOnly: false, upvotes: 0 }
