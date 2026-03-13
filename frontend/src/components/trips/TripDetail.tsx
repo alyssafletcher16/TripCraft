@@ -1307,7 +1307,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
 
         {/* ── Tab bar ───────────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-mist overflow-hidden">
-          <div className="flex border-b border-mist overflow-x-auto">
+          <div className="flex border-b border-mist">
             {TABS.map((tab) => {
               const badge = tab.id === 'todo' && todoCount > 0 ? todoCount
                 : tab.id === 'research' && researchItems.length > 0 ? researchItems.length
