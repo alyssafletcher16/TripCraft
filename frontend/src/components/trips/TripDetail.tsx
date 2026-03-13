@@ -268,7 +268,7 @@ function MapTab({ trip }: { trip: Trip }) {
           </svg>
         </div>
         {/* Stats strip */}
-        <div className="px-5 py-3 border-t border-white/6 flex gap-8">
+        <div className="px-5 py-3 border-t border-white/6 flex flex-wrap gap-x-6 gap-y-2">
           {[
             { n: duration || '—', l: 'Days' },
             { n: trip.days.length, l: 'Itinerary days' },
@@ -499,7 +499,7 @@ function TodoTab({
                 )}
                 <button
                   onClick={() => deleteItem(item.id)}
-                  className="opacity-0 group-hover:opacity-100 p-1 text-slate hover:text-red-500 transition-all"
+                  className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 p-2 sm:p-1 text-slate hover:text-red-500 transition-all"
                 >
                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
@@ -806,7 +806,7 @@ function ResearchTab({
           </div>
           <div className="divide-y divide-mist">
             {researchItems.map((item) => (
-              <div key={item.id} className="px-5 py-4 flex items-center gap-4">
+              <div key={item.id} className="px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-ink text-sm truncate">{item.activityName}</div>
                   <div className="text-[11px] text-slate mt-0.5">
@@ -823,7 +823,7 @@ function ResearchTab({
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex items-center gap-2 flex-wrap">
                   {item.tour.bookingUrl && (
                     <a
                       href={item.tour.bookingUrl}
@@ -943,7 +943,7 @@ function ResearchTab({
                     </a>
                     <button
                       onClick={() => removeLink(link.id)}
-                      className="opacity-0 group-hover:opacity-100 p-1 text-slate hover:text-red-500 transition-all"
+                      className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 p-2 sm:p-1 text-slate hover:text-red-500 transition-all"
                     >
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
@@ -1233,16 +1233,27 @@ export function TripDetail({ tripId }: { tripId: string }) {
   return (
     <>
       <div className="flex flex-col gap-6">
-        {/* ── Back button ───────────────────────────────────────── */}
-        <button
-          onClick={() => router.back()}
-          className="self-start flex items-center gap-1.5 text-[12px] text-slate hover:text-ink transition-colors -mt-2"
-        >
-          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 12H5M5 12l7 7M5 12l7-7" />
-          </svg>
-          Back
-        </button>
+        {/* ── Breadcrumb + Back button ───────────────────────────── */}
+        <div className="flex flex-col gap-1.5 -mt-2">
+          <nav className="flex items-center gap-1 text-[11px] text-slate/60 font-mono tracking-wide">
+            <a href="/" className="hover:text-slate transition-colors">Home</a>
+            <span className="mx-0.5">›</span>
+            <a href="/profile" className="hover:text-slate transition-colors">Profile</a>
+            <span className="mx-0.5">›</span>
+            <a href="/profile" className="hover:text-slate transition-colors">{STATUS_LABEL[trip.status]}</a>
+            <span className="mx-0.5">›</span>
+            <span className="text-slate/80 truncate max-w-[140px]">{trip.destination}</span>
+          </nav>
+          <button
+            onClick={() => router.push('/profile')}
+            className="self-start flex items-center gap-1.5 text-[12px] text-slate hover:text-ink transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M5 12l7 7M5 12l7-7" />
+            </svg>
+            Back
+          </button>
+        </div>
 
         {/* ── Trip header ───────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-mist overflow-hidden">
@@ -1254,7 +1265,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-            <div className="absolute bottom-4 left-7 right-7 flex items-end justify-between">
+            <div className="absolute bottom-4 left-4 right-4 sm:left-7 sm:right-7 flex items-end justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                   <h1 className="font-serif text-2xl font-bold text-white drop-shadow">{trip.title}</h1>
@@ -1282,8 +1293,8 @@ export function TripDetail({ tripId }: { tripId: string }) {
 
           {/* Confirm complete panel */}
           {pendingComplete && (
-            <div className="px-7 py-3 border-b border-mist bg-success/5">
-              <div className="flex items-center justify-between gap-3 mb-2">
+            <div className="px-4 sm:px-7 py-3 border-b border-mist bg-success/5">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
                 <p className="text-[11px] text-slate">This trip will be shared with the community. Do you want your itinerary to be shared publicly or anonymously?</p>
                 <div className="flex rounded-full border border-mist bg-foam text-[11px] font-semibold overflow-hidden flex-shrink-0">
                   <button
@@ -1320,8 +1331,8 @@ export function TripDetail({ tripId }: { tripId: string }) {
             </div>
           )}
 
-          <div className="px-7 py-4">
-            <div className="flex flex-wrap gap-5 text-[11px] font-mono text-slate uppercase tracking-wide mb-3">
+          <div className="px-4 sm:px-7 py-4">
+            <div className="flex flex-wrap gap-3 sm:gap-5 text-[11px] font-mono text-slate uppercase tracking-wide mb-3">
               {trip.startDate && (
                 <span>
                   {new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
@@ -1352,7 +1363,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
         {/* ── Reflection banners ────────────────────────────────── */}
         {trip.status === 'COMPLETED' && !trip.reflection && (
           <div
-            className="rounded-2xl p-5 flex items-center gap-4 border border-gold/20"
+            className="rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 border border-gold/20"
             style={{ background: 'linear-gradient(135deg, #0D2B45, #143352)' }}
           >
             <div className="flex-1">
@@ -1361,7 +1372,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
             </div>
             <button
               onClick={() => setReflecting(true)}
-              className="flex-shrink-0 px-5 py-2 rounded-full text-[12px] font-semibold transition-all hover:bg-gold/30"
+              className="flex-shrink-0 w-full sm:w-auto px-5 py-2.5 sm:py-2 rounded-full text-[12px] font-semibold transition-all hover:bg-gold/30"
               style={{ background: 'rgba(201,168,76,0.2)', border: '1px solid rgba(201,168,76,0.4)', color: '#E2C06A' }}
             >
               Reflect on this trip →
@@ -1391,7 +1402,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
 
         {/* ── Tab bar ───────────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-mist overflow-hidden">
-          <div className="flex border-b border-mist">
+          <div className="flex border-b border-mist overflow-x-auto scrollbar-none">
             {TABS.map((tab) => {
               const badge = tab.id === 'todo' && todoCount > 0 ? todoCount
                 : tab.id === 'research' && researchItems.length > 0 ? researchItems.length
@@ -1400,7 +1411,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className="flex items-center gap-1.5 px-5 py-3.5 text-[13px] whitespace-nowrap transition-all border-b-2 -mb-px"
+                  className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-5 py-3 sm:py-3.5 text-[12px] sm:text-[13px] whitespace-nowrap transition-all border-b-2 -mb-px flex-shrink-0"
                   style={{
                     fontWeight: activeTab === tab.id ? 600 : 400,
                     color: activeTab === tab.id ? '#C4603A' : '#5B7A8E',
@@ -1429,11 +1440,11 @@ export function TripDetail({ tripId }: { tripId: string }) {
           </div>
 
           {/* ── Tab content ─────────────────────────────────────── */}
-          <div className="p-6">
+          <div className="p-3 sm:p-6">
 
             {/* Itinerary tab */}
             {activeTab === 'itinerary' && (
-              <div className="flex gap-6">
+              <div className="flex flex-col lg:flex-row gap-6">
                 {/* Left: global search + days */}
                 <div className="flex-1 min-w-0 flex flex-col gap-4">
                   <GlobalItinerarySearch
@@ -1460,8 +1471,8 @@ export function TripDetail({ tripId }: { tripId: string }) {
                   ))}
                 </div>
 
-                {/* Right: suggestions panel */}
-                <div style={{ width: 260, flexShrink: 0 }}>
+                {/* Right: suggestions panel — desktop only */}
+                <div className="hidden lg:block" style={{ width: 260, flexShrink: 0 }}>
                   <SuggestionsPanel
                     destination={trip.destination}
                     onAdd={(act) => setSearchActivity(act)}

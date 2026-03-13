@@ -217,8 +217,8 @@ export function ProfileHeader() {
         }}
       />
 
-      <div className="relative z-10 px-12 py-14">
-        <div className="flex items-center gap-7">
+      <div className="relative z-10 px-4 sm:px-8 md:px-12 py-8 sm:py-12 md:py-14">
+        <div className="flex items-center gap-4 sm:gap-7">
           <div className="w-20 h-20 rounded-full bg-terra/20 border-2 border-terra/30 flex items-center justify-center text-2xl font-serif font-bold text-terra-lt">
             {initials}
           </div>
@@ -235,7 +235,7 @@ export function ProfileHeader() {
           </div>
         </div>
 
-        <div className="flex gap-8 mt-10">
+        <div className="flex gap-5 sm:gap-8 mt-6 sm:mt-10">
           {[
             { n: tripCount,   l: 'Trips completed' },
             { n: countryCount,l: 'Countries visited' },

@@ -33,12 +33,12 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-[500] bg-ink/60 backdrop-blur-sm flex items-center justify-center p-6"
+      className="fixed inset-0 z-[500] bg-ink/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
       onClick={(e) => { if (e.target === overlayRef.current) onClose() }}
     >
       <div className={`bg-white rounded-3xl shadow-2xl w-full ${sizes[size]} max-h-[90vh] overflow-y-auto`}>
         {title && (
-          <div className="flex items-center justify-between px-7 py-5 border-b border-mist">
+          <div className="flex items-center justify-between px-4 sm:px-7 py-4 sm:py-5 border-b border-mist">
             <h2 className="font-serif text-xl font-bold text-ink">{title}</h2>
             <button
               onClick={onClose}
@@ -48,7 +48,7 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
             </button>
           </div>
         )}
-        <div className="p-7">{children}</div>
+        <div className="p-4 sm:p-7">{children}</div>
       </div>
     </div>
   )

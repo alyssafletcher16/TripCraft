@@ -36,7 +36,7 @@ export function LoginForm() {
   }
 
   return (
-    <div className="border border-white/10 rounded-3xl p-8" style={{ background: 'rgba(255,255,255,0.05)' }}>
+    <div className="border border-white/10 rounded-3xl p-5 sm:p-8" style={{ background: 'rgba(255,255,255,0.05)' }}>
       {/* Google OAuth */}
       <button
         type="button"

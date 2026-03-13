@@ -16,7 +16,7 @@ export function Navbar() {
         <button
           type="button"
           onClick={session ? toggle : toggle}
-          className="md:hidden flex flex-col justify-center gap-[5px] w-8 h-8 p-1 rounded-lg hover:bg-white/10 transition-colors"
+          className="md:hidden flex flex-col justify-center gap-[5px] w-11 h-11 p-2 rounded-lg hover:bg-white/10 transition-colors"
           aria-label="Open menu"
         >
           <span className="block w-full h-[1.5px] bg-white/70 rounded-full" />

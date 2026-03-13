@@ -148,8 +148,8 @@ export function TripsList() {
               draggingId && draggingId !== trip.id ? 'opacity-60' : 'opacity-100'
             }`}
           >
-            {/* Drag handle */}
-            <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing p-1">
+            {/* Drag handle — hidden on mobile (drag not supported on touch) */}
+            <div className="hidden sm:block flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing p-1">
               <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" className="text-slate/50">
                 <circle cx="4" cy="2" r="1.2"/><circle cx="8" cy="2" r="1.2"/>
                 <circle cx="4" cy="6" r="1.2"/><circle cx="8" cy="6" r="1.2"/>

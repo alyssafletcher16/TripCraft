@@ -143,10 +143,10 @@ export function CommunityCard({ card, index, upvoted, onUpvote }: Props) {
 
       {/* ── Footer ── */}
       <div className="px-4 py-2.5 border-t border-mist flex gap-2">
-        <button className="flex-1 py-2.5 rounded-[10px] border-[1.5px] border-mist text-[12px] text-slate transition-colors hover:border-terra hover:text-terra">
+        <button className="flex-1 py-3 rounded-[10px] border-[1.5px] border-mist text-[12px] text-slate transition-colors hover:border-terra hover:text-terra">
           Fork trip
         </button>
-        <button className="flex-1 py-2.5 rounded-[10px] border-none bg-ocean text-white text-[12px]">
+        <button className="flex-1 py-3 rounded-[10px] border-none bg-ocean text-white text-[12px]">
           View →
         </button>
       </div>

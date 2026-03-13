@@ -209,9 +209,9 @@ export function DateRangePicker({ startDate, endDate, onChange }: Props) {
 
       {/* Dropdown calendar */}
       {open && (
-        <div className="absolute z-50 top-full left-0 mt-2 bg-white border border-mist rounded-2xl shadow-xl overflow-hidden w-max max-w-[calc(100vw-2rem)]">
+        <div className="absolute z-50 top-full left-0 mt-2 bg-white border border-mist rounded-2xl shadow-xl overflow-hidden w-[calc(100vw-2rem)] sm:w-max max-w-[calc(100vw-2rem)]">
           {/* Header */}
-          <div className="flex items-center gap-6 px-5 py-3 border-b border-mist bg-foam/40 text-sm">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-6 px-4 py-3 border-b border-mist bg-foam/40 text-sm">
             <div>
               <span className="text-[10px] text-slate/50 uppercase tracking-wide font-medium block mb-0.5">Departure</span>
               <span className={start ? 'text-ink font-semibold' : 'text-slate/40'}>
@@ -243,10 +243,12 @@ export function DateRangePicker({ startDate, endDate, onChange }: Props) {
                 <MonthGrid year={viewYear} month={viewMonth} start={start} end={end}
                   hoverDate={hoverDate} selecting={selecting}
                   onDayClick={handleDayClick} onDayHover={setHoverDate} />
-                <div className="w-px bg-mist self-stretch" />
-                <MonthGrid year={nextYearNum} month={nextMonthNum} start={start} end={end}
-                  hoverDate={hoverDate} selecting={selecting}
-                  onDayClick={handleDayClick} onDayHover={setHoverDate} />
+                <div className="hidden sm:block w-px bg-mist self-stretch" />
+                <div className="hidden sm:block flex-1 min-w-0">
+                  <MonthGrid year={nextYearNum} month={nextMonthNum} start={start} end={end}
+                    hoverDate={hoverDate} selecting={selecting}
+                    onDayClick={handleDayClick} onDayHover={setHoverDate} />
+                </div>
               </div>
               <button type="button" onClick={nextMonth}
                 className="p-2 hover:bg-foam rounded-lg text-slate hover:text-ink transition-colors leading-none">

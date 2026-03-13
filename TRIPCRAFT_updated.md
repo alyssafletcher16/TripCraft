@@ -221,7 +221,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - PDF/DOCX/XLSX/CSV/TXT itinerary import — Claude parses → review → save; "Import itinerary" button on Completed tab; auto-COMPLETED if past date; "Imported" badge; routes: POST /api/itinerary/upload, POST /api/itinerary/save
 - Trip status system: ACTIVE / COMPLETED (2 statuses in UI; PLANNING in DB maps to ACTIVE)
 - Google Places API + PlaceCache + intelligence service (built, needs credits)
-- Back button on trip detail page — top-left, calls router.back() to return to previous page (Active tab, sidebar nav, etc.)
+- Breadcrumb + back button on trip detail page — breadcrumb shows Home › Profile › Active|Completed › [destination]; back button calls router.push('/profile') (not router.back()) so it always returns to profile regardless of navigation origin
 - Stats banner on home page — hidden until real data is available (STATS constant removed)
 - Mobile hamburger + sign-in: home page gets `<Sidebar hideDesktop />` so the drawer works on all pages; sidebar shows Sign In / Get Started links for unauthenticated users
 - Home page sidebar: when logged in, home page renders full sidebar (Discover, My Profile, Active Itineraries) in the standard 272px grid layout; logged-out users see the marketing landing page with mobile-only drawer
