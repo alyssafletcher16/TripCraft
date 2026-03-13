@@ -166,7 +166,7 @@ export function ProfileHeader() {
         const pins: TripPin[] = []
         const countriesSet = new Set<string>()
 
-        for (const t of trips) {
+        for (const t of completed) {
           const c = destinationToCoords(t.destination)
           if (c) {
             pins.push({ destination: t.destination, title: t.title, coords: c })
