@@ -384,136 +384,6 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 /* saved panel inside trip */
 .saved-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .saved-count-badge{background:var(--terra);color:#fff;font-family:'DM Mono',monospace;font-size:10px;padding:3px 9px;border-radius:100px;letter-spacing:0.5px}
-
-/* ── Mobile bottom nav (hidden by default, shown on mobile) ── */
-.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--deep);border-top:1px solid rgba(255,255,255,0.08);z-index:250;align-items:center;justify-content:space-around;padding:0 4px;safe-area-inset-bottom:env(safe-area-inset-bottom)}
-.mbn-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;border:none;background:none;cursor:pointer;color:rgba(255,255,255,0.4);font-size:10px;font-family:'DM Sans',sans-serif;transition:color 0.15s;min-width:52px}
-.mbn-btn.active{color:var(--terra-lt)}
-.mbn-icon{font-size:18px;line-height:1.2}
-
-/* ── Tablet (641–1024px) ────────────────────────────────────── */
-@media(max-width:1024px){
-  .nav{padding:0 24px}
-  .hero{padding:60px 32px 72px;gap:40px}
-  .hero-h1{font-size:52px}
-  .stats-bar{padding:20px 32px;gap:32px}
-  .shell{grid-template-columns:220px 1fr}
-  .content{padding:32px 28px}
-  .card-grid{grid-template-columns:repeat(2,1fr)}
-  .about-pillars{grid-template-columns:repeat(2,1fr)}
-  .tripmap-body{grid-template-columns:1fr 260px}
-  .about-hero{padding:40px 32px}
-  .setup-card{padding:28px}
-}
-
-/* ── Mobile (≤640px) ────────────────────────────────────────── */
-@media(max-width:640px){
-  /* nav */
-  .nav{padding:0 16px;height:54px}
-  .nav-links{display:none}
-  .nav-cta{padding:8px 14px;font-size:12px}
-  /* save bar aligns with shorter nav */
-  .save-bar{top:54px;padding:0 14px;gap:8px}
-  .save-label{display:none}
-
-  /* hero */
-  .hero{grid-template-columns:1fr;padding:40px 20px 52px;gap:28px}
-  .hero-h1{font-size:36px}
-  .hero-p{font-size:14px;max-width:100%;margin-bottom:24px}
-  .hero-btns{flex-direction:column;gap:10px}
-  .btn-hero,.btn-ghost{width:100%;text-align:center;padding:14px 20px;box-sizing:border-box}
-  .hero-card{padding:18px}
-
-  /* stats */
-  .stats-bar{padding:16px 20px;gap:20px;flex-wrap:wrap}
-  .stats-bar>div{min-width:calc(50% - 20px)}
-  .stat-num{font-size:24px}
-
-  /* shell: hide sidebar, full-width content, leave space for bottom nav */
-  .shell{grid-template-columns:1fr;min-height:calc(100vh - 54px);padding-bottom:60px}
-  .sidebar{display:none}
-  .content{padding:20px 14px;overflow-y:auto}
-
-  /* show mobile bottom nav */
-  .mobile-bottom-nav{display:flex}
-
-  /* page headers */
-  .pg-title{font-size:26px}
-
-  /* day cards */
-  .iday-hd{padding:12px 14px}
-  .iday-body{padding:12px 14px}
-  .block{padding:10px 12px;gap:10px}
-  .block-ico{width:30px;height:30px;font-size:13px}
-
-  /* grids → single column */
-  .card-grid{grid-template-columns:1fr}
-  .about-pillars{grid-template-columns:1fr}
-  .form-grid2{grid-template-columns:1fr}
-
-  /* trip map: hide side panel, full map */
-  .tripmap-body{grid-template-columns:1fr}
-  .tripmap-panel{display:none}
-
-  /* modals */
-  .overlay{padding:0;align-items:flex-end}
-  .modal{border-radius:20px 20px 0 0;max-width:100%;max-height:96vh}
-  .modal-hd{padding:16px 20px 12px}
-  .modal-body{padding:14px 20px}
-  .type-box{width:100%;border-radius:20px}
-
-  /* profile */
-  .profile-map-header{height:170px}
-  .profile-overlay{padding:32px 18px 18px}
-  .profile-name{font-size:20px}
-  .pstats{gap:18px}
-  .profile-avatar{width:56px;height:56px;font-size:22px}
-
-  /* about */
-  .about-hero{padding:32px 20px}
-  .about-section{padding:22px 18px}
-  .setup-card{padding:22px 18px;max-width:100%}
-
-  /* discover tabs: scrollable */
-  .discover-tabs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;-webkit-overflow-scrolling:touch}
-  .dtab{white-space:nowrap}
-
-  /* intel panel */
-  .intel-panel{padding:16px 18px}
-  .ck-panel{padding:16px 18px}
-  .budget-panel{padding:16px 18px}
-
-  /* vibe chips: wrap nicely */
-  .vibe-grid{gap:6px}
-  .vibe-chip{font-size:12px;padding:8px 14px}
-
-  /* photo strip */
-  .photo-thumb,.photo-add{width:60px;height:48px}
-
-  /* reflect banner */
-  .reflect-banner{flex-direction:column;align-items:flex-start;gap:10px;padding:16px 18px}
-  .reflect-cta{margin-left:0;align-self:flex-start}
-
-  /* compare table: allow horizontal scroll */
-  .compare-table{font-size:12px}
-  .modal-body .compare-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-
-  /* map outer */
-  .map-outer{border-radius:14px}
-  .dmap-wrap{border-radius:14px}
-
-  /* saved items */
-  .saved-item{padding:10px 12px;gap:10px}
-
-  /* link preview */
-  .link-preview-thumb{width:80px}
-
-  /* phase rows in about */
-  .phase-row{flex-direction:column;gap:6px}
-
-  /* profile stats */
-  .pstat-n{font-size:20px}
-}
 `;
 
 /* ═══════════════════════════════════════════════════════════════ DATA ═════ */
@@ -1245,12 +1115,15 @@ function TimeSlotGroup({slot, label, blocks, onEdit, onDelete, travelers}) {
 function SmartPanels({dest="Sicily, Italy", travelers=2, budget=3200}) {
   const [tab,setTab]=useState("todo");
   const [todos,setTodos]=useState(SMART_TODO.map((t,i)=>({...t,id:i})));
+  const [perPerson,setPerPerson]=useState(false);
 
   const donePct = Math.round(todos.filter(t=>t.done).length/todos.length*100);
   const catColors={"Booking":"var(--terra)","Admin":"var(--ocean)","Activity":"var(--gold)","Food":"var(--green)","Prep":"var(--slate)","Transport":"var(--amber)"};
 
   const totalSpent=BUDGET_ITEMS.reduce((s,b)=>s+b.spent,0);
   const totalBudget=BUDGET_ITEMS.reduce((s,b)=>s+b.budget,0);
+  const div=perPerson?travelers:1;
+  const pp=perPerson?" / person":"";
 
   return (
     <div style={{position:"sticky",top:14}}>
@@ -1318,36 +1191,27 @@ function SmartPanels({dest="Sicily, Italy", travelers=2, budget=3200}) {
         {tab==="budget" && <>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
             <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:17,fontWeight:700,color:"var(--ink)"}}>Budget Tracker</div>
-            <div style={{fontFamily:"DM Mono,monospace",fontSize:10,color:"var(--slate)"}}>{travelers} traveler{travelers>1?"s":""}</div>
+            <button onClick={()=>setPerPerson(p=>!p)} style={{padding:"5px 12px",borderRadius:100,border:"1.5px solid var(--mist)",background:perPerson?"var(--ocean)":"none",color:perPerson?"#fff":"var(--slate)",fontSize:11,cursor:"pointer",fontFamily:"DM Mono,monospace",letterSpacing:0.5}}>
+              {perPerson?"Per person":"Total"}
+            </button>
           </div>
           <div style={{background:"var(--foam)",borderRadius:10,padding:12,marginBottom:14,display:"flex",justifyContent:"space-between"}}>
-            <div>
-              <div style={{fontSize:11,color:"var(--slate)"}}>Spent</div>
-              <div style={{fontFamily:"DM Mono,monospace",fontSize:18,fontWeight:500,color:"var(--ink)"}}>${totalSpent.toLocaleString()}</div>
-              {travelers>1&&<div style={{fontFamily:"DM Mono,monospace",fontSize:10,color:"var(--slate)",marginTop:2}}>${Math.round(totalSpent/travelers).toLocaleString()} / person</div>}
-            </div>
-            <div style={{textAlign:"right"}}>
-              <div style={{fontSize:11,color:"var(--slate)"}}>Budget</div>
-              <div style={{fontFamily:"DM Mono,monospace",fontSize:18,fontWeight:500,color:"var(--ocean)"}}>${totalBudget.toLocaleString()}</div>
-              {travelers>1&&<div style={{fontFamily:"DM Mono,monospace",fontSize:10,color:"var(--slate)",marginTop:2}}>${Math.round(totalBudget/travelers).toLocaleString()} / person</div>}
-            </div>
+            <div><div style={{fontSize:11,color:"var(--slate)"}}>Spent{pp}</div><div style={{fontFamily:"DM Mono,monospace",fontSize:18,fontWeight:500,color:"var(--ink)"}}>${Math.round(totalSpent/div).toLocaleString()}</div></div>
+            <div style={{textAlign:"right"}}><div style={{fontSize:11,color:"var(--slate)"}}>Budget{pp}</div><div style={{fontFamily:"DM Mono,monospace",fontSize:18,fontWeight:500,color:"var(--ocean)"}}>${Math.round(totalBudget/div).toLocaleString()}</div></div>
           </div>
           {BUDGET_ITEMS.map((b,i)=>{
-            const over=b.spent>b.budget;
+            const s=Math.round(b.spent/div), bg=Math.round(b.budget/div);
+            const over=s>bg;
             return <div key={i} style={{marginBottom:12}}>
               <div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:4}}>
                 <span style={{color:"var(--ink)",display:"flex",gap:6,alignItems:"center"}}><span>{b.icon}</span>{b.label}</span>
-                <div style={{textAlign:"right"}}>
-                  <div style={{fontFamily:"DM Mono,monospace",color:over?"var(--red)":"var(--slate)",fontSize:11}}>${b.spent} / ${b.budget}</div>
-                  {travelers>1&&<div style={{fontFamily:"DM Mono,monospace",fontSize:10,color:"var(--slate)"}}>${Math.round(b.spent/travelers)} pp</div>}
-                </div>
+                <span style={{fontFamily:"DM Mono,monospace",color:over?"var(--red)":"var(--slate)",fontSize:11}}>${s}{pp} / ${bg}{pp}</span>
               </div>
-              <div className="bbar"><div className="bbar-fill" style={{width:`${Math.min((b.spent/b.budget)*100,100)}%`,background:over?"var(--red)":"var(--terra)"}}/></div>
+              <div className="bbar"><div className="bbar-fill" style={{width:`${Math.min((s/bg)*100,100)}%`,background:over?"var(--red)":"var(--terra)"}}/></div>
             </div>;
           })}
-          <div style={{marginTop:14,padding:"10px 14px",borderRadius:10,background:"rgba(201,168,76,0.08)",border:"1px solid rgba(201,168,76,0.2)",fontSize:12,color:"var(--slate)",display:"flex",justifyContent:"space-between"}}>
-            <span>${(totalBudget-totalSpent).toLocaleString()} remaining</span>
-            {travelers>1&&<span style={{fontFamily:"DM Mono,monospace",fontSize:11}}>${Math.round((totalBudget-totalSpent)/travelers).toLocaleString()} / pp</span>}
+          <div style={{marginTop:14,padding:"10px 14px",borderRadius:10,background:"rgba(201,168,76,0.08)",border:"1px solid rgba(201,168,76,0.2)",fontSize:12,color:"var(--slate)"}}>
+            ${Math.round((totalBudget-totalSpent)/div).toLocaleString()} remaining{pp} across all categories
           </div>
         </>}
 
@@ -2301,7 +2165,7 @@ function TripMapView() {
 }
 
 /* ═══════════ EXISTING TRIP VIEW ═════════════════════════════════ */
-function ExistingTrip() {
+function ExistingTrip({onTripPosted}) {
   const [mainTab, setMainTab] = useState("itinerary");
   const [exp,setExp]=useState({0:true,1:false,2:false});
   const [blocks,setBlocks]=useState(()=>{
@@ -2313,6 +2177,10 @@ function ExistingTrip() {
   const [showReflect,setShowReflect]=useState(false);
   const [reflected,setReflected]=useState(null);
   const [tripStatus,setTripStatus]=useState("active"); // active | draft | past
+  const [posted,setPosted]=useState(false);
+  const [shareAnon,setShareAnon]=useState(true);
+  const [showPostedBanner,setShowPostedBanner]=useState(false);
+  const [showShareModal,setShowShareModal]=useState(false);
   const [editing,setEditing]=useState(false);
   const [details,setDetails]=useState({dest:"Sicily, Italy",dates:"May 12–19",days:"7",travelers:"2",budget:"3,200",theme:"Foodie escape with culture and coastal stops"});
   const [draftDetails,setDraftDetails]=useState({...details});
@@ -2321,6 +2189,7 @@ function ExistingTrip() {
   const [hotelModal,setHotelModal]=useState(null);
   const [savedItems,setSavedItems]=useState(INITIAL_SAVED_ITEMS);
   const [todos,setTodos]=useState(SMART_TODO.map((t,i)=>({...t,id:i})));
+  const [perPerson,setPerPerson]=useState(false);
   const travelers=parseInt(details.travelers)||2;
 
   const toggleVibe=id=>setSelVibes(p=>p.includes(id)?p.filter(x=>x!==id):[...p,id]);
@@ -2337,6 +2206,8 @@ function ExistingTrip() {
   const catColors={"Booking":"var(--terra)","Admin":"var(--ocean)","Activity":"var(--gold)","Food":"var(--green)","Prep":"var(--slate)","Transport":"var(--amber)"};
   const totalSpent=BUDGET_ITEMS.reduce((s,b)=>s+b.spent,0);
   const totalBudget=BUDGET_ITEMS.reduce((s,b)=>s+b.budget,0);
+  const div=perPerson?travelers:1;
+  const pp=perPerson?" / person":"";
 
   const todoRemaining=todos.filter(t=>!t.done).length;
   const MAIN_TABS=[
@@ -2348,7 +2219,93 @@ function ExistingTrip() {
     {id:"saved",     label:"Saved",      icon:"LNK", badge: savedItems.length||null},
   ];
 
+  const doShare=(anon)=>{
+    const trip={
+      id:"posted_"+Date.now(),
+      dest:details.dest,
+      flag:details.dest.includes("Italy")?"IT":details.dest.includes("Japan")?"JP":"🌍",
+      country:(details.dest.split(",")[1]||"").trim(),
+      meta:`${details.days} days · ${details.travelers} travelers · $${details.budget}`,
+      tags:selVibes.slice(0,2).map(v=>VIBES.find(x=>x.id===v)?.label||v),
+      votes:0,
+      photo:"https://images.unsplash.com/photo-1533104816931-20fa691ff6ca?w=500&q=80",
+      highlight:"#C4603A",
+      anon,
+      author:anon?"?":"A",
+      name:anon?"anonymous":"alyssa.t",
+      user:"Alyssa Fletcher",
+      initial:"A",
+      color:"#4A6FA5",
+      action:"just completed a trip to",
+      time:"Just now",
+      postedAt:Date.now(),
+    };
+    setPosted(true);
+    setShareAnon(anon);
+    setShowShareModal(false);
+    setShowPostedBanner(true);
+    setTimeout(()=>setShowPostedBanner(false),6000);
+    if(onTripPosted) onTripPosted(trip);
+  };
+
   return <>
+    {showShareModal&&(
+      <div className="overlay" onClick={e=>e.target===e.currentTarget&&setShowShareModal(false)}>
+        <div className="modal" style={{maxWidth:480}}>
+          <div className="modal-hd">
+            <div>
+              <div className="modal-title">Share this trip?</div>
+              <div className="modal-sub">Your trip is complete — choose how to share it with the community.</div>
+            </div>
+            <button className="x-btn" onClick={()=>setShowShareModal(false)}>×</button>
+          </div>
+          <div className="modal-body" style={{padding:28,display:"flex",flexDirection:"column",gap:14}}>
+            <button onClick={()=>doShare(true)}
+              style={{display:"flex",gap:16,alignItems:"flex-start",padding:"18px 20px",borderRadius:16,border:"1.5px solid var(--mist)",background:"#fff",cursor:"pointer",textAlign:"left",width:"100%"}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor="var(--terra)";e.currentTarget.style.background="#FEF8F5"}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor="var(--mist)";e.currentTarget.style.background="#fff"}}>
+              <div style={{width:44,height:44,borderRadius:12,background:"var(--foam)",border:"1.5px solid var(--mist)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>👤</div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:14,fontWeight:600,color:"var(--ink)",marginBottom:4}}>Share anonymously</div>
+                <div style={{fontSize:12,color:"var(--slate)",lineHeight:1.6}}>Your itinerary appears in Community with no name. Friends can still see it's you in their feed.</div>
+                <div style={{marginTop:8,display:"flex",gap:6}}>
+                  <span style={{fontSize:10,padding:"2px 10px",borderRadius:100,background:"rgba(91,122,142,0.1)",color:"var(--slate)",fontFamily:"DM Mono,monospace"}}>Community · no name</span>
+                  <span style={{fontSize:10,padding:"2px 10px",borderRadius:100,background:"rgba(74,111,165,0.1)",color:"#4A6FA5",fontFamily:"DM Mono,monospace"}}>Friends · your name</span>
+                </div>
+              </div>
+            </button>
+            <button onClick={()=>doShare(false)}
+              style={{display:"flex",gap:16,alignItems:"flex-start",padding:"18px 20px",borderRadius:16,border:"1.5px solid var(--mist)",background:"#fff",cursor:"pointer",textAlign:"left",width:"100%"}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor="var(--ocean)";e.currentTarget.style.background="rgba(13,43,69,0.02)"}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor="var(--mist)";e.currentTarget.style.background="#fff"}}>
+              <div style={{width:44,height:44,borderRadius:12,background:"rgba(13,43,69,0.06)",border:"1.5px solid rgba(13,43,69,0.12)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>🌐</div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:14,fontWeight:600,color:"var(--ink)",marginBottom:4}}>Share publicly <span style={{fontSize:11,fontWeight:400,color:"var(--slate)"}}>— link to your profile</span></div>
+                <div style={{fontSize:12,color:"var(--slate)",lineHeight:1.6}}>Your name and profile are shown. Others can tap your name to visit your profile and see your other trips.</div>
+                <div style={{marginTop:8,display:"flex",gap:6}}>
+                  <span style={{fontSize:10,padding:"2px 10px",borderRadius:100,background:"rgba(13,43,69,0.1)",color:"var(--ocean)",fontFamily:"DM Mono,monospace"}}>Community · @alyssa.t</span>
+                  <span style={{fontSize:10,padding:"2px 10px",borderRadius:100,background:"rgba(74,111,165,0.1)",color:"#4A6FA5",fontFamily:"DM Mono,monospace"}}>Friends · your name</span>
+                </div>
+              </div>
+            </button>
+            <button onClick={()=>setShowShareModal(false)}
+              style={{background:"none",border:"none",fontSize:12,color:"var(--slate)",cursor:"pointer",padding:"6px 0",textAlign:"center"}}>
+              Don't share this trip
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    {showPostedBanner&&(
+      <div style={{background:"linear-gradient(135deg,var(--ocean),var(--tide))",borderRadius:14,padding:"14px 20px",marginBottom:20,display:"flex",alignItems:"center",gap:14,border:"1px solid rgba(201,168,76,0.25)"}}>
+        <div style={{width:38,height:38,borderRadius:10,background:"rgba(201,168,76,0.2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>🌍</div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:13,fontWeight:600,color:"#fff",marginBottom:2}}>Trip shared to community & friends</div>
+          <div style={{fontSize:11,color:"rgba(255,255,255,0.6)"}}>Community: <strong style={{color:"var(--gold-lt)"}}>{shareAnon?"anonymous":"@alyssa.t (public)"}</strong> · Friends: <strong style={{color:"var(--gold-lt)"}}>Alyssa Fletcher</strong></div>
+        </div>
+        <button onClick={()=>setShowPostedBanner(false)} style={{background:"none",border:"none",color:"rgba(255,255,255,0.4)",cursor:"pointer",fontSize:18,flexShrink:0}}>×</button>
+      </div>
+    )}
     {/* Status-aware banners */}
     {tripStatus==="draft" && (
       <div style={{background:"rgba(201,168,76,0.08)",border:"1.5px solid rgba(201,168,76,0.25)",borderRadius:14,padding:"14px 20px",marginBottom:20,display:"flex",alignItems:"center",gap:14}}>
@@ -2392,7 +2349,11 @@ function ExistingTrip() {
               <div style={{display:"flex",gap:6,alignItems:"center"}}>
                 <span style={{fontSize:11,fontFamily:"DM Mono,monospace",fontWeight:600,color:m.color,background:m.bg,border:`1px solid ${m.border}`,padding:"4px 12px",borderRadius:100}}>{m.label}</span>
                 <div style={{position:"relative"}}>
-                  <select value={tripStatus} onChange={e=>setTripStatus(e.target.value)}
+                  <select value={tripStatus} onChange={e=>{
+                    const s=e.target.value;
+                    setTripStatus(s);
+                    if(s==="past"&&!posted) setShowShareModal(true);
+                  }}
                     style={{appearance:"none",background:"none",border:"1.5px solid var(--mist)",borderRadius:100,padding:"4px 24px 4px 10px",fontSize:11,color:"var(--slate)",cursor:"pointer",fontFamily:"DM Sans,sans-serif"}}>
                     <option value="active">Active</option>
                     <option value="draft">Draft</option>
@@ -2538,37 +2499,33 @@ function ExistingTrip() {
       <div style={{maxWidth:600}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
           <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:22,fontWeight:700,color:"var(--ink)"}}>Budget Tracker</div>
-          <div style={{fontFamily:"DM Mono,monospace",fontSize:11,color:"var(--slate)",background:"var(--foam)",border:"1.5px solid var(--mist)",borderRadius:100,padding:"5px 14px"}}>{travelers} traveler{travelers>1?"s":""}</div>
+          <button onClick={()=>setPerPerson(p=>!p)} style={{padding:"7px 16px",borderRadius:100,border:"1.5px solid var(--mist)",background:perPerson?"var(--ocean)":"none",color:perPerson?"#fff":"var(--slate)",fontSize:12,cursor:"pointer",fontFamily:"DM Mono,monospace",letterSpacing:0.5,transition:"all 0.15s"}}>
+            {perPerson?"Per person ↕":"Total ↕"}
+          </button>
         </div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:24}}>
           <div style={{background:"var(--foam)",borderRadius:14,padding:18,border:"1.5px solid var(--mist)"}}>
-            <div style={{fontSize:11,color:"var(--slate)",marginBottom:4}}>Total spent</div>
-            <div style={{fontFamily:"DM Mono,monospace",fontSize:26,fontWeight:500,color:"var(--ink)"}}>${totalSpent.toLocaleString()}</div>
-            {travelers>1&&<div style={{fontSize:11,color:"var(--slate)",marginTop:5,fontFamily:"DM Mono,monospace"}}>${Math.round(totalSpent/travelers).toLocaleString()} / person</div>}
+            <div style={{fontSize:11,color:"var(--slate)",marginBottom:4}}>Total spent{pp}</div>
+            <div style={{fontFamily:"DM Mono,monospace",fontSize:26,fontWeight:500,color:"var(--ink)"}}>${Math.round(totalSpent/div).toLocaleString()}</div>
           </div>
           <div style={{background:"var(--foam)",borderRadius:14,padding:18,border:"1.5px solid var(--mist)"}}>
-            <div style={{fontSize:11,color:"var(--slate)",marginBottom:4}}>Total budget</div>
-            <div style={{fontFamily:"DM Mono,monospace",fontSize:26,fontWeight:500,color:"var(--ocean)"}}>${totalBudget.toLocaleString()}</div>
-            {travelers>1&&<div style={{fontSize:11,color:"var(--slate)",marginTop:5,fontFamily:"DM Mono,monospace"}}>${Math.round(totalBudget/travelers).toLocaleString()} / person</div>}
+            <div style={{fontSize:11,color:"var(--slate)",marginBottom:4}}>Total budget{pp}</div>
+            <div style={{fontFamily:"DM Mono,monospace",fontSize:26,fontWeight:500,color:"var(--ocean)"}}>${Math.round(totalBudget/div).toLocaleString()}</div>
           </div>
         </div>
         {BUDGET_ITEMS.map((b,i)=>{
-          const over=b.spent>b.budget;
+          const s=Math.round(b.spent/div),bg=Math.round(b.budget/div),over=s>bg;
           return <div key={i} style={{marginBottom:14,background:"#fff",borderRadius:12,padding:14,border:"1.5px solid var(--mist)"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
               <span style={{fontSize:14,fontWeight:500,color:"var(--ink)",display:"flex",gap:8,alignItems:"center"}}><span>{b.icon}</span>{b.label}</span>
-              <div style={{textAlign:"right"}}>
-                <div style={{fontFamily:"DM Mono,monospace",color:over?"var(--red)":"var(--slate)",fontSize:11}}>${b.spent.toLocaleString()} <span style={{color:"var(--mist)"}}>/ ${b.budget.toLocaleString()}</span></div>
-                {travelers>1&&<div style={{fontFamily:"DM Mono,monospace",fontSize:10,color:"var(--slate)",marginTop:2}}>${Math.round(b.spent/travelers).toLocaleString()} / ${Math.round(b.budget/travelers).toLocaleString()} pp</div>}
-              </div>
+              <span style={{fontFamily:"DM Mono,monospace",color:over?"var(--red)":"var(--slate)",fontSize:11}}>${s.toLocaleString()}{pp} <span style={{color:"var(--mist)"}}>/ ${bg.toLocaleString()}{pp}</span></span>
             </div>
-            <div className="bbar" style={{height:8}}><div className="bbar-fill" style={{width:`${Math.min((b.spent/b.budget)*100,100)}%`,background:over?"var(--red)":"var(--terra)"}}/></div>
-            {over&&<div style={{fontSize:10,color:"var(--red)",marginTop:5,fontFamily:"DM Mono,monospace"}}>${(b.spent-b.budget).toLocaleString()} over budget</div>}
+            <div className="bbar" style={{height:8}}><div className="bbar-fill" style={{width:`${Math.min((s/bg)*100,100)}%`,background:over?"var(--red)":"var(--terra)"}}/></div>
+            {over&&<div style={{fontSize:10,color:"var(--red)",marginTop:5,fontFamily:"DM Mono,monospace"}}>${(s-bg).toLocaleString()} over</div>}
           </div>;
         })}
-        <div style={{padding:"12px 16px",borderRadius:12,background:"rgba(201,168,76,0.08)",border:"1px solid rgba(201,168,76,0.2)",fontSize:13,color:"var(--slate)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <span>${(totalBudget-totalSpent).toLocaleString()} remaining</span>
-          {travelers>1&&<span style={{fontFamily:"DM Mono,monospace",fontSize:11}}>${Math.round((totalBudget-totalSpent)/travelers).toLocaleString()} / person</span>}
+        <div style={{padding:"12px 16px",borderRadius:12,background:"rgba(201,168,76,0.08)",border:"1px solid rgba(201,168,76,0.2)",fontSize:13,color:"var(--slate)"}}>
+          ${Math.round((totalBudget-totalSpent)/div).toLocaleString()} remaining{pp} · {travelers} traveler{travelers>1?"s":""}
         </div>
       </div>
     )}
@@ -3024,7 +2981,7 @@ function DiscoverMap() {
 }
 
 
-function DiscoverView() {
+function DiscoverView({postedTrips=[]}) {
   const [tab,setTab]=useState("community");
   const [filters,setFilters]=useState([]);
   const toggleFilter=f=>setFilters(p=>p.includes(f)?p.filter(x=>x!==f):[...p,f]);
@@ -3047,6 +3004,40 @@ function DiscoverView() {
         <div style={{display:"flex",gap:8,marginBottom:20,flexWrap:"wrap"}}>
           {FILTERS.map(f=><button key={f} className={`fchip ${filters.includes(f)||f==="All"&&filters.length===0?"active":""}`} onClick={()=>toggleFilter(f)}>{f}</button>)}
         </div>
+        {postedTrips.length>0&&(
+          <div style={{marginBottom:18}}>
+            <div style={{fontFamily:"DM Mono,monospace",fontSize:9,color:"var(--terra)",letterSpacing:2,textTransform:"uppercase",marginBottom:10,display:"flex",alignItems:"center",gap:8}}>
+              <span style={{width:6,height:6,borderRadius:"50%",background:"var(--terra)",display:"inline-block"}}/>
+              Just posted · from you
+            </div>
+            <div className="card-grid">
+              {postedTrips.map((c)=>(
+                <div key={c.id} className="ccard" style={{border:"1.5px solid rgba(196,96,58,0.3)"}}>
+                  <div className="ccard-img" style={{position:"relative",overflow:"hidden"}}>
+                    {c.photo&&<img src={c.photo} alt={c.dest} style={{width:"100%",height:"100%",objectFit:"cover",position:"absolute",inset:0}}/>}
+                    <div className="ccard-img-overlay"/>
+                    <div className="ccard-img-meta">
+                      <div className="ccard-dest">{c.dest}<br/><span style={{fontSize:12,fontWeight:400,opacity:0.8}}>{c.country}</span></div>
+                      <div className="ccard-votes">↑ {c.votes}</div>
+                    </div>
+                  </div>
+                  <div className="ccard-body">
+                    <div className="ccard-author">
+                      <div className="ccard-avatar" style={{background:c.anon?"var(--slate)":"var(--ocean)"}}>{c.author}</div>
+                      {c.anon
+                        ?<span className="ccard-name" style={{color:"var(--slate)",fontStyle:"italic"}}>anonymous traveler</span>
+                        :<span className="ccard-name" style={{color:"var(--terra)",cursor:"pointer",textDecoration:"underline dotted"}} title="View profile">@{c.name}</span>
+                      }
+                      <span style={{marginLeft:"auto",fontSize:9,color:"var(--terra)",fontFamily:"DM Mono,monospace",background:"rgba(196,96,58,0.08)",border:"1px solid rgba(196,96,58,0.2)",borderRadius:100,padding:"2px 8px"}}>your trip</span>
+                    </div>
+                    <div className="ccard-meta">{c.meta}</div>
+                    <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{(c.tags||[]).map(t=><span key={t} className="ctag hi">{t}</span>)}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="card-grid">
           {COMMUNITY_CARDS.map((c,i)=>(
             <div key={i} className="ccard">
@@ -3070,6 +3061,27 @@ function DiscoverView() {
         </div>
       </>}
       {tab==="friends"&&<>
+        {postedTrips.map((f)=>(
+          <div key={f.id} className="ffeed-card" style={{border:"1.5px solid rgba(196,96,58,0.25)",marginBottom:10}}>
+            <div className="ffeed-header">
+              <div className="ffeed-avatar" style={{background:f.color}}>{f.initial}</div>
+              <div>
+                <div className="ffeed-user">{f.user}</div>
+                <div className="ffeed-action">{f.action} <strong>{f.dest}</strong> · {f.time}</div>
+              </div>
+              <span style={{marginLeft:"auto",fontSize:9,color:"var(--terra)",fontFamily:"DM Mono,monospace",background:"rgba(196,96,58,0.08)",border:"1px solid rgba(196,96,58,0.2)",borderRadius:100,padding:"2px 8px",flexShrink:0}}>your trip</span>
+            </div>
+            <div style={{padding:"0 18px 14px",display:"flex",gap:8,alignItems:"center"}}>
+              <div style={{width:36,height:36,borderRadius:8,background:"var(--ocean)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:"rgba(255,255,255,0.7)",fontFamily:"DM Mono,monospace",flexShrink:0}}>{f.flag}</div>
+              <div><div style={{fontSize:13,color:"var(--slate)",marginBottom:4}}>{f.meta}</div><div style={{display:"flex",gap:6}}>{(f.tags||[]).map(t=><span key={t} className="ctag hi">{t}</span>)}</div></div>
+            </div>
+            <div className="ffeed-footer">
+              <button className="ffeed-btn">Like · {f.votes}</button>
+              <button className="ffeed-btn">Fork trip</button>
+              <button className="ffeed-btn">Comment</button>
+            </div>
+          </div>
+        ))}
         {FRIENDS_FEED.map((f,i)=>(
           <div key={i} className="ffeed-card">
             <div className="ffeed-header">
@@ -3166,9 +3178,11 @@ function SidebarPastTrips({onSelect}) {
 export default function App() {
   const [showHero,setShowHero]=useState(true);
   const [tab,setTab]=useState("sicily");
-  const [globalSavedCount,setGlobalSavedCount]=useState(2); // starts with 2 demo items
+  const [globalSavedCount,setGlobalSavedCount]=useState(2);
+  const [postedTrips,setPostedTrips]=useState([]);
 
   const handleGlobalSave=(item)=>{setGlobalSavedCount(p=>p+1);};
+  const handleTripPosted=(trip)=>setPostedTrips(p=>[trip,...p]);
   const inApp=!showHero;
 
   return (
@@ -3178,7 +3192,8 @@ export default function App() {
         <div className="nav-logo" onClick={()=>setShowHero(true)} style={{cursor:"pointer"}}>trip<span>craft</span></div>
         <div className="nav-links">
           <button className={`nav-link ${tab==="discover"&&inApp?"active":""}`} onClick={()=>{setShowHero(false);setTab("discover")}}>Discover</button>
-<button className={`nav-link ${tab==="profile"&&inApp?"active":""}`} onClick={()=>{setShowHero(false);setTab("profile")}}>Profile</button>
+          <button className={`nav-link ${tab==="sicily"&&inApp?"active":""}`} onClick={()=>{setShowHero(false);setTab("sicily")}}>My Trips</button>
+          <button className={`nav-link ${tab==="profile"&&inApp?"active":""}`} onClick={()=>{setShowHero(false);setTab("profile")}}>Profile</button>
         </div>
         <button className="nav-cta" onClick={()=>{setShowHero(false);setTab("new")}}>+ New trip</button>
       </nav>
@@ -3220,7 +3235,6 @@ export default function App() {
           </div>
         </>
       ):(
-        <>
         <div className="shell">
           <aside className="sidebar">
             <div className="sb-section">Active</div>
@@ -3247,32 +3261,13 @@ export default function App() {
             </button>
           </aside>
           <div className="content">
-            {tab==="sicily"   && <ExistingTrip/>}
-            {tab==="discover" && <DiscoverView/>}
+            {tab==="sicily"   && <ExistingTrip onTripPosted={handleTripPosted}/>}
+            {tab==="discover" && <DiscoverView postedTrips={postedTrips}/>}
             {tab==="new"      && <NewTripBuilder/>}
             {tab==="profile"  && <ProfileView/>}
             {tab==="save"     && <SaveView/>}
           </div>
         </div>
-        {/* ── Mobile bottom navigation (only visible on mobile via CSS) ── */}
-        <nav className="mobile-bottom-nav">
-          <button className={`mbn-btn ${tab==="sicily"?"active":""}`} onClick={()=>setTab("sicily")}>
-            <span className="mbn-icon">IT</span>My Trip
-          </button>
-          <button className={`mbn-btn ${tab==="discover"?"active":""}`} onClick={()=>setTab("discover")}>
-            <span className="mbn-icon">✦</span>Discover
-          </button>
-          <button className={`mbn-btn ${tab==="new"?"active":""}`} onClick={()=>setTab("new")}>
-            <span className="mbn-icon">+</span>New
-          </button>
-          <button className={`mbn-btn ${tab==="save"?"active":""}`} onClick={()=>setTab("save")}>
-            <span className="mbn-icon">↗</span>Saved
-          </button>
-          <button className={`mbn-btn ${tab==="profile"?"active":""}`} onClick={()=>setTab("profile")}>
-            <span className="mbn-icon">◈</span>Profile
-          </button>
-        </nav>
-        </>
       )}
     </div>
   );
