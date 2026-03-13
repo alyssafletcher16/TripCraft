@@ -53,6 +53,7 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
   const [fileName, setFileName] = useState('')
   const [error, setError] = useState('')
   const [dragOver, setDragOver] = useState(false)
+  const [showAllDays, setShowAllDays] = useState(false)
 
   const handleFile = useCallback((f: File) => {
     setFile(f)
@@ -138,10 +139,12 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
         background: '#fff', borderRadius: 20, width: '100%', maxWidth: 560,
         maxHeight: '90vh', overflowY: 'auto', padding: 36, position: 'relative'
       }}>
-        <button onClick={onClose} style={{
-          position: 'absolute', top: 20, right: 20, background: 'none',
-          border: 'none', fontSize: 20, color: '#5B7A8E', cursor: 'pointer'
-        }}>x</button>
+        {step !== 'review' && (
+          <button onClick={onClose} style={{
+            position: 'absolute', top: 20, right: 20, background: 'none',
+            border: 'none', fontSize: 20, color: '#5B7A8E', cursor: 'pointer'
+          }}>x</button>
+        )}
 
         {step === 'upload' && (
           <>
@@ -208,6 +211,13 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
 
         {step === 'parsing' && (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
+            <div style={{
+              width: 40, height: 40, border: '3px solid #D6E4EE',
+              borderTopColor: '#C4603A', borderRadius: '50%',
+              margin: '0 auto 24px',
+              animation: 'spin 0.8s linear infinite'
+            }} />
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             <div style={{ fontSize: 15, fontWeight: 600, color: '#0A1F30', marginBottom: 8 }}>Reading your itinerary...</div>
             <div style={{ fontSize: 13, color: '#5B7A8E' }}>This usually takes 10 to 20 seconds.</div>
           </div>
@@ -281,6 +291,12 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
 
         {step === 'saving' && (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
+            <div style={{
+              width: 40, height: 40, border: '3px solid #D6E4EE',
+              borderTopColor: '#C4603A', borderRadius: '50%',
+              margin: '0 auto 24px',
+              animation: 'spin 0.8s linear infinite'
+            }} />
             <div style={{ fontSize: 15, fontWeight: 600, color: '#0A1F30', marginBottom: 8 }}>Saving your trip...</div>
           </div>
         )}
