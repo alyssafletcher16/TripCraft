@@ -1,17 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import { useSidebar } from './SidebarContext'
 
-const NAV_LINKS = [
-  { href: '/discover', label: 'Discover' },
-  { href: '/profile',  label: 'Profile'  },
-]
-
 export function Navbar() {
-  const pathname = usePathname()
   const { data: session } = useSession()
   const { toggle } = useSidebar()
 
@@ -34,19 +27,6 @@ export function Navbar() {
         <Link href="/" className="font-serif text-[22px] font-black text-foam tracking-[-0.5px] flex items-center">
           trip<span className="text-terra italic">craft</span>
         </Link>
-      </div>
-
-      {/* Center nav links — hidden on mobile */}
-      <div className="hidden md:flex gap-1">
-        {NAV_LINKS.map(({ href, label }) => (
-          <Link
-            key={href}
-            href={href}
-            className={`nav-link ${pathname.startsWith(href) ? 'nav-link-active' : ''}`}
-          >
-            {label}
-          </Link>
-        ))}
       </div>
 
       {/* Right: auth actions */}

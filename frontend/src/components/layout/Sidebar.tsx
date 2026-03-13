@@ -66,6 +66,16 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
         Discover
       </Link>
 
+      {/* ── My Profile ──────────────────────────────────────────── */}
+      <Link
+        href="/profile"
+        onClick={close}
+        className={`${SB_ITEM} ${pathname.startsWith('/profile') ? SB_ACTIVE : ''}`}
+      >
+        <span className={SB_ICON}>◈</span>
+        My Profile
+      </Link>
+
       {/* ── Active Itineraries ──────────────────────────────────── */}
       <div className={SB_SECTION}>Active Itineraries</div>
 
@@ -97,18 +107,6 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
           <span className="opacity-40">Start a trip</span>
         </Link>
       )}
-
-      {/* ── Account ─────────────────────────────────────────────── */}
-      <div className={SB_SECTION}>Account</div>
-
-      <Link
-        href="/profile"
-        onClick={close}
-        className={`${SB_ITEM} ${pathname.startsWith('/profile') ? SB_ACTIVE : ''}`}
-      >
-        <span className={SB_ICON}>◈</span>
-        My Profile
-      </Link>
     </aside>
   )
 
