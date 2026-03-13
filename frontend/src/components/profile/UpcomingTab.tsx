@@ -183,8 +183,8 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
                 {/* Confirm complete prompt */}
                 {isPending && (
                   <div className="mx-4 mb-1 px-4 py-2.5 rounded-b-xl bg-success/5 border border-t-0 border-success/20">
-                    <p className="text-[11px] text-slate mb-2">This trip will be added to the community. Public or anonymous?</p>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between gap-3 mb-2">
+                      <p className="text-[11px] text-slate">Do you want your account to be shared publicly or anonymously?</p>
                       {/* Public / Anon pill toggle */}
                       <div className="flex rounded-full border border-mist bg-foam text-[11px] font-semibold overflow-hidden flex-shrink-0">
                         <button
@@ -202,6 +202,8 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
                           Anon
                         </button>
                       </div>
+                    </div>
+                    <div className="flex items-center gap-3">
                       <button
                         disabled={confirming}
                         onClick={() => confirmComplete(trip.id)}
