@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import type { Trip } from '@/types'
 import { UploadItineraryModal } from '@/components/itinerary/UploadItineraryModal'
+import { useCityPhoto } from '@/hooks/useCityPhoto'
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
 
@@ -20,9 +21,30 @@ function dateRange(startDate: string | null, endDate: string | null) {
   return s ?? e ?? null
 }
 
-function rankLabel(index: number) {
-  if (index === 0) return 'of my life'
-  return 'overall'
+// Sub-component so each row can call useCityPhoto as a hook
+function TripCover({ destination, coverEmoji }: { destination: string; coverEmoji?: string | null }) {
+  const photoUrl = useCityPhoto(destination)
+  return (
+    <div className="w-11 h-11 rounded-xl bg-foam overflow-hidden flex-shrink-0 relative">
+      {photoUrl ? (
+        <>
+          <img
+            src={photoUrl}
+            alt={destination}
+            className="w-full h-full object-cover"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+          />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+            <span className="text-lg drop-shadow">{coverEmoji || '◻'}</span>
+          </div>
+        </>
+      ) : (
+        <div className="w-full h-full flex items-center justify-center text-xl">
+          {coverEmoji || '◻'}
+        </div>
+      )}
+    </div>
+  )
 }
 
 interface CompletedTabProps {
@@ -136,16 +158,13 @@ export function CompletedTab({ refreshKey }: CompletedTabProps) {
   return (
     <div className="p-4 sm:p-8 md:p-12 max-w-3xl">
       {showImport && <UploadItineraryModal onClose={() => setShowImport(false)} />}
-      <div className="flex items-start justify-between gap-4 mb-2">
-        <p className="eyebrow">Completed</p>
-        <button
-          onClick={() => setShowImport(true)}
-          className="flex-shrink-0 px-4 py-1.5 rounded-xl bg-terra text-white text-sm font-semibold hover:bg-terra/90 transition-colors"
-        >
-          Import itinerary
-        </button>
-      </div>
-      <h2 className="font-serif text-2xl md:text-3xl font-bold text-ink mb-1">Your life ranking</h2>
+      <h2 className="font-serif text-2xl md:text-3xl font-bold text-ink mb-2">Past Trips</h2>
+      <button
+        onClick={() => setShowImport(true)}
+        className="flex-shrink-0 px-4 py-1.5 rounded-xl bg-terra text-white text-sm font-semibold hover:bg-terra/90 transition-colors mb-4"
+      >
+        Import itinerary
+      </button>
       {trips.length > 0 && (
         <p className="text-slate text-sm mb-6">Drag to reorder your permanent ranking.</p>
       )}
@@ -178,15 +197,10 @@ export function CompletedTab({ refreshKey }: CompletedTabProps) {
                 {/* Rank badge */}
                 <div className="flex-shrink-0 w-10 text-center select-none">
                   <span className="text-sm font-mono font-semibold text-gold">#{index + 1}</span>
-                  <p className={`text-[9px] leading-tight ${index === 0 ? 'text-gold/60' : 'text-slate/40'} font-mono`}>
-                    {rankLabel(index)}
-                  </p>
                 </div>
 
                 {/* Cover */}
-                <div className="w-11 h-11 rounded-xl bg-foam flex items-center justify-center text-xl flex-shrink-0 select-none">
-                  {trip.coverEmoji || '◻'}
-                </div>
+                <TripCover destination={trip.destination} coverEmoji={trip.coverEmoji} />
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">

@@ -115,7 +115,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - **Vibes:** multi-select chips + custom text input
 - **Sharing:** anonymous = no name in Community, real name in Friends; public = @handle in Community (clickable → profile)
 - **Profile Active tab:** numbered list, no drag, always private (was "Upcoming"); "Mark complete" button per trip (replaces dropdown) — clicking opens confirm panel with community sharing option
-- **Profile Completed tab:** drag to reorder = permanent life ranking (#1 of my life, #2 overall…)
+- **Profile Completed tab:** titled "Past Trips"; drag to reorder = permanent life ranking (rank shown as #1, #2… with no sub-label); city photo cover (same as Active tab); Import itinerary button left-aligned below title; no "Completed" eyebrow
 - **Share toggle (ANON):** Completed tab only — trips are always in Community, always shown with username to friends. Toggle controls anonymity: on = anonymous in community feed, off = shows @handle
 - **Imported trips:** always private on upload, "Imported" badge, auto-COMPLETED if past date
 - **Sidebar:** "Active Itineraries" section — shows only PLANNING/ACTIVE trips; completed trips not listed; trip city shown beneath name; no status indicators
@@ -231,7 +231,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - **Vibes:** multi-select chips + custom text input
 - **Sharing:** anonymous = no name in Community, real name in Friends; public = @handle in Community (clickable → profile)
 - **Profile Active tab:** numbered list, no drag, always private (was "Upcoming"); "Mark complete" button per trip (replaces dropdown) — clicking opens confirm panel with community sharing option
-- **Profile Completed tab:** drag to reorder = permanent life ranking (#1 of my life, #2 overall…)
+- **Profile Completed tab:** titled "Past Trips"; drag to reorder = permanent life ranking (rank shown as #1, #2… with no sub-label); city photo cover (same as Active tab); Import itinerary button left-aligned below title; no "Completed" eyebrow
 - **Share toggle (ANON):** Completed tab only — trips are always in Community, always shown with username to friends. Toggle controls anonymity: on = anonymous in community feed, off = shows @handle
 - **Imported trips:** always private on upload, "Imported" badge, auto-COMPLETED if past date
 - **Sidebar:** "Active Itineraries" section — shows only PLANNING/ACTIVE trips; completed trips not listed; trip city shown beneath name; no status indicators
