@@ -16,6 +16,7 @@ export interface MapCluster {
 interface Props {
   onCitySelect: (city: MapCluster | null) => void
   selectedCity: MapCluster | null
+  destinationCounts: Record<string, number>
 }
 
 // ── Geography helpers ─────────────────────────────────────────────────────────
@@ -176,7 +177,15 @@ const REGION_LABELS: Record<string, string> = {
 const CITY_REGIONS = ['europe', 'asia', 'americas']
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export function DiscoverMap({ onCitySelect, selectedCity }: Props) {
+// Sum destination counts for all DB destinations that contain a cluster label
+function countForCluster(label: string, counts: Record<string, number>): number {
+  const lower = label.toLowerCase()
+  return Object.entries(counts)
+    .filter(([dest]) => dest.toLowerCase().includes(lower))
+    .reduce((sum, [, n]) => sum + n, 0)
+}
+
+export function DiscoverMap({ onCitySelect, selectedCity, destinationCounts }: Props) {
   const [zoom, setZoom] = useState('out')
   const [scale, setScale] = useState(1)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -199,7 +208,22 @@ export function DiscoverMap({ onCitySelect, selectedCity }: Props) {
     onCitySelect(null)
   }, [onCitySelect])
 
-  const visible = CLUSTERS.filter((c) => c.zoom === zoom)
+  const hasRealData = Object.keys(destinationCounts).length > 0
+
+  // For city-level clusters, use real counts; hide cities with 0 trips
+  const visible = CLUSTERS.filter((c) => {
+    if (c.zoom !== zoom) return false
+    if (hasRealData && CITY_REGIONS.includes(c.zoom)) {
+      return countForCluster(c.label, destinationCounts) > 0
+    }
+    return true
+  }).map((c) => ({
+    ...c,
+    count: hasRealData && CITY_REGIONS.includes(c.zoom)
+      ? countForCluster(c.label, destinationCounts)
+      : c.count,
+  }))
+
   const totalCount = visible.reduce((a, c) => a + c.count, 0)
 
   function handleClusterClick(c: MapCluster) {

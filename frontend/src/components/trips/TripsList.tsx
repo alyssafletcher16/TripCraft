@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { TripCard } from './TripCard'
-import type { Trip } from '@/types'
+import type { Trip, TripStatus } from '@/types'
+
+const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
 
 export function TripsList() {
   const { data: session, status } = useSession()
@@ -19,7 +21,7 @@ export function TripsList() {
       return
     }
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'}/api/trips`, {
+    fetch(`${API}/api/trips`, {
       headers: { Authorization: `Bearer ${session.accessToken}` },
     })
       .then((r) => r.json())
@@ -32,6 +34,31 @@ export function TripsList() {
         setLoading(false)
       })
   }, [session, status])
+
+  async function handleStatusChange(tripId: string, newStatus: TripStatus) {
+    if (!session?.accessToken) return
+    setTrips((prev) => prev.map((t) => t.id === tripId ? { ...t, status: newStatus } : t))
+    await fetch(`${API}/api/trips/${tripId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.accessToken}` },
+      body: JSON.stringify({ status: newStatus }),
+    }).catch(() => {
+      setTrips((prev) => prev.map((t) => t.id === tripId ? { ...t, status: t.status } : t))
+    })
+  }
+
+  async function handleTogglePublic(tripId: string, newVal: boolean) {
+    if (!session?.accessToken) return
+    setTrips((prev) => prev.map((t) => t.id === tripId ? { ...t, isPublic: newVal } : t))
+    await fetch(`${API}/api/trips/${tripId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.accessToken}` },
+      body: JSON.stringify({ isPublic: newVal }),
+    }).catch(() => {
+      // revert on failure
+      setTrips((prev) => prev.map((t) => t.id === tripId ? { ...t, isPublic: !newVal } : t))
+    })
+  }
 
   if (loading || status === 'loading') {
     return (
@@ -84,6 +111,9 @@ export function TripsList() {
               : null
           }
           travelers={trip.travelers}
+          isPublic={trip.isPublic}
+          onStatusChange={handleStatusChange}
+          onTogglePublic={handleTogglePublic}
         />
       ))}
     </div>

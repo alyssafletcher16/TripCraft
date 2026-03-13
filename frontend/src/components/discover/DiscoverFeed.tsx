@@ -49,6 +49,14 @@ export function DiscoverFeed() {
   const [cards, setCards] = useState<DiscoverTrip[]>([])
   const [loading, setLoading] = useState(true)
   const [upvoted, setUpvoted] = useState<Set<string>>(new Set())
+  const [destinationCounts, setDestinationCounts] = useState<Record<string, number>>({})
+
+  useEffect(() => {
+    fetch(`${API}/api/discover/stats`)
+      .then((r) => r.json())
+      .then((data) => { if (data.counts) setDestinationCounts(data.counts) })
+      .catch(() => {})
+  }, [])
 
   const fetchFeed = useCallback(async () => {
     setLoading(true)
@@ -63,14 +71,14 @@ export function DiscoverFeed() {
       const trips: DiscoverTrip[] = Array.isArray(data.trips) ? data.trips : []
       if (trips.length > 0) {
         setCards(trips)
-      } else if (selectedCity?.itins && selectedCity.itins.length > 0) {
-        setCards(selectedCity.itins.map((i) => STATIC_CARDS[i]).filter(Boolean))
+      } else if (selectedCity) {
+        setCards([])
       } else {
         setCards(STATIC_CARDS)
       }
     } catch {
-      if (selectedCity?.itins && selectedCity.itins.length > 0) {
-        setCards(selectedCity.itins.map((i) => STATIC_CARDS[i]).filter(Boolean))
+      if (selectedCity) {
+        setCards([])
       } else {
         setCards(STATIC_CARDS)
       }
@@ -103,7 +111,7 @@ export function DiscoverFeed() {
   return (
     <div>
       {/* ── Interactive map ── */}
-      <DiscoverMap onCitySelect={setSelectedCity} selectedCity={selectedCity} />
+      <DiscoverMap onCitySelect={setSelectedCity} selectedCity={selectedCity} destinationCounts={destinationCounts} />
 
       {/* Selected city banner */}
       {selectedCity && (
@@ -111,7 +119,7 @@ export function DiscoverFeed() {
           <div>
             <div className="font-serif text-xl font-bold text-ink">{selectedCity.label}</div>
             <div className="text-[12px] text-slate mt-0.5">
-              {selectedCity.count} itineraries · Showing top-rated below
+              {cards.length} itineraries · Showing top-rated below
             </div>
           </div>
           <button
@@ -182,6 +190,12 @@ export function DiscoverFeed() {
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="h-64 bg-white rounded-[18px] border-[1.5px] border-mist animate-pulse" />
               ))}
+            </div>
+          ) : cards.length === 0 && selectedCity ? (
+            <div className="py-16 text-center">
+              <div className="text-3xl mb-3">🗺️</div>
+              <div className="font-serif text-base font-bold text-ink mb-1">No itineraries yet for {selectedCity.label}</div>
+              <p className="text-[13px] text-slate">Be the first to share a trip here.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[18px]">

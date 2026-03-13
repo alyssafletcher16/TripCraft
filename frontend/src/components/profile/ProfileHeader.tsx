@@ -57,7 +57,11 @@ function destinationToCoords(destination: string): [number, number] | null {
 }
 
 // ── Profile World Map ─────────────────────────────────────────────────────────
-function ProfileWorldMap({ visitedCoords }: { visitedCoords: Array<[number, number]> }) {
+interface TripPin { destination: string; title: string; coords: [number, number] }
+
+function ProfileWorldMap({ trips }: { trips: TripPin[] }) {
+  const [hovered, setHovered] = useState<{ label: string; x: number; y: number } | null>(null)
+
   return (
     <svg
       className="absolute inset-0 w-full h-full"
@@ -85,11 +89,18 @@ function ProfileWorldMap({ visitedCoords }: { visitedCoords: Array<[number, numb
         />
       ))}
 
-      {/* Visited destination dots */}
-      {visitedCoords.map(([lon, lat], i) => {
-        const [x, y] = geo(lon, lat)
+      {/* Trip destination dots — one per itinerary */}
+      {trips.map((trip, i) => {
+        const [x, y] = geo(trip.coords[0], trip.coords[1])
         return (
-          <g key={i}>
+          <g
+            key={i}
+            style={{ cursor: 'pointer' }}
+            onMouseEnter={() => setHovered({ label: trip.destination, x, y })}
+            onMouseLeave={() => setHovered(null)}
+          >
+            {/* Hit area (invisible, larger for easy hover) */}
+            <circle cx={x} cy={y} r={10} fill="transparent" />
             {/* Outer glow */}
             <circle cx={x} cy={y} r={6} fill="rgba(201,168,76,0.15)" />
             <circle cx={x} cy={y} r={3} fill="rgba(201,168,76,0.55)" />
@@ -97,6 +108,34 @@ function ProfileWorldMap({ visitedCoords }: { visitedCoords: Array<[number, numb
           </g>
         )
       })}
+
+      {/* Tooltip */}
+      {hovered && (() => {
+        const label = hovered.label
+        const charW = 5.5
+        const padX = 6
+        const padY = 4
+        const boxW = Math.min(label.length * charW + padX * 2, 120)
+        const boxH = 14
+        const tx = Math.max(2, Math.min(hovered.x - boxW / 2, 498 - boxW))
+        const ty = hovered.y - boxH - 10
+        return (
+          <g style={{ pointerEvents: 'none' }}>
+            <rect x={tx} y={ty} width={boxW} height={boxH} rx={3} fill="rgba(7,24,37,0.92)" stroke="rgba(201,168,76,0.5)" strokeWidth={0.6} />
+            <text
+              x={tx + boxW / 2}
+              y={ty + boxH - padY}
+              textAnchor="middle"
+              fontSize={6}
+              fill="rgba(201,168,76,1)"
+              fontFamily="DM Mono, monospace"
+              letterSpacing={0.5}
+            >
+              {label.toUpperCase()}
+            </text>
+          </g>
+        )
+      })()}
     </svg>
   )
 }
@@ -106,7 +145,7 @@ const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
 
 export function ProfileHeader() {
   const { data: session } = useSession()
-  const [visitedCoords, setVisitedCoords] = useState<Array<[number, number]>>([])
+  const [tripPins, setTripPins] = useState<TripPin[]>([])
   const [tripCount, setTripCount] = useState(0)
   const [countryCount, setCountryCount] = useState(0)
   const [dayCount, setDayCount] = useState(0)
@@ -118,20 +157,19 @@ export function ProfileHeader() {
     })
       .then((r) => r.json())
       .then((data) => {
-        const trips: Array<{ destination: string; status: string; days?: number; startDate?: string; endDate?: string }> =
+        const trips: Array<{ title: string; destination: string; status: string; days?: number; startDate?: string; endDate?: string }> =
           Array.isArray(data) ? data : Array.isArray(data.trips) ? data.trips : []
 
         const completed = trips.filter((t) => t.status === 'COMPLETED')
         setTripCount(completed.length)
 
-        const coords: Array<[number, number]> = []
+        const pins: TripPin[] = []
         const countriesSet = new Set<string>()
 
         for (const t of trips) {
           const c = destinationToCoords(t.destination)
           if (c) {
-            coords.push(c)
-            // Use first matching key as "country" proxy
+            pins.push({ destination: t.destination, title: t.title, coords: c })
             const lower = t.destination.toLowerCase()
             for (const key of Object.keys(CITY_COORDS)) {
               if (lower.includes(key)) { countriesSet.add(key); break }
@@ -139,7 +177,7 @@ export function ProfileHeader() {
           }
         }
 
-        setVisitedCoords(coords)
+        setTripPins(pins)
         setCountryCount(countriesSet.size)
 
         // Approximate days from completed trips
@@ -168,7 +206,7 @@ export function ProfileHeader() {
     <div className="relative overflow-hidden" style={{ background: '#071825' }}>
       {/* World map background */}
       <div className="absolute inset-0">
-        <ProfileWorldMap visitedCoords={visitedCoords} />
+        <ProfileWorldMap trips={tripPins} />
       </div>
 
       {/* Gradient overlay so text stays readable */}
@@ -189,9 +227,9 @@ export function ProfileHeader() {
               {session?.user?.name ?? 'Traveler'}
             </h1>
             <p className="text-slate text-sm">{session?.user?.email}</p>
-            {visitedCoords.length > 0 && (
+            {tripPins.length > 0 && (
               <p className="text-[11px] mt-1" style={{ color: 'rgba(201,168,76,0.8)', fontFamily: 'DM Mono, monospace', letterSpacing: '1px' }}>
-                {visitedCoords.length} DESTINATION{visitedCoords.length !== 1 ? 'S' : ''} ON THE MAP
+                {tripPins.length} ITINERAR{tripPins.length !== 1 ? 'IES' : 'Y'} ON THE MAP
               </p>
             )}
           </div>

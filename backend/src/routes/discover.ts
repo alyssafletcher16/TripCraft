@@ -6,12 +6,12 @@ export const discoverRouter = Router()
 
 // GET /api/discover  — public trips feed
 discoverRouter.get('/', async (req, res) => {
-  const { vibe, sort = 'popular', limit = '20', offset = '0' } = req.query as Record<string, string>
+  const { vibe, destination, sort = 'popular', limit = '20', offset = '0' } = req.query as Record<string, string>
   try {
     const where = {
       isPublic: true,
-      status: 'COMPLETED' as const,
       ...(vibe ? { vibes: { some: { vibe } } } : {}),
+      ...(destination ? { destination: { contains: destination, mode: 'insensitive' as const } } : {}),
     }
 
     const [trips, total] = await Promise.all([
@@ -30,6 +30,26 @@ discoverRouter.get('/', async (req, res) => {
     ])
 
     return res.json({ trips, total, limit: parseInt(limit), offset: parseInt(offset) })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// GET /api/discover/stats  — destination counts for map clusters
+discoverRouter.get('/stats', async (req, res) => {
+  try {
+    const rows = await prisma.trip.groupBy({
+      by: ['destination'],
+      where: { isPublic: true },
+      _count: { destination: true },
+    })
+    // Return as { destination: count } map
+    const counts: Record<string, number> = {}
+    for (const row of rows) {
+      counts[row.destination] = row._count.destination
+    }
+    return res.json({ counts })
   } catch (err) {
     console.error(err)
     return res.status(500).json({ error: 'Internal server error' })

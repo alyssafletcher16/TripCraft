@@ -23,6 +23,7 @@ export interface Trip {
   budgetType: 'total' | 'per_person'
   status: TripStatus
   isPublic: boolean
+  rank: number | null
   coverEmoji: string | null
   vibes: TripVibe[]
   days: ItineraryDay[]

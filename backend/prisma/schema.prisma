@@ -76,6 +76,7 @@ model Trip {
   budgetType  String     @default("total") // "total" | "per_person"
   status      TripStatus @default(PLANNING)
   isPublic    Boolean    @default(false)
+  rank        Int?       // personal ranking 1–5
   coverEmoji  String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
