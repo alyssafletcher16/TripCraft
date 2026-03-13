@@ -53,12 +53,13 @@ itineraryRouter.post('/upload', requireAuth, upload.single('file'), async (req: 
 // Status is auto-assigned: COMPLETED if start date is in the past, PLANNING otherwise.
 itineraryRouter.post('/save', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const { parsed, fileName } = req.body
+    const { parsed, fileName, status: requestedStatus } = req.body
     const userId = req.userId!
 
-    const status = parsed.startDate && new Date(parsed.startDate) < new Date()
-      ? 'COMPLETED'
-      : 'PLANNING'
+    const validStatuses = ['ACTIVE', 'COMPLETED', 'PLANNING']
+    const status = validStatuses.includes(requestedStatus) ? requestedStatus : (
+      parsed.startDate && new Date(parsed.startDate) < new Date() ? 'COMPLETED' : 'PLANNING'
+    )
 
     const trip = await prisma.trip.create({
       data: {

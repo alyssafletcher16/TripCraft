@@ -40,7 +40,8 @@ interface UploadItineraryModalProps {
   onClose: () => void
 }
 
-type Step = 'upload' | 'parsing' | 'review' | 'saving' | 'done'
+type Step = 'upload' | 'parsing' | 'review' | 'status' | 'saving' | 'done'
+type TripStatus = 'ACTIVE' | 'COMPLETED'
 
 export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
   const router = useRouter()
@@ -54,6 +55,7 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
   const [error, setError] = useState('')
   const [dragOver, setDragOver] = useState(false)
   const [showAllDays, setShowAllDays] = useState(false)
+  const [selectedStatus, setSelectedStatus] = useState<TripStatus | null>(null)
 
   const handleFile = useCallback((f: File) => {
     setFile(f)
@@ -99,7 +101,7 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
   }
 
   const handleSave = async () => {
-    if (!parsed) return
+    if (!parsed || !selectedStatus) return
     setStep('saving')
 
     try {
@@ -109,7 +111,7 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ parsed, fileName }),
+        body: JSON.stringify({ parsed, fileName, status: selectedStatus }),
       })
 
       if (!res.ok) {
@@ -118,14 +120,15 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
       }
 
       setStep('done')
+      const tab = selectedStatus === 'ACTIVE' ? 'Active' : 'Completed'
       setTimeout(() => {
-        router.push('/profile?tab=Completed')
+        router.push(`/profile?tab=${tab}`)
         router.refresh()
         onClose()
       }, 1500)
     } catch (err: any) {
       setError(err.message || 'Something went wrong')
-      setStep('review')
+      setStep('status')
     }
   }
 
@@ -139,7 +142,7 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
         background: '#fff', borderRadius: 20, width: '100%', maxWidth: 560,
         maxHeight: '90vh', overflowY: 'auto', padding: 36, position: 'relative'
       }}>
-        {step !== 'review' && (
+        {step !== 'review' && step !== 'status' && (
           <button onClick={onClose} style={{
             position: 'absolute', top: 20, right: 20, background: 'none',
             border: 'none', fontSize: 20, color: '#5B7A8E', cursor: 'pointer'
@@ -272,22 +275,69 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
 
             <div style={{ height: 1, background: '#D6E4EE', margin: '20px 0' }} />
 
-            <div style={{ fontSize: 13, color: '#5B7A8E', padding: '12px 16px', background: '#EEF4F8', borderRadius: 12 }}>
-              This trip will be saved to your profile. You can share it after marking it complete.
+            <button
+              onClick={() => setStep('status')}
+              style={{
+                width: '100%', padding: '14px 0', borderRadius: 12, marginTop: 20,
+                background: '#C4603A', color: '#fff',
+                border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer'
+              }}
+            >
+              Looks good — continue
+            </button>
+          </>
+        )}
+
+        {step === 'status' && (
+          <>
+            <button onClick={() => setStep('review')} style={{
+              position: 'absolute', top: 20, left: 20, background: 'none',
+              border: 'none', fontSize: 13, color: '#5B7A8E', cursor: 'pointer', padding: 0
+            }}>← Back</button>
+            <div style={{ fontSize: 11, fontFamily: 'DM Mono, monospace', color: '#C4603A', letterSpacing: 2, marginBottom: 8 }}>IMPORT</div>
+            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 700, color: '#0A1F30', marginBottom: 8 }}>
+              Is this trip active or completed?
+            </div>
+            <div style={{ fontSize: 14, color: '#5B7A8E', marginBottom: 28 }}>
+              This determines where it appears on your profile.
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
+              {(['ACTIVE', 'COMPLETED'] as TripStatus[]).map(s => (
+                <button
+                  key={s}
+                  onClick={() => setSelectedStatus(s)}
+                  style={{
+                    padding: '18px 20px', borderRadius: 14, textAlign: 'left', cursor: 'pointer',
+                    border: `2px solid ${selectedStatus === s ? '#C4603A' : '#D6E4EE'}`,
+                    background: selectedStatus === s ? 'rgba(196,96,58,0.06)' : '#EEF4F8',
+                    transition: 'all 0.15s'
+                  }}
+                >
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#0A1F30', marginBottom: 3 }}>
+                    {s === 'ACTIVE' ? 'Active' : 'Completed'}
+                  </div>
+                  <div style={{ fontSize: 12, color: '#5B7A8E' }}>
+                    {s === 'ACTIVE' ? 'Trip is upcoming or in progress — appears in your Active tab' : 'Trip has already happened — appears in your Completed tab'}
+                  </div>
+                </button>
+              ))}
             </div>
 
             {error && (
-              <div style={{ background: 'rgba(192,64,64,0.08)', border: '1px solid rgba(192,64,64,0.3)', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#C04040', margin: '16px 0' }}>
+              <div style={{ background: 'rgba(192,64,64,0.08)', border: '1px solid rgba(192,64,64,0.3)', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#C04040', marginBottom: 16 }}>
                 {error}
               </div>
             )}
 
             <button
               onClick={handleSave}
+              disabled={!selectedStatus}
               style={{
-                width: '100%', padding: '14px 0', borderRadius: 12, marginTop: 20,
-                background: '#C4603A', color: '#fff',
-                border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer'
+                width: '100%', padding: '14px 0', borderRadius: 12,
+                background: selectedStatus ? '#C4603A' : '#D6E4EE',
+                color: selectedStatus ? '#fff' : '#5B7A8E',
+                border: 'none', fontSize: 14, fontWeight: 600, cursor: selectedStatus ? 'pointer' : 'not-allowed'
               }}
             >
               Save to my trips

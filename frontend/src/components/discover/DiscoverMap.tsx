@@ -162,12 +162,13 @@ const CLUSTERS: MapCluster[] = [
   { ...geoXY(14,  50),  count:  67, label: 'Prague',   zoom: 'europe',   region: 'europe',  itins: [0, 4] },
   { ...geoXY(2,   41),  count:  55, label: 'Barcelona',zoom: 'europe',   region: 'europe',  itins: [0, 4] },
   // Asia cities
-  { ...geoXY(101, 14),  count:  76, label: 'Bangkok',  zoom: 'asia',     region: 'asia',    itins: [3] },
-  { ...geoXY(140, 36),  count: 112, label: 'Tokyo',    zoom: 'asia',     region: 'asia',    itins: [3] },
-  { ...geoXY(115, -8),  count:  88, label: 'Bali',     zoom: 'asia',     region: 'asia',    itins: [3] },
+  { ...geoXY(101, 14),  count:  76, label: 'Bangkok',  zoom: 'asia',     region: 'asia',    itins: [3], matchTerms: ['thailand','cambodia','vietnam','laos','myanmar','ho chi minh','hanoi','phuket','chiang mai','phnom penh','siem reap'] },
+  { ...geoXY(140, 36),  count: 112, label: 'Tokyo',    zoom: 'asia',     region: 'asia',    itins: [3], matchTerms: ['tokyo','japan','osaka','kyoto','hiroshima','hokkaido'] },
+  { ...geoXY(115, -8),  count:  88, label: 'Bali',     zoom: 'asia',     region: 'asia',    itins: [3], matchTerms: ['bali','indonesia','jakarta','lombok'] },
   // Americas cities
-  { ...geoXY(-74, 41),  count: 134, label: 'New York',  zoom: 'americas', region: 'americas',itins: [2, 5] },
-  { ...geoXY(-77,-12),  count:  93, label: 'Lima',     zoom: 'americas', region: 'americas',itins: [2] },
+  { ...geoXY(-74, 41),  count: 134, label: 'New York',  zoom: 'americas', region: 'americas',itins: [2, 5], matchTerms: ['new york','nyc','manhattan'] },
+  { ...geoXY(-115, 36), count:  80, label: 'Las Vegas', zoom: 'americas', region: 'americas', matchTerms: ['las vegas','nevada','arizona','grand canyon'] },
+  { ...geoXY(-77,-12),  count:  93, label: 'Lima',     zoom: 'americas', region: 'americas',itins: [2], matchTerms: ['lima','peru','machu picchu','cusco'] },
 ]
 
 const REGION_LABELS: Record<string, string> = {
@@ -185,14 +186,13 @@ const REGION_TO_ZOOM: Record<string, string> = {
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
-// Sum destination counts for all DB destinations that match a cluster label.
-// Uses bidirectional contains so "New York City" matches "New York" and vice versa.
-function countForCluster(label: string, counts: Record<string, number>): number {
-  const lower = label.toLowerCase()
+// Sum destination counts for all DB destinations that match a cluster label or its matchTerms.
+function countForCluster(label: string, counts: Record<string, number>, matchTerms?: string[]): number {
+  const terms = [label.toLowerCase(), ...(matchTerms ?? []).map((t) => t.toLowerCase())]
   return Object.entries(counts)
     .filter(([dest]) => {
       const d = dest.toLowerCase()
-      return d.includes(lower) || lower.includes(d)
+      return terms.some((t) => d.includes(t) || t.includes(d))
     })
     .reduce((sum, [, n]) => sum + n, 0)
 }
