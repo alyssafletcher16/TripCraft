@@ -14,7 +14,7 @@ const SB_ICON = 'text-[15px] w-5 text-center flex-shrink-0'
 const SB_SECTION = 'font-mono text-[9px] text-slate tracking-[2px] uppercase pt-[18px] px-[10px] pb-2'
 
 // ── Sidebar ──────────────────────────────────────────────────────────────────
-export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
+export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hideDesktop?: boolean } = {}) {
   const pathname = usePathname()
   const { data: session, status } = useSession()
   const { isOpen, close, refreshKey } = useSidebar()
@@ -107,15 +107,32 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
           <span className="opacity-40">Start a trip</span>
         </Link>
       )}
+
+      {/* ── Sign in — unauthenticated mobile only ────────────────── */}
+      {!session && status !== 'loading' && (
+        <>
+          <div className={SB_SECTION}>Account</div>
+          <Link href="/login" onClick={close} className={SB_ITEM}>
+            <span className={SB_ICON}>→</span>
+            Sign in
+          </Link>
+          <Link href="/register" onClick={close} className={`${SB_ITEM} !text-terra-lt`}>
+            <span className={SB_ICON}>+</span>
+            Get started
+          </Link>
+        </>
+      )}
     </aside>
   )
 
   return (
     <>
-      {/* Desktop sidebar — always visible at md+ */}
-      <div className="hidden md:block">
-        {sidebarContent}
-      </div>
+      {/* Desktop sidebar — always visible at md+, unless hideDesktop */}
+      {!hideDesktop && (
+        <div className="hidden md:block">
+          {sidebarContent}
+        </div>
+      )}
 
       {/* Mobile drawer */}
       {isOpen && (

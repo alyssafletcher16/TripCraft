@@ -1216,6 +1216,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
     setTrip((prev) => prev ? { ...prev, status: 'COMPLETED' } : prev)
     setPendingComplete(false)
     setConfirming(false)
+    setReflecting(true)
   }
 
   if (loading || sessionStatus === 'loading') {

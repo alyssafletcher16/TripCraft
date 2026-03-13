@@ -223,6 +223,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - Google Places API + PlaceCache + intelligence service (built, needs credits)
 - Back button on trip detail page — top-left, calls router.back() to return to previous page (Active tab, sidebar nav, etc.)
 - Stats banner on home page — hidden until real data is available (STATS constant removed)
+- Mobile hamburger + sign-in: home page gets `<Sidebar hideDesktop />` so the drawer works on all pages; sidebar shows Sign In / Get Started links for unauthenticated users
 
 ---
 

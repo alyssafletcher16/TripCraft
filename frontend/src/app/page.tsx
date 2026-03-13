@@ -1,5 +1,9 @@
+'use client'
+
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import { Navbar } from '@/components/layout/Navbar'
+import { Sidebar } from '@/components/layout/Sidebar'
 
 // Exact SVG grain from tripcraft-v5.jsx
 const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E")`
@@ -12,9 +16,16 @@ const HERO_DAYS = [
 
 
 export default function HomePage() {
+  const { data: session } = useSession()
+  const isLoggedIn = !!session
+
   return (
     <div className="min-h-screen">
       <Navbar />
+      {isLoggedIn ? (
+        <div className="md:grid md:grid-cols-[272px_1fr] min-h-[calc(100vh-62px)]">
+          <Sidebar />
+          <main className="overflow-y-auto">
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <section className="bg-deep pt-12 pb-16 sm:pt-16 sm:pb-20 md:pt-[88px] md:pb-[100px] px-4 sm:px-8 md:px-16 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-[72px] items-center relative overflow-hidden">
