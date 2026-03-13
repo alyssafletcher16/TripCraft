@@ -35,8 +35,14 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
     close()
   }, [pathname]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const sidebarTrips = trips.filter((t) => t.status === 'PLANNING' || t.status === 'ACTIVE')
-  const hasMore = trips.filter((t) => t.status !== 'PLANNING' && t.status !== 'ACTIVE').length > 0
+  const sidebarTrips = trips
+    .filter((t) => t.status === 'PLANNING' || t.status === 'ACTIVE')
+    .sort((a, b) => {
+      if (!a.startDate && !b.startDate) return 0
+      if (!a.startDate) return 1
+      if (!b.startDate) return -1
+      return new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+    })
 
   const sidebarContent = (
     <aside className="bg-deep px-[18px] py-7 flex flex-col gap-1 border-r border-white/[0.06] h-full">
@@ -61,13 +67,7 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
       </Link>
 
       {/* ── Active Itineraries ──────────────────────────────────── */}
-      <Link
-        href="/profile"
-        onClick={close}
-        className={`${SB_SECTION} hover:text-white/60 transition-colors cursor-pointer`}
-      >
-        My Itineraries
-      </Link>
+      <div className={SB_SECTION}>Active Itineraries</div>
 
       {sidebarTrips.map((trip) => {
         const active = pathname === `/trips/${trip.id}`
@@ -95,17 +95,6 @@ export function Sidebar({ activeTab: _ }: { activeTab?: string } = {}) {
         <Link href="/trips/new" onClick={close} className={SB_ITEM}>
           <span className={`${SB_ICON} opacity-40`}>+</span>
           <span className="opacity-40">Start a trip</span>
-        </Link>
-      )}
-
-      {hasMore && (
-        <Link
-          href="/profile"
-          onClick={close}
-          className="flex items-center gap-[11px] px-3 py-[8px] rounded-[10px] text-white/30 text-[12px] hover:text-white/60 transition-colors"
-        >
-          <span className={`${SB_ICON} text-[12px] opacity-40`}>→</span>
-          See all
         </Link>
       )}
 
