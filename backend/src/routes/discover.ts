@@ -9,17 +9,18 @@ discoverRouter.get('/', async (req, res) => {
   const { vibe, destination, sort = 'popular', limit = '20', offset = '0' } = req.query as Record<string, string>
   try {
     const where = {
-      isPublic: true,
+      status: 'COMPLETED' as const,
       ...(vibe ? { vibes: { some: { vibe } } } : {}),
       ...(destination ? { destination: { contains: destination, mode: 'insensitive' as const } } : {}),
     }
 
-    const [trips, total] = await Promise.all([
+    const [rawTrips, total] = await Promise.all([
       prisma.trip.findMany({
         where,
         include: {
           vibes: true,
           user: { select: { id: true, name: true, avatar: true } },
+          community: { select: { isAnonymous: true } },
           _count: { select: { upvotes: true } },
         },
         orderBy: sort === 'popular' ? { upvotes: { _count: 'desc' } } : { updatedAt: 'desc' },
@@ -29,6 +30,11 @@ discoverRouter.get('/', async (req, res) => {
       prisma.trip.count({ where }),
     ])
 
+    const trips = rawTrips.map(({ community, user, ...trip }) => ({
+      ...trip,
+      user: community?.isAnonymous ? { name: null, avatar: null } : user,
+    }))
+
     return res.json({ trips, total, limit: parseInt(limit), offset: parseInt(offset) })
   } catch (err) {
     console.error(err)
@@ -37,11 +43,11 @@ discoverRouter.get('/', async (req, res) => {
 })
 
 // GET /api/discover/stats  — destination counts for map clusters
-discoverRouter.get('/stats', async (req, res) => {
+discoverRouter.get('/stats', async (_req, res) => {
   try {
     const rows = await prisma.trip.groupBy({
       by: ['destination'],
-      where: { isPublic: true },
+      where: { status: 'COMPLETED' },
       _count: { destination: true },
     })
     // Return as { destination: count } map
