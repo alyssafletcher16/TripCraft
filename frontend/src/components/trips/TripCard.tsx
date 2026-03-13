@@ -27,14 +27,12 @@ const statusVariant: Record<TripStatus, 'gold' | 'green' | 'slate' | 'ocean'> = 
   ACTIVE:    'gold',
   COMPLETED: 'green',
   PLANNING:  'ocean',
-  DRAFT:     'slate',
 }
 
 const STATUS_LABELS: Record<TripStatus, string> = {
   PLANNING:  'Planning',
   ACTIVE:    'Active',
   COMPLETED: 'Completed',
-  DRAFT:     'Draft',
 }
 
 export function TripCard({ id, title, destination, status, startDate, endDate, travelers, isPublic, rank, isDragging, row, onTogglePublic, onStatusChange }: TripCardProps) {
