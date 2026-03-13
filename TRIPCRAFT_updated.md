@@ -218,7 +218,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - Post-trip reflection modal — backend connected
 - Map tab — SVG world map with destination pin + itinerary sequence
 - Profile: Upcoming / Completed tabs, draggable rankings, share toggle
-- PDF itinerary upload + auto-route by parsed date
+- PDF/DOCX/XLSX/CSV/TXT itinerary import — Claude parses → review → save; "Import itinerary" button on Completed tab; auto-COMPLETED if past date; "Imported" badge; routes: POST /api/itinerary/upload, POST /api/itinerary/save
 - Trip status system: ACTIVE / COMPLETED (2 statuses in UI; PLANNING in DB maps to ACTIVE)
 - Google Places API + PlaceCache + intelligence service (built, needs credits)
 
