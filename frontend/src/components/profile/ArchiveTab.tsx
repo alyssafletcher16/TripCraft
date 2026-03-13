@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
-import { UploadItineraryModal } from '@/components/itinerary/UploadItineraryModal'
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
 
@@ -81,7 +80,7 @@ function UploadZone({ onFile, disabled }: { onFile: (f: File) => void; disabled:
       />
       <div className="text-4xl mb-3">📂</div>
       <p className="font-medium text-ink mb-1">Drop your trip file here</p>
-      <p className="text-slate text-sm">Supports Excel (.xlsx, .xls, .csv) and PDF</p>
+      <p className="text-slate text-sm">Excel (.xlsx, .xls), CSV, or PDF</p>
       <p className="text-xs text-slate/70 mt-2">Up to 15 MB</p>
       <div className="mt-5 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-ocean text-white text-sm font-medium">
         Browse file
@@ -192,7 +191,6 @@ export function ArchiveTab() {
   const token = (session as { accessToken?: string })?.accessToken
 
   const [stage, setStage] = useState<Stage>('idle')
-  const [showImport, setShowImport] = useState(false)
   const [parsedTrips, setParsedTrips] = useState<ParsedTrip[]>([])
   const [archivedTrips, setArchivedTrips] = useState<ArchivedTrip[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -279,22 +277,14 @@ export function ArchiveTab() {
 
   return (
     <div className="p-4 sm:p-8 md:p-12 max-w-3xl">
-      {showImport && <UploadItineraryModal onClose={() => setShowImport(false)} />}
-      <div className="flex items-start justify-between gap-4 mb-2">
-        <p className="eyebrow">Trip Archive</p>
-        <button
-          onClick={() => setShowImport(true)}
-          className="flex-shrink-0 px-4 py-2 rounded-xl bg-terra text-white text-sm font-semibold hover:bg-terra/90 transition-colors"
-        >
-          Import itinerary
-        </button>
-      </div>
+      <p className="eyebrow mb-2">Trip Archive</p>
       <h2 className="font-serif text-2xl md:text-3xl font-bold text-ink mb-2">Your journey</h2>
       <p className="text-slate text-sm mb-6 md:mb-8">Upload an old trip spreadsheet or PDF to import it into TripCraft.</p>
 
       {/* ── Upload or Preview ── */}
       {stage === 'idle' && (
         <>
+          <p className="text-sm font-semibold text-ink mb-3">Import itinerary</p>
           <UploadZone onFile={handleFile} disabled={false} />
           <TemplateHint />
         </>
