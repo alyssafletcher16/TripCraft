@@ -158,7 +158,7 @@ tripsRouter.get('/', requireAuth, async (req: AuthRequest, res) => {
       include: {
         vibes: true,
         _count: { select: { days: true, upvotes: true } },
-        community: { select: { isPublic: true, friendsOnly: true } },
+        community: { select: { isPublic: true, friendsOnly: true, isAnonymous: true } },
         itineraryImport: { select: { id: true } },
         reflection: { select: { id: true } },
       },
@@ -282,14 +282,18 @@ tripsRouter.patch('/:id', requireAuth, async (req: AuthRequest, res) => {
 
 // PATCH /api/trips/:id/community — upsert share visibility
 tripsRouter.patch('/:id/community', requireAuth, async (req: AuthRequest, res) => {
-  const { isPublic, friendsOnly } = req.body
+  const { isPublic, friendsOnly, isAnonymous } = req.body
   try {
     const trip = await prisma.trip.findFirst({ where: { id: req.params.id, userId: req.userId } })
     if (!trip) return res.status(404).json({ error: 'Trip not found' })
+    const updateData: Record<string, unknown> = {}
+    if (isPublic !== undefined) updateData.isPublic = Boolean(isPublic)
+    if (friendsOnly !== undefined) updateData.friendsOnly = Boolean(friendsOnly)
+    if (isAnonymous !== undefined) updateData.isAnonymous = Boolean(isAnonymous)
     const community = await prisma.community.upsert({
       where: { tripId: req.params.id },
-      create: { tripId: req.params.id, isPublic: Boolean(isPublic), friendsOnly: Boolean(friendsOnly), upvotes: 0 },
-      update: { isPublic: Boolean(isPublic), friendsOnly: Boolean(friendsOnly) },
+      create: { tripId: req.params.id, isPublic: Boolean(isPublic), friendsOnly: Boolean(friendsOnly), isAnonymous: Boolean(isAnonymous), upvotes: 0 },
+      update: updateData,
     })
     return res.json(community)
   } catch (err) {

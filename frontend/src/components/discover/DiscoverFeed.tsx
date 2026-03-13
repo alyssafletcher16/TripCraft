@@ -4,8 +4,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { CommunityCard } from './CommunityCard'
 import type { DiscoverTrip } from './CommunityCard'
-import { FriendCard } from './FriendCard'
-import type { FriendEntry } from './FriendCard'
 import { DiscoverMap } from './DiscoverMap'
 import type { MapCluster } from './DiscoverMap'
 
@@ -21,23 +19,6 @@ const FILTER_VIBE: Record<string, string> = {
   Solo:      'Solo',
   Adventure: 'Adventure',
 }
-
-// ── Static fallback cards ─────────────────────────────────────────────────────
-const STATIC_CARDS: DiscoverTrip[] = [
-  { id: 's1', destination: 'Amalfi Coast', country: 'Italy',    coverEmoji: '🌋', travelers: 2, budget: 2800, startDate: null, endDate: null, vibes: [{vibe:'Romantic'},{vibe:'Relaxation'}], user: { name: 'mara.v',   avatar: null }, _count: { upvotes: 214 } },
-  { id: 's2', destination: 'Oaxaca',       country: 'Mexico',   coverEmoji: '🌵', travelers: 1, budget: 900,  startDate: null, endDate: null, vibes: [{vibe:'Cultural'},{vibe:'Budget'}],     user: { name: 'j.ramos',  avatar: null }, _count: { upvotes: 188 } },
-  { id: 's3', destination: 'Salkantay',    country: 'Peru',     coverEmoji: '🏔', travelers: 4, budget: 1400, startDate: null, endDate: null, vibes: [{vibe:'Hiking'},{vibe:'Adventure'}],    user: { name: 'alyssa.t', avatar: null }, _count: { upvotes: 341 } },
-  { id: 's4', destination: 'Kyoto',        country: 'Japan',    coverEmoji: '🌸', travelers: 2, budget: 3100, startDate: null, endDate: null, vibes: [{vibe:'Cultural'},{vibe:'Luxury'}],     user: { name: 'koda.s',   avatar: null }, _count: { upvotes: 276 } },
-  { id: 's5', destination: 'Lisbon',       country: 'Portugal', coverEmoji: '🏄', travelers: 3, budget: 1200, startDate: null, endDate: null, vibes: [{vibe:'Budget'},{vibe:'Foodie'}],       user: { name: 'priya.n',  avatar: null }, _count: { upvotes: 159 } },
-  { id: 's6', destination: 'Patagonia',    country: 'Argentina',coverEmoji: '🦅', travelers: 3, budget: 2600, startDate: null, endDate: null, vibes: [{vibe:'Hiking'},{vibe:'Adventure'}],    user: { name: 'marcos.g', avatar: null }, _count: { upvotes: 422 } },
-]
-
-// ── Static friends feed ───────────────────────────────────────────────────────
-const FRIENDS_FEED: FriendEntry[] = [
-  { user: 'Sara K.',  initial: 'S', color: '#4A6FA5', action: 'just posted photos from',    dest: 'Cinque Terre, Italy', time: '2h ago',     meta: '5 days · 2 travelers · $1,800',  tags: ['Coastal', 'Romantic'],   photos: ['🌊', '🏘', '🍋'], flag: '🌊', votes: 47  },
-  { user: 'James R.', initial: 'J', color: '#3A7D5A', action: 'shared their itinerary for', dest: 'Bali, Indonesia',     time: 'Yesterday',  meta: '10 days · 1 traveler · $1,400', tags: ['Adventure', 'Cultural'], photos: ['🌺', '🌊', '🛕'], flag: '🌺', votes: 89  },
-  { user: 'Mia C.',   initial: 'M', color: '#8A4F3A', action: 'completed a trip to',        dest: 'Morocco',             time: '3 days ago', meta: '8 days · 4 travelers · $2,200',  tags: ['Cultural', 'Foodie'],    photos: ['🏜', '🕌', '🌶'], flag: '🏜', votes: 134 },
-]
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
 
@@ -69,19 +50,9 @@ export function DiscoverFeed() {
       const res = await fetch(url)
       const data = await res.json()
       const trips: DiscoverTrip[] = Array.isArray(data.trips) ? data.trips : []
-      if (trips.length > 0) {
-        setCards(trips)
-      } else if (selectedCity) {
-        setCards([])
-      } else {
-        setCards(STATIC_CARDS)
-      }
+      setCards(trips)
     } catch {
-      if (selectedCity) {
-        setCards([])
-      } else {
-        setCards(STATIC_CARDS)
-      }
+      setCards([])
     } finally {
       setLoading(false)
     }
@@ -147,11 +118,6 @@ export function DiscoverFeed() {
             }}
           >
             {t === 'community' ? '🌍 Community' : '👥 Friends'}
-            {t === 'friends' && (
-              <span className="ml-2 text-[9px] bg-terra text-white rounded-full px-1.5 py-0.5">
-                3 new
-              </span>
-            )}
           </button>
         ))}
       </div>
@@ -191,10 +157,12 @@ export function DiscoverFeed() {
                 <div key={i} className="h-64 bg-white rounded-[18px] border-[1.5px] border-mist animate-pulse" />
               ))}
             </div>
-          ) : cards.length === 0 && selectedCity ? (
+          ) : cards.length === 0 ? (
             <div className="py-16 text-center">
               <div className="text-3xl mb-3">🗺️</div>
-              <div className="font-serif text-base font-bold text-ink mb-1">No itineraries yet for {selectedCity.label}</div>
+              <div className="font-serif text-base font-bold text-ink mb-1">
+                {selectedCity ? `No itineraries yet for ${selectedCity.label}` : 'No trips shared yet'}
+              </div>
               <p className="text-[13px] text-slate">Be the first to share a trip here.</p>
             </div>
           ) : (
@@ -216,12 +184,9 @@ export function DiscoverFeed() {
       {/* ── Friends tab ── */}
       {feedTab === 'friends' && (
         <div className="max-w-[680px]">
-          {FRIENDS_FEED.map((entry, i) => (
-            <FriendCard key={i} entry={entry} />
-          ))}
           <div className="bg-white rounded-[18px] border-[1.5px] border-dashed border-mist p-8 text-center">
             <div className="text-2xl mb-2">👥</div>
-            <div className="font-serif text-base font-bold text-ink mb-1">Find more travelers</div>
+            <div className="font-serif text-base font-bold text-ink mb-1">Friends feed coming soon</div>
             <p className="text-[13px] text-slate">Follow friends to see their trips in real time.</p>
           </div>
         </div>

@@ -352,7 +352,7 @@ export function DiscoverMap({ onCitySelect, selectedCity, destinationCounts }: P
                   fontWeight={600}
                   fontFamily="DM Mono, monospace"
                 >
-                  {c.count}
+                  {hasRealData ? c.count : '—'}
                 </text>
                 <text
                   x={c.x} y={c.y + r / scale + 8 / scale}

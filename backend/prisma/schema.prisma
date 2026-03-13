@@ -271,6 +271,7 @@ model Community {
   tripId      String  @unique
   isPublic    Boolean @default(false)
   friendsOnly Boolean @default(false)
+  isAnonymous Boolean @default(false)
   upvotes     Int     @default(0)
 
   trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
