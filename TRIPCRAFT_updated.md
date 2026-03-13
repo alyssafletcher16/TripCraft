@@ -116,7 +116,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - **Sharing:** anonymous = no name in Community, real name in Friends; public = @handle in Community (clickable → profile)
 - **Profile Upcoming tab:** numbered list, no drag, always private
 - **Profile Completed tab:** drag to reorder = permanent life ranking (#1 of my life, #2 overall…)
-- **Share toggle:** Completed tab only — off = private, on = Friends only / Everyone
+- **Share toggle (ANON):** Completed tab only — trips are always in Community, always shown with username to friends. Toggle controls anonymity: on = anonymous in community feed, off = shows @handle
 - **Imported trips:** always private on upload, "Imported" badge, auto-COMPLETED if past date
 - **Sidebar:** flat "My Itineraries" list, all upcoming + 3 recent completed, capped at 8, "See all" link
 - **Cancellation UI:** green ✓ (free) · amber ⚠ (deadline) · structured tiers
@@ -231,7 +231,7 @@ UI: ✅ 100% if 7+ days · ⚠️ 50% if 3–7 days · ❌ No refund within 3 da
 - **Sharing:** anonymous = no name in Community, real name in Friends; public = @handle in Community (clickable → profile)
 - **Profile Upcoming tab:** numbered list, no drag, always private
 - **Profile Completed tab:** drag to reorder = permanent life ranking (#1 of my life, #2 overall…)
-- **Share toggle:** Completed tab only — off = private, on = Friends only / Everyone
+- **Share toggle (ANON):** Completed tab only — trips are always in Community, always shown with username to friends. Toggle controls anonymity: on = anonymous in community feed, off = shows @handle
 - **Imported trips:** always private on upload, "Imported" badge, auto-COMPLETED if past date
 - **Sidebar:** flat "My Itineraries" list, all upcoming + 3 recent completed, capped at 8, "See all" link
 - **Cancellation UI:** green ✓ (free) · amber ⚠ (deadline) · structured tiers (see URL paste spec)

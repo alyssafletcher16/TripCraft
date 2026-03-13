@@ -31,7 +31,7 @@ export interface Trip {
   insights: TripInsight[]
   checklist: ChecklistItem[]
   _count?: { upvotes: number; days?: number }
-  community?: { isPublic: boolean; friendsOnly: boolean } | null
+  community?: { isPublic: boolean; friendsOnly: boolean; isAnonymous: boolean } | null
   itineraryImport?: { id: string } | null
   createdAt: string
   updatedAt: string

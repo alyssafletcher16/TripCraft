@@ -36,7 +36,6 @@ export function CompletedTab({ refreshKey }: CompletedTabProps) {
   const [loading, setLoading] = useState(true)
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const dragOverId = useRef<string | null>(null)
-  const [shareOpenId, setShareOpenId] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'loading') return
@@ -102,33 +101,23 @@ export function CompletedTab({ refreshKey }: CompletedTabProps) {
     dragOverId.current = null
   }
 
-  function isShared(trip: Trip) {
-    return !!(trip.community?.isPublic || trip.community?.friendsOnly)
+  function isAnonymous(trip: Trip) {
+    return !!trip.community?.isAnonymous
   }
 
-  function handleShareToggle(trip: Trip) {
-    if (isShared(trip)) {
-      // Turn off sharing
-      saveShare(trip.id, false, false)
-    } else {
-      // Show inline choice
-      setShareOpenId((prev) => (prev === trip.id ? null : trip.id))
-    }
-  }
-
-  async function saveShare(tripId: string, pub: boolean, friendsOnly: boolean) {
+  async function handleAnonToggle(trip: Trip) {
+    const next = !isAnonymous(trip)
     setTrips((prev) =>
       prev.map((t) =>
-        t.id === tripId
-          ? { ...t, community: { isPublic: pub, friendsOnly } }
+        t.id === trip.id
+          ? { ...t, community: { isPublic: false, friendsOnly: false, ...t.community, isAnonymous: next } }
           : t
       )
     )
-    setShareOpenId(null)
-    await fetch(`${API}/api/trips/${tripId}/community`, {
+    await fetch(`${API}/api/trips/${trip.id}/community`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ isPublic: pub, friendsOnly }),
+      body: JSON.stringify({ isAnonymous: next }),
     }).catch(() => {})
   }
 
@@ -160,8 +149,7 @@ export function CompletedTab({ refreshKey }: CompletedTabProps) {
         <div className="flex flex-col gap-2">
           {trips.map((trip, index) => {
             const range = dateRange(trip.startDate, trip.endDate)
-            const shared = isShared(trip)
-            const shareOpen = shareOpenId === trip.id
+            const anon = isAnonymous(trip)
             const isDragging = draggingId === trip.id
 
             return (
@@ -215,50 +203,22 @@ export function CompletedTab({ refreshKey }: CompletedTabProps) {
                   )}
                 </div>
 
-                {/* Share section */}
-                <div className="flex flex-col items-end gap-1 flex-shrink-0 select-none">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] text-slate/40 uppercase tracking-wider font-mono">SHARE</span>
-                    <button
-                      onClick={() => handleShareToggle(trip)}
-                      className={`relative w-9 h-5 rounded-full transition-colors focus:outline-none ${
-                        shared ? 'bg-ocean' : 'bg-mist'
+                {/* Anonymous toggle */}
+                <div className="flex items-center gap-2 flex-shrink-0 select-none">
+                  <span className="text-[9px] text-slate/40 uppercase tracking-wider font-mono">ANON</span>
+                  <button
+                    onClick={() => handleAnonToggle(trip)}
+                    className={`relative w-9 h-5 rounded-full transition-colors focus:outline-none ${
+                      anon ? 'bg-ocean' : 'bg-mist'
+                    }`}
+                    aria-label={anon ? 'Anonymous — click to show your name' : 'Named — click to post anonymously'}
+                  >
+                    <span
+                      className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                        anon ? 'translate-x-4' : ''
                       }`}
-                      aria-label={shared ? 'Sharing on — click to make private' : 'Sharing off — click to share'}
-                    >
-                      <span
-                        className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${
-                          shared ? 'translate-x-4' : ''
-                        }`}
-                      />
-                    </button>
-                  </div>
-
-                  {/* Inline share choice */}
-                  {shareOpen && (
-                    <div className="flex gap-1 mt-0.5">
-                      <button
-                        onClick={() => saveShare(trip.id, false, true)}
-                        className={`text-[10px] px-2 py-1 rounded-lg border transition-colors ${
-                          trip.community?.friendsOnly
-                            ? 'border-ocean text-ocean bg-ocean/5'
-                            : 'border-mist text-slate hover:border-ocean/50'
-                        }`}
-                      >
-                        Friends only
-                      </button>
-                      <button
-                        onClick={() => saveShare(trip.id, true, false)}
-                        className={`text-[10px] px-2 py-1 rounded-lg border transition-colors ${
-                          trip.community?.isPublic
-                            ? 'border-ocean text-ocean bg-ocean/5'
-                            : 'border-mist text-slate hover:border-ocean/50'
-                        }`}
-                      >
-                        Everyone
-                      </button>
-                    </div>
-                  )}
+                    />
+                  </button>
                 </div>
               </div>
             )
