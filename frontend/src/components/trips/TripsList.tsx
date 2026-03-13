@@ -132,7 +132,7 @@ export function TripsList() {
 
   return (
     <div>
-      <p className="text-[11px] text-slate font-mono uppercase tracking-wide mb-4">
+      <p className="hidden sm:block text-[11px] text-slate font-mono uppercase tracking-wide mb-4">
         Drag to reorder your ranking
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
