@@ -119,7 +119,7 @@ export function UploadItineraryModal({ onClose }: UploadItineraryModalProps) {
 
       setStep('done')
       setTimeout(() => {
-        router.push('/profile')
+        router.push('/profile?tab=Completed')
         router.refresh()
         onClose()
       }, 1500)

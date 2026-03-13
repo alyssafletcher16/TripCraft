@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { Suspense } from 'react'
 import { Navbar } from '@/components/layout/Navbar'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { ProfileHeader } from '@/components/profile/ProfileHeader'
@@ -14,7 +15,9 @@ export default function ProfilePage() {
         <Sidebar activeTab="profile" />
         <main className="bg-surface overflow-y-auto">
           <ProfileHeader />
-          <ProfileContent />
+          <Suspense>
+            <ProfileContent />
+          </Suspense>
         </main>
       </div>
     </div>

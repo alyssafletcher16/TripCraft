@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { UpcomingTab } from '@/components/profile/UpcomingTab'
 import { CompletedTab } from '@/components/profile/CompletedTab'
 
@@ -8,7 +9,9 @@ const TABS = ['Active', 'Completed'] as const
 type Tab = typeof TABS[number]
 
 export function ProfileContent() {
-  const [activeTab, setActiveTab] = useState<Tab>('Active')
+  const searchParams = useSearchParams()
+  const initialTab = searchParams.get('tab') === 'Completed' ? 'Completed' : 'Active'
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab)
   const [completedRefreshKey, setCompletedRefreshKey] = useState(0)
 
   function handleTripCompleted() {
