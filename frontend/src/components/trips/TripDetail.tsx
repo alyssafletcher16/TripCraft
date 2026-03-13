@@ -1073,6 +1073,9 @@ export function TripDetail({ tripId }: { tripId: string }) {
   const [error, setError] = useState('')
   const [reflecting, setReflecting] = useState(false)
   const [activeTab, setActiveTab] = useState<TabId>('itinerary')
+  const [pendingComplete, setPendingComplete] = useState(false)
+  const [shareAnonymous, setShareAnonymous] = useState(false)
+  const [confirming, setConfirming] = useState(false)
 
   // Research state
   const [searchActivity, setSearchActivity] = useState<SearchActivity | null>(null)
@@ -1182,6 +1185,11 @@ export function TripDetail({ tripId }: { tripId: string }) {
 
   async function handleStatusChange(newStatus: TripStatus) {
     if (!session?.accessToken || !trip) return
+    if (newStatus === 'COMPLETED') {
+      setShareAnonymous(false)
+      setPendingComplete(true)
+      return
+    }
     setTrip((prev) => prev ? { ...prev, status: newStatus } : prev)
     await fetch(`${API}/api/trips/${tripId}`, {
       method: 'PATCH',
@@ -1190,6 +1198,24 @@ export function TripDetail({ tripId }: { tripId: string }) {
     }).catch(() => {
       setTrip((prev) => prev ? { ...prev, status: trip.status } : prev)
     })
+  }
+
+  async function confirmComplete() {
+    if (!session?.accessToken || !trip) return
+    setConfirming(true)
+    await fetch(`${API}/api/trips/${tripId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.accessToken}` },
+      body: JSON.stringify({ status: 'COMPLETED' }),
+    })
+    await fetch(`${API}/api/trips/${tripId}/community`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.accessToken}` },
+      body: JSON.stringify({ isPublic: true, isAnonymous: shareAnonymous }),
+    }).catch(() => {})
+    setTrip((prev) => prev ? { ...prev, status: 'COMPLETED' } : prev)
+    setPendingComplete(false)
+    setConfirming(false)
   }
 
   if (loading || sessionStatus === 'loading') {
@@ -1231,15 +1257,19 @@ export function TripDetail({ tripId }: { tripId: string }) {
               <div>
                 <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                   <h1 className="font-serif text-2xl font-bold text-white drop-shadow">{trip.title}</h1>
-                  <select
-                    value={trip.status}
-                    onChange={(e) => handleStatusChange(e.target.value as TripStatus)}
-                    className="text-[11px] font-mono border border-white/30 rounded-full px-2.5 py-1 bg-black/30 text-white backdrop-blur-sm focus:outline-none focus:border-white/60 cursor-pointer"
-                  >
-                    {(['ACTIVE', 'COMPLETED'] as TripStatus[]).map((s) => (
-                      <option key={s} value={s} className="text-ink bg-white">{STATUS_LABEL[s]}</option>
-                    ))}
-                  </select>
+                  {trip.status !== 'COMPLETED' && !pendingComplete && (
+                    <button
+                      onClick={() => handleStatusChange('COMPLETED')}
+                      className="text-[11px] font-semibold px-2.5 py-1 rounded-full border border-white/30 bg-black/30 text-white backdrop-blur-sm hover:bg-black/50 transition-colors cursor-pointer"
+                    >
+                      Mark complete
+                    </button>
+                  )}
+                  {trip.status === 'COMPLETED' && (
+                    <span className="text-[11px] font-mono border border-white/30 rounded-full px-2.5 py-1 bg-black/30 text-white/70 backdrop-blur-sm">
+                      Completed
+                    </span>
+                  )}
                 </div>
                 <p className="text-white/80 text-sm drop-shadow">
                   {trip.destination}{trip.country ? `, ${trip.country}` : ''}
@@ -1248,6 +1278,46 @@ export function TripDetail({ tripId }: { tripId: string }) {
               <span className="text-3xl leading-none drop-shadow">{trip.coverEmoji ?? '✈'}</span>
             </div>
           </div>
+
+          {/* Confirm complete panel */}
+          {pendingComplete && (
+            <div className="px-7 py-3 border-b border-mist bg-success/5">
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <p className="text-[11px] text-slate">This trip will be shared with the community. Do you want your itinerary to be shared publicly or anonymously?</p>
+                <div className="flex rounded-full border border-mist bg-foam text-[11px] font-semibold overflow-hidden flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setShareAnonymous(false)}
+                    className={`px-3 py-1 transition-colors ${!shareAnonymous ? 'bg-ocean text-white' : 'text-slate hover:text-ink'}`}
+                  >
+                    Public
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShareAnonymous(true)}
+                    className={`px-3 py-1 transition-colors ${shareAnonymous ? 'bg-ocean text-white' : 'text-slate hover:text-ink'}`}
+                  >
+                    Anon
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  disabled={confirming}
+                  onClick={confirmComplete}
+                  className="text-xs font-semibold text-white bg-success px-3 py-1.5 rounded-lg disabled:opacity-60"
+                >
+                  Confirm
+                </button>
+                <button
+                  onClick={() => setPendingComplete(false)}
+                  className="text-xs text-slate hover:text-ink"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="px-7 py-4">
             <div className="flex flex-wrap gap-5 text-[11px] font-mono text-slate uppercase tracking-wide mb-3">
