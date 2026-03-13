@@ -10,12 +10,6 @@ const HERO_DAYS = [
   { day: 'Day 03', title: 'Agrigento',          items: ['Morning train', 'Valley of Temples ✓']                       },
 ]
 
-const STATS = [
-  { n: '12,400+', l: 'Itineraries built'   },
-  { n: '84',      l: 'Countries covered'   },
-  { n: '3.2M+',   l: 'Reviews synthesized' },
-  { n: '94%',     l: 'Would plan again'    },
-]
 
 export default function HomePage() {
   return (
@@ -144,15 +138,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Stats bar ─────────────────────────────────────────────────────── */}
-      <div className="bg-ocean px-4 sm:px-8 md:px-16 py-[22px] grid grid-cols-2 sm:flex sm:gap-14 gap-y-4 border-b border-white/6">
-        {STATS.map((s, i) => (
-          <div key={i}>
-            <div className="font-serif text-[26px] sm:text-[30px] font-bold text-gold">{s.n}</div>
-            <div className="text-[11px] text-slate mt-0.5">{s.l}</div>
-          </div>
-        ))}
-      </div>
+      {/* ── Stats bar ─── hidden until real data is available ──────────────── */}
 
       {/* ── Feature highlights ────────────────────────────────────────────── */}
       <section className="px-4 sm:px-8 md:px-16 py-12 md:py-20 bg-surface">
