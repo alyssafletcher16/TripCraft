@@ -8,10 +8,10 @@ import { useSidebar } from './SidebarContext'
 import type { Trip } from '@/types'
 
 const SB_ITEM =
-  'flex items-center gap-[11px] px-3 py-[10px] rounded-[10px] transition-all duration-150 text-white/50 text-[13px] hover:bg-white/[0.06] hover:text-white/85'
-const SB_ACTIVE = 'bg-terra/15 text-terra-lt ring-1 ring-inset ring-terra/20'
+  'flex items-center gap-[11px] px-3 py-[10px] rounded-[10px] transition-all duration-150 text-white/70 text-[13px] hover:bg-white/10 hover:text-white'
+const SB_ACTIVE = 'bg-white/15 text-white ring-1 ring-inset ring-white/25'
 const SB_ICON = 'text-[15px] w-5 text-center flex-shrink-0'
-const SB_SECTION = 'font-mono text-[9px] text-slate tracking-[2px] uppercase pt-[18px] px-[10px] pb-2'
+const SB_SECTION = 'font-mono text-[9px] text-white/40 tracking-[2px] uppercase pt-[18px] px-[10px] pb-2'
 
 // ── Sidebar ──────────────────────────────────────────────────────────────────
 export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hideDesktop?: boolean } = {}) {
@@ -45,7 +45,7 @@ export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hid
     })
 
   const sidebarContent = (
-    <aside className="bg-deep px-[18px] py-7 flex flex-col gap-1 border-r border-white/[0.06] h-full">
+    <aside className="bg-terra px-[18px] py-7 flex flex-col gap-1 border-r border-white/[0.12] h-full">
       {/* Close button — mobile only */}
       <button
         type="button"
@@ -94,7 +94,7 @@ export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hid
             <span className="flex-1 min-w-0">
               <span className="block truncate">{trip.title}</span>
               {trip.destination && (
-                <span className="block truncate text-[11px] text-white/30">{trip.destination}</span>
+                <span className="block truncate text-[11px] text-white/50">{trip.destination}</span>
               )}
             </span>
           </Link>
@@ -129,7 +129,7 @@ export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hid
     <>
       {/* Desktop sidebar — collapsible */}
       {!hideDesktop && (
-        <div className={`hidden md:flex relative transition-[width] duration-200 ${desktopCollapsed ? 'w-5' : 'w-[272px]'}`}>
+        <div className={`hidden md:flex relative transition-[width] duration-200 bg-terra ${desktopCollapsed ? 'w-5' : 'w-[272px]'}`}>
           <div className={`w-[272px] overflow-hidden transition-opacity duration-200 ${desktopCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
             {sidebarContent}
           </div>
@@ -137,7 +137,7 @@ export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hid
           <button
             type="button"
             onClick={toggleDesktop}
-            className="absolute right-0 top-8 translate-x-1/2 z-10 w-6 h-6 flex items-center justify-center bg-tide border border-white/20 rounded-full text-white/80 hover:text-white hover:bg-terra hover:border-terra transition-all duration-150 text-[13px] shadow-md"
+            className="absolute right-0 top-8 translate-x-1/2 z-10 w-6 h-6 flex items-center justify-center bg-terra-lt border border-white/30 rounded-full text-white hover:bg-white hover:text-terra transition-all duration-150 text-[13px] shadow-md"
             aria-label="Toggle sidebar"
           >
             {desktopCollapsed ? '›' : '‹'}
