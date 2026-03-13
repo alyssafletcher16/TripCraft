@@ -135,7 +135,7 @@ export function TripsList() {
       <p className="hidden sm:block text-[11px] text-slate font-mono uppercase tracking-wide mb-4">
         Drag to reorder your ranking
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className="flex flex-col gap-2">
         {trips.map((trip) => (
           <div
             key={trip.id}
@@ -144,20 +144,19 @@ export function TripsList() {
             onDragOver={(e) => handleDragOver(e, trip.id)}
             onDrop={handleDrop}
             onDragEnd={() => setDraggingId(null)}
-            className={`relative group transition-opacity duration-150 ${
+            className={`relative group transition-opacity duration-150 flex items-center gap-2 ${
               draggingId && draggingId !== trip.id ? 'opacity-60' : 'opacity-100'
             }`}
           >
             {/* Drag handle */}
-            <div className="absolute top-3 left-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
-              <div className="bg-black/40 rounded-md p-1">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="white">
-                  <circle cx="4" cy="2" r="1.2"/><circle cx="8" cy="2" r="1.2"/>
-                  <circle cx="4" cy="6" r="1.2"/><circle cx="8" cy="6" r="1.2"/>
-                  <circle cx="4" cy="10" r="1.2"/><circle cx="8" cy="10" r="1.2"/>
-                </svg>
-              </div>
+            <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing p-1">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" className="text-slate/50">
+                <circle cx="4" cy="2" r="1.2"/><circle cx="8" cy="2" r="1.2"/>
+                <circle cx="4" cy="6" r="1.2"/><circle cx="8" cy="6" r="1.2"/>
+                <circle cx="4" cy="10" r="1.2"/><circle cx="8" cy="10" r="1.2"/>
+              </svg>
             </div>
+            <div className="flex-1 min-w-0">
             <TripCard
               id={trip.id}
               title={trip.title}
@@ -178,9 +177,11 @@ export function TripsList() {
               isPublic={trip.isPublic}
               rank={trip.rank}
               isDragging={draggingId === trip.id}
+              row
               onStatusChange={handleStatusChange}
               onTogglePublic={handleTogglePublic}
             />
+            </div>
           </div>
         ))}
       </div>

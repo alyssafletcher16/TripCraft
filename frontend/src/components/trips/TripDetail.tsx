@@ -1178,6 +1178,18 @@ export function TripDetail({ tripId }: { tripId: string }) {
     } catch {} finally { setResearchAdding(false) }
   }
 
+  async function handleStatusChange(newStatus: TripStatus) {
+    if (!session?.accessToken || !trip) return
+    setTrip((prev) => prev ? { ...prev, status: newStatus } : prev)
+    await fetch(`${API}/api/trips/${tripId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.accessToken}` },
+      body: JSON.stringify({ status: newStatus }),
+    }).catch(() => {
+      setTrip((prev) => prev ? { ...prev, status: trip.status } : prev)
+    })
+  }
+
   if (loading || sessionStatus === 'loading') {
     return <div className="animate-pulse bg-white rounded-2xl border border-mist h-64" />
   }
@@ -1206,7 +1218,15 @@ export function TripDetail({ tripId }: { tripId: string }) {
               <div>
                 <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                   <h1 className="font-serif text-2xl font-bold text-white drop-shadow">{trip.title}</h1>
-                  <Badge variant={STATUS_VARIANT[trip.status]}>{STATUS_LABEL[trip.status]}</Badge>
+                  <select
+                    value={trip.status}
+                    onChange={(e) => handleStatusChange(e.target.value as TripStatus)}
+                    className="text-[11px] font-mono border border-white/30 rounded-full px-2.5 py-1 bg-black/30 text-white backdrop-blur-sm focus:outline-none focus:border-white/60 cursor-pointer"
+                  >
+                    {(['PLANNING', 'ACTIVE', 'COMPLETED', 'DRAFT'] as TripStatus[]).map((s) => (
+                      <option key={s} value={s} className="text-ink bg-white">{STATUS_LABEL[s]}</option>
+                    ))}
+                  </select>
                 </div>
                 <p className="text-white/80 text-sm drop-shadow">
                   {trip.destination}{trip.country ? `, ${trip.country}` : ''}
