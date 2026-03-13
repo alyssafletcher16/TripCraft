@@ -156,11 +156,11 @@ const CLUSTERS: MapCluster[] = [
   { ...geoXY(-60, -20), count:  87, label: 'S. America',zoom: 'out',     region: 'sameric', matchTerms: ['brazil','argentina','chile','colombia','venezuela','peru','bolivia','ecuador','paraguay','uruguay'], itins: [2, 5] },
   { ...geoXY(20,    5), count:  62, label: 'Africa',   zoom: 'out',      region: 'africa',  matchTerms: ['kenya','nigeria','south africa','egypt','ethiopia','ghana','tanzania','morocco','senegal','uganda'], itins: [1, 4] },
   // Europe cities
-  { ...geoXY(-9,  39),  count:  89, label: 'Lisbon',   zoom: 'europe',   region: 'europe',  itins: [4] },
-  { ...geoXY(2,   49),  count: 124, label: 'Paris',    zoom: 'europe',   region: 'europe',  itins: [0, 4] },
-  { ...geoXY(12,  42),  count:  98, label: 'Rome',     zoom: 'europe',   region: 'europe',  itins: [0], matchTerms: ['rome','italy','amalfi','florence','venice','naples','sicily','milan','turin','sardinia','puglia','cinque terre'] },
-  { ...geoXY(14,  50),  count:  67, label: 'Prague',   zoom: 'europe',   region: 'europe',  itins: [0, 4] },
-  { ...geoXY(2,   41),  count:  55, label: 'Barcelona',zoom: 'europe',   region: 'europe',  itins: [0, 4] },
+  { ...geoXY(-9,  39),  count:  89, label: 'Lisbon',   zoom: 'europe',   region: 'europe',  itins: [4], matchTerms: ['lisbon','portugal','porto','algarve','sintra','madeira','azores'] },
+  { ...geoXY(2,   49),  count: 124, label: 'Paris',    zoom: 'europe',   region: 'europe',  itins: [0, 4], matchTerms: ['paris','france','provence','lyon','nice','marseille','bordeaux','strasbourg','normandy','loire'] },
+  { ...geoXY(12,  42),  count:  98, label: 'Rome',     zoom: 'europe',   region: 'europe',  itins: [0], matchTerms: ['rome','italy','amalfi','florence','venice','naples','sicily','milan','turin','sardinia','puglia','cinque terre','positano','capri','pompeii'] },
+  { ...geoXY(14,  50),  count:  67, label: 'Prague',   zoom: 'europe',   region: 'europe',  itins: [0, 4], matchTerms: ['prague','czech','vienna','austria','budapest','hungary','bratislava','slovakia','krakow','poland','warsaw'] },
+  { ...geoXY(2,   41),  count:  55, label: 'Barcelona',zoom: 'europe',   region: 'europe',  itins: [0, 4], matchTerms: ['barcelona','spain','madrid','seville','granada','valencia','ibiza','mallorca','costa brava','andalusia','san sebastian'] },
   // Asia cities
   { ...geoXY(101, 14),  count:  76, label: 'Bangkok',  zoom: 'asia',     region: 'asia',    itins: [3], matchTerms: ['thailand','cambodia','vietnam','laos','myanmar','ho chi minh','hanoi','phuket','chiang mai','phnom penh','siem reap'] },
   { ...geoXY(140, 36),  count: 112, label: 'Tokyo',    zoom: 'asia',     region: 'asia',    itins: [3], matchTerms: ['tokyo','japan','osaka','kyoto','hiroshima','hokkaido'] },
