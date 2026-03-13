@@ -97,7 +97,7 @@ export function Block({ block, tripId, destination }: BlockProps) {
               href={block.bookingUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-terra text-white text-[11px] font-semibold hover:bg-terra-lt transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-terra text-white text-[11px] font-semibold hover:bg-terra-lt transition-colors"
             >
               Book now ↗
             </a>

@@ -106,13 +106,13 @@ export function ReflectionModal({ trip, accessToken, onClose, onSaved }: Props) 
 
   return (
     <div
-      className="fixed inset-0 z-[1000] bg-[rgba(7,24,37,0.82)] backdrop-blur-[5px] flex items-center justify-center p-6"
+      className="fixed inset-0 z-[1000] bg-[rgba(7,24,37,0.82)] backdrop-blur-[5px] flex items-center justify-center p-3 sm:p-6"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="bg-surface rounded-[24px] w-full max-w-[620px] max-h-[92vh] overflow-hidden flex flex-col shadow-[0_48px_96px_rgba(0,0,0,0.5)] border border-white/[0.08]">
 
         {/* ── Header ── */}
-        <div className="flex items-start justify-between px-7 py-5 border-b border-mist">
+        <div className="flex items-start justify-between px-4 sm:px-7 py-4 sm:py-5 border-b border-mist">
           <div>
             <div className="font-serif text-xl font-bold text-ink">
               Trip Reflection — {trip.destination}
@@ -143,7 +143,7 @@ export function ReflectionModal({ trip, accessToken, onClose, onSaved }: Props) 
         </div>
 
         {/* ── Body ── */}
-        <div className="overflow-y-auto flex-1 px-7 py-7">
+        <div className="overflow-y-auto flex-1 px-4 sm:px-7 py-5 sm:py-7">
           {/* Step indicator */}
           <div className="flex items-center gap-2 mb-5">
             <span className="bg-ocean text-white font-mono text-[10px] px-2.5 py-0.5 rounded-full tracking-[1px]">
@@ -353,7 +353,7 @@ export function ReflectionModal({ trip, accessToken, onClose, onSaved }: Props) 
         </div>
 
         {/* ── Nav footer ── */}
-        <div className="flex justify-between items-center px-7 py-5 border-t border-mist">
+        <div className="flex justify-between items-center px-4 sm:px-7 py-4 sm:py-5 border-t border-mist">
           <button
             onClick={() => setStep((s) => Math.max(0, s - 1))}
             disabled={step === 0}

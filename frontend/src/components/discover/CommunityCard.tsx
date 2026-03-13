@@ -83,7 +83,7 @@ export function CommunityCard({ card, index, upvoted, onUpvote }: Props) {
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); onUpvote(card.id) }}
-            className="flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold transition-all"
+            className="flex items-center gap-1 rounded-full px-2.5 py-1.5 text-[11px] font-semibold transition-all"
             style={{
               background: upvoted ? 'rgba(201,168,76,0.45)' : 'rgba(201,168,76,0.25)',
               border: '1px solid rgba(201,168,76,0.4)',
@@ -136,10 +136,10 @@ export function CommunityCard({ card, index, upvoted, onUpvote }: Props) {
 
       {/* ── Footer ── */}
       <div className="px-4 py-2.5 border-t border-mist flex gap-2">
-        <button className="flex-1 py-2 rounded-[10px] border-[1.5px] border-mist text-[12px] text-slate transition-colors hover:border-terra hover:text-terra">
+        <button className="flex-1 py-2.5 rounded-[10px] border-[1.5px] border-mist text-[12px] text-slate transition-colors hover:border-terra hover:text-terra">
           Fork trip
         </button>
-        <button className="flex-1 py-2 rounded-[10px] border-none bg-ocean text-white text-[12px]">
+        <button className="flex-1 py-2.5 rounded-[10px] border-none bg-ocean text-white text-[12px]">
           View →
         </button>
       </div>

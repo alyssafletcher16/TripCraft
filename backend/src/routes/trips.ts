@@ -126,6 +126,23 @@ tripsRouter.post('/import/confirm', requireAuth, async (req: AuthRequest, res) =
   }
 })
 
+// POST /api/trips/reorder — bulk-update rank positions
+tripsRouter.post('/reorder', requireAuth, async (req: AuthRequest, res) => {
+  const { order } = req.body as { order: { id: string; rank: number }[] }
+  if (!Array.isArray(order)) return res.status(400).json({ error: 'order array required' })
+  try {
+    await prisma.$transaction(
+      order.map(({ id, rank }) =>
+        prisma.trip.updateMany({ where: { id, userId: req.userId }, data: { rank } })
+      )
+    )
+    return res.status(204).send()
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 // GET /api/trips  — current user's trips
 tripsRouter.get('/', requireAuth, async (req: AuthRequest, res) => {
   try {

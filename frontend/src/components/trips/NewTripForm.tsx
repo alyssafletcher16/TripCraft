@@ -262,14 +262,14 @@ export function NewTripForm() {
                   <button
                     type="button"
                     onClick={() => setBudgetType('total')}
-                    className={`px-2.5 py-1 transition-colors ${budgetType === 'total' ? 'bg-ocean text-white' : 'text-slate hover:text-ink'}`}
+                    className={`px-2.5 py-2 transition-colors ${budgetType === 'total' ? 'bg-ocean text-white' : 'text-slate hover:text-ink'}`}
                   >
                     Total
                   </button>
                   <button
                     type="button"
                     onClick={() => setBudgetType('per_person')}
-                    className={`px-2.5 py-1 border-l border-mist transition-colors ${budgetType === 'per_person' ? 'bg-ocean text-white' : 'text-slate hover:text-ink'}`}
+                    className={`px-2.5 py-2 border-l border-mist transition-colors ${budgetType === 'per_person' ? 'bg-ocean text-white' : 'text-slate hover:text-ink'}`}
                   >
                     Per person
                   </button>

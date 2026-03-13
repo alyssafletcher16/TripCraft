@@ -115,7 +115,7 @@ export function DiscoverFeed() {
 
       {/* Selected city banner */}
       {selectedCity && (
-        <div className="mt-3 bg-white rounded-2xl border-[1.5px] border-mist px-5 py-3.5 flex items-center justify-between">
+        <div className="mt-3 bg-white rounded-2xl border-[1.5px] border-mist px-4 sm:px-5 py-3 sm:py-3.5 flex flex-row items-center justify-between gap-3">
           <div>
             <div className="font-serif text-xl font-bold text-ink">{selectedCity.label}</div>
             <div className="text-[12px] text-slate mt-0.5">
@@ -124,7 +124,7 @@ export function DiscoverFeed() {
           </div>
           <button
             onClick={() => setSelectedCity(null)}
-            className="border-[1.5px] border-mist text-slate px-4 py-1.5 rounded-full text-[12px] hover:border-terra/40 hover:text-terra transition-colors"
+            className="border-[1.5px] border-mist text-slate px-4 py-2 rounded-full text-[12px] hover:border-terra/40 hover:text-terra transition-colors flex-shrink-0"
           >
             ✕ Clear
           </button>

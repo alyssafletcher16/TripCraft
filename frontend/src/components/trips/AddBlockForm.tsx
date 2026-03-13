@@ -301,7 +301,7 @@ export function AddBlockForm({ dayId, tripId, destination, vibes, date, onSucces
             key={s}
             type="button"
             onClick={() => setStatus(s)}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+            className={`px-3 py-2 rounded-full text-xs font-medium transition-all ${
               status === s
                 ? s === 'BOOKED'
                   ? 'bg-green-100 text-green-700 border border-green-300'
@@ -359,7 +359,7 @@ export function AddBlockForm({ dayId, tripId, destination, vibes, date, onSucces
         <button
           type="submit"
           disabled={loading}
-          className="bg-terra text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-terra-lt disabled:opacity-50"
+          className="bg-terra text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-terra-lt disabled:opacity-50"
         >
           {loading ? 'Adding…' : 'Add block'}
         </button>
