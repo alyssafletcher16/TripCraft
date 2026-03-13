@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
+import { UploadItineraryModal } from '@/components/itinerary/UploadItineraryModal'
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
 
@@ -191,6 +192,7 @@ export function ArchiveTab() {
   const token = (session as { accessToken?: string })?.accessToken
 
   const [stage, setStage] = useState<Stage>('idle')
+  const [showImport, setShowImport] = useState(false)
   const [parsedTrips, setParsedTrips] = useState<ParsedTrip[]>([])
   const [archivedTrips, setArchivedTrips] = useState<ArchivedTrip[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -277,7 +279,16 @@ export function ArchiveTab() {
 
   return (
     <div className="p-4 sm:p-8 md:p-12 max-w-3xl">
-      <p className="eyebrow mb-2">Trip Archive</p>
+      {showImport && <UploadItineraryModal onClose={() => setShowImport(false)} />}
+      <div className="flex items-start justify-between gap-4 mb-2">
+        <p className="eyebrow">Trip Archive</p>
+        <button
+          onClick={() => setShowImport(true)}
+          className="flex-shrink-0 px-4 py-2 rounded-xl bg-terra text-white text-sm font-semibold hover:bg-terra/90 transition-colors"
+        >
+          Import itinerary
+        </button>
+      </div>
       <h2 className="font-serif text-2xl md:text-3xl font-bold text-ink mb-2">Your journey</h2>
       <p className="text-slate text-sm mb-6 md:mb-8">Upload an old trip spreadsheet or PDF to import it into TripCraft.</p>
 

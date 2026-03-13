@@ -81,13 +81,15 @@ model Trip {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
-  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  vibes      TripVibe[]
-  days       ItineraryDay[]
-  reflection TripReflection?
-  insights   TripInsight[]
-  upvotes    CommunityUpvote[]
-  checklist  ChecklistItem[]
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vibes           TripVibe[]
+  days            ItineraryDay[]
+  reflection      TripReflection?
+  insights        TripInsight[]
+  upvotes         CommunityUpvote[]
+  checklist       ChecklistItem[]
+  community       Community?
+  itineraryImport ItineraryImport?
 }
 
 enum TripStatus {
@@ -264,6 +266,28 @@ model BookingClick {
 }
 
 // ─── Community / Discover ────────────────────────────────────────────────────
+
+model Community {
+  id          String  @id @default(cuid())
+  tripId      String  @unique
+  isPublic    Boolean @default(false)
+  friendsOnly Boolean @default(false)
+  upvotes     Int     @default(0)
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+}
+
+model ItineraryImport {
+  id           String   @id @default(cuid())
+  tripId       String   @unique
+  fileName     String
+  sourceFormat String
+  confidence   Float
+  parseNotes   String?
+  createdAt    DateTime @default(now())
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+}
 
 model CommunityUpvote {
   id        String   @id @default(cuid())

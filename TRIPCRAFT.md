@@ -314,6 +314,11 @@ Session 16: 2.12       — Mobile reference view
 ---
 
 ## Product Decisions (Locked)
+- **Imported trips** default to private on save. User must opt in to friends or public visibility.
+- **Imported trips** show a source badge on the profile card (e.g. "Imported from PDF") — tracked via ItineraryImport model.
+- **Community model** has a `friendsOnly` boolean: `isPublic=false` + `friendsOnly=true` means friends feed only.
+
+
 - **Travelers field** always labeled "Total number of travelers (including yourself)"
 - **Vibes** are multi-select chips — user can select any combination
 - **Cancellation deadlines** shown green ✓ (free/safe) or amber ⚠ (deadline/non-refundable) per block
@@ -391,7 +396,8 @@ Session 16: 2.12       — Mobile reference view
 - [ ] Trip detail modal
 - [ ] Post-trip reflection flow
 - [ ] Photo upload
-- [ ] PDF itinerary upload
+- [x] PDF itinerary upload
+- [x] Privacy selector on save (private / friends / public)
 
 ## How to Use This File
 
