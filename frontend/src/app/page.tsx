@@ -14,19 +14,9 @@ const HERO_DAYS = [
   { day: 'Day 03', title: 'Agrigento',          items: ['Morning train', 'Valley of Temples ✓']                       },
 ]
 
-
-export default function HomePage() {
-  const { data: session } = useSession()
-  const isLoggedIn = !!session
-
+function MarketingContent() {
   return (
-    <div className="min-h-screen">
-      <Navbar />
-      {isLoggedIn ? (
-        <div className="md:grid md:grid-cols-[272px_1fr] min-h-[calc(100vh-62px)]">
-          <Sidebar />
-          <main className="overflow-y-auto">
-
+    <>
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <section className="bg-deep pt-12 pb-16 sm:pt-16 sm:pb-20 md:pt-[88px] md:pb-[100px] px-4 sm:px-8 md:px-16 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-[72px] items-center relative overflow-hidden">
 
@@ -206,6 +196,29 @@ export default function HomePage() {
           Start building free →
         </Link>
       </section>
+    </>
+  )
+}
+
+export default function HomePage() {
+  const { data: session } = useSession()
+
+  return (
+    <div className="min-h-screen">
+      <Navbar />
+      {session ? (
+        <div className="md:grid md:grid-cols-[272px_1fr] min-h-[calc(100vh-62px)]">
+          <Sidebar />
+          <main className="overflow-y-auto">
+            <MarketingContent />
+          </main>
+        </div>
+      ) : (
+        <>
+          <Sidebar hideDesktop />
+          <MarketingContent />
+        </>
+      )}
     </div>
   )
 }
