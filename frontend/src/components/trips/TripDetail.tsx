@@ -1440,7 +1440,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
           </div>
 
           {/* ── Tab content ─────────────────────────────────────── */}
-          <div className="p-3 sm:p-6">
+          <div className="p-3 sm:p-6 overflow-y-auto" style={{ minHeight: 480, maxHeight: '70vh' }}>
 
             {/* Itinerary tab */}
             {activeTab === 'itinerary' && (
