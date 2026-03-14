@@ -270,20 +270,18 @@ export function MyTripsTab() {
 
       {/* ── Completed ── */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="font-serif text-xl font-bold text-ink">Completed</h2>
-          <button
-            onClick={() => setShowImport(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-terra text-white text-xs font-semibold hover:bg-terra/90 transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
-            Import itinerary
-          </button>
-        </div>
+        <h2 className="font-serif text-xl font-bold text-ink mb-2">Completed</h2>
+        <button
+          onClick={() => setShowImport(true)}
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-terra text-white text-xs font-semibold hover:bg-terra/90 transition-colors mb-2"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          Import itinerary
+        </button>
         {completedTrips.length > 0 && (
           <p className="text-slate/60 text-[11px] font-mono uppercase tracking-wide mb-4">
             Drag to reorder your ranking
@@ -331,10 +329,18 @@ export function MyTripsTab() {
                       <p className="text-slate/50 text-[10px] font-mono uppercase mt-0.5">{range}</p>
                     )}
                     {trip.reflection ? (
-                      <span className="text-[10px] text-success/70 font-medium">Reflected</span>
+                      <Link
+                        href={`/trips/${trip.id}`}
+                        className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-success/10 text-success/80 border border-success/20 hover:bg-success/20 transition-colors mt-0.5"
+                      >
+                        View Reflection
+                      </Link>
                     ) : (
-                      <Link href={`/trips/${trip.id}`} className="text-[10px] text-slate/40 hover:text-slate underline">
-                        Add reflection
+                      <Link
+                        href={`/trips/${trip.id}`}
+                        className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-mist text-slate border border-mist hover:bg-ocean/10 hover:text-ocean hover:border-ocean/20 transition-colors mt-0.5"
+                      >
+                        Add Reflection
                       </Link>
                     )}
                   </div>
