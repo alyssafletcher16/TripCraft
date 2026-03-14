@@ -357,9 +357,6 @@ function TodoTab({
   const [adding, setAdding] = useState(false)
   const [showAdd, setShowAdd] = useState(false)
 
-  // Sync when trip updates externally
-  useEffect(() => { setItems(trip.checklist ?? []) }, [trip.checklist])
-
   const [pendingBlocks, setPendingBlocks] = useState<Block[]>(
     trip.days.flatMap((d) => d.blocks.filter((b) => b.status === 'PENDING'))
   )
@@ -762,9 +759,10 @@ function ResearchTab({
   const [linkInput, setLinkInput] = useState('')
   const [linkTitle, setLinkTitle] = useState('')
   const [addingLink, setAddingLink] = useState(false)
-  const [blogPosts, setBlogPosts] = useState<Array<{ title: string; url: string; description: string; source: string }>>([])
-  const [blogsLoading, setBlogsLoading] = useState(false)
-  const [blogsError, setBlogsError] = useState(false)
+  type ResearchResult = { title: string; url: string; description: string; source: string; rating?: string; price?: string }
+  const [researchData, setResearchData] = useState<{ blogs: ResearchResult[]; tours: ResearchResult[]; stays: ResearchResult[]; tips: ResearchResult[] } | null>(null)
+  const [researchLoading, setResearchLoading] = useState(false)
+  const [researchError, setResearchError] = useState(false)
 
   useEffect(() => {
     try {
@@ -775,23 +773,28 @@ function ResearchTab({
 
   useEffect(() => {
     if (!trip.destination) return
-    const cacheKey = `tripcraft_blogs_${trip.destination}`
+    const cacheKey = `tripcraft_research_data_${trip.destination}`
     const cached = sessionStorage.getItem(cacheKey)
     if (cached) {
-      try { setBlogPosts(JSON.parse(cached)); return } catch {}
+      try { setResearchData(JSON.parse(cached)); return } catch {}
     }
-    setBlogsLoading(true)
-    setBlogsError(false)
+    setResearchLoading(true)
+    setResearchError(false)
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
     fetch(`${API_URL}/api/blogs/${encodeURIComponent(trip.destination)}`)
       .then((r) => r.json())
       .then((data) => {
-        const posts = data.blogPosts ?? []
-        setBlogPosts(posts)
-        sessionStorage.setItem(cacheKey, JSON.stringify(posts))
+        const parsed = {
+          blogs: data.blogs ?? [],
+          tours: data.tours ?? [],
+          stays: data.stays ?? [],
+          tips: data.tips ?? [],
+        }
+        setResearchData(parsed)
+        sessionStorage.setItem(cacheKey, JSON.stringify(parsed))
       })
-      .catch(() => setBlogsError(true))
-      .finally(() => setBlogsLoading(false))
+      .catch(() => setResearchError(true))
+      .finally(() => setResearchLoading(false))
   }, [trip.destination])
 
   function saveLink() {
@@ -834,9 +837,9 @@ function ResearchTab({
       <div>
         <h2 className="font-serif text-2xl font-bold text-ink mb-1">Research Hub</h2>
         <p className="text-sm text-slate">
-          {blogPosts.length > 0
-            ? `${blogPosts.length} blog posts found for ${trip.destination}`
-            : `Blog posts, saved tours, and social links for ${trip.destination}`}
+          {researchData
+            ? `Tours, stays, tips & blog posts for ${trip.destination}`
+            : `Research hub for ${trip.destination}`}
         </p>
       </div>
 
@@ -858,56 +861,74 @@ function ResearchTab({
         ))}
       </div>
 
-      {/* Reviews & Insights — Travel Blog Posts */}
+      {/* Reviews & Insights — sourced from the web */}
       {(filter === 'all' || filter === 'insights') && (
-        <div className="bg-white rounded-2xl border border-mist overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-mist flex items-center gap-2">
-            <span className="font-mono text-[10px] text-slate uppercase tracking-wider">Reviews & Insights</span>
-            {blogPosts.length > 0 && (
-              <span className="bg-ocean/10 text-ocean text-[10px] font-bold px-2 py-0.5 rounded-full">
-                {blogPosts.length}
-              </span>
-            )}
-          </div>
-          {blogsLoading ? (
-            <div className="px-5 py-8 text-center">
+        <>
+          {researchLoading && (
+            <div className="bg-white rounded-2xl border border-mist px-5 py-10 text-center">
               <div className="inline-block w-5 h-5 border-2 border-ocean/30 border-t-ocean rounded-full animate-spin mb-3" />
-              <p className="text-slate text-sm">Finding blog posts about {trip.destination.split(',')[0]}…</p>
-            </div>
-          ) : blogsError ? (
-            <div className="px-5 py-8 text-center">
-              <p className="text-slate text-sm">Could not load blog posts. Try again later.</p>
-            </div>
-          ) : blogPosts.length === 0 ? (
-            <div className="px-5 py-8 text-center">
-              <p className="text-slate text-sm">No blog posts found for this destination.</p>
-            </div>
-          ) : (
-            <div className="divide-y divide-mist">
-              {blogPosts.map((post, i) => (
-                <a
-                  key={i}
-                  href={post.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex gap-3 px-5 py-4 hover:bg-foam/50 transition-colors group"
-                >
-                  <div className="w-2 h-2 rounded-full mt-[5px] flex-shrink-0 bg-ocean/40 group-hover:bg-ocean transition-colors" />
-                  <div className="min-w-0">
-                    <p className="text-[13px] text-ocean font-medium leading-snug group-hover:underline">{post.title}</p>
-                    {post.description && (
-                      <p className="text-[12px] text-ink/70 leading-relaxed mt-0.5">{post.description}</p>
-                    )}
-                    <p className="font-mono text-[10px] text-slate mt-1.5 flex items-center gap-1">
-                      {post.source}
-                      <span className="opacity-50">↗</span>
-                    </p>
-                  </div>
-                </a>
-              ))}
+              <p className="text-slate text-sm">Finding top suggestions for {trip.destination.split(',')[0]}…</p>
             </div>
           )}
-        </div>
+          {researchError && (
+            <div className="bg-white rounded-2xl border border-mist px-5 py-8 text-center">
+              <p className="text-slate text-sm">Could not load suggestions. Try again later.</p>
+            </div>
+          )}
+          {researchData && (
+            <>
+              {(
+                [
+                  { key: 'tours', label: 'Top Tours & Experiences', dot: '#2E7D4F' },
+                  { key: 'stays', label: 'Where to Stay', dot: '#0D2B45' },
+                  { key: 'tips',  label: 'Tips & Tricks',  dot: '#D4A843' },
+                  { key: 'blogs', label: 'Travel Blog Posts', dot: '#5B7A8E' },
+                ] as const
+              ).map(({ key, label, dot }) => {
+                const items = researchData[key]
+                if (items.length === 0) return null
+                return (
+                  <div key={key} className="bg-white rounded-2xl border border-mist overflow-hidden">
+                    <div className="px-5 py-3.5 border-b border-mist flex items-center gap-2">
+                      <span className="font-mono text-[10px] text-slate uppercase tracking-wider">{label}</span>
+                      <span className="bg-ocean/10 text-ocean text-[10px] font-bold px-2 py-0.5 rounded-full">{items.length}</span>
+                    </div>
+                    <div className="divide-y divide-mist">
+                      {items.map((item, i) => (
+                        <a
+                          key={i}
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex gap-3 px-5 py-4 hover:bg-foam/50 transition-colors group"
+                        >
+                          <div className="w-2 h-2 rounded-full mt-[5px] flex-shrink-0 transition-opacity group-hover:opacity-100 opacity-60" style={{ background: dot }} />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[13px] text-ocean font-medium leading-snug group-hover:underline">{item.title}</p>
+                            {item.description && (
+                              <p className="text-[12px] text-ink/70 leading-relaxed mt-0.5">{item.description}</p>
+                            )}
+                            <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                              {item.rating && (
+                                <span className="font-mono text-[10px] text-[#2E7D4F]">★ {item.rating}</span>
+                              )}
+                              {item.price && (
+                                <span className="font-mono text-[10px] text-slate">{item.price}</span>
+                              )}
+                              <span className="font-mono text-[10px] text-slate flex items-center gap-1">
+                                {item.source} <span className="opacity-50">↗</span>
+                              </span>
+                            </div>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </>
+          )}
+        </>
       )}
 
       {/* Saved tour comparisons */}
