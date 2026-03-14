@@ -28,7 +28,7 @@ export function RegisterForm() {
         setError('Account created — please sign in.')
         router.push('/login')
       } else {
-        router.push('/trips')
+        router.push('/')
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
@@ -42,7 +42,7 @@ export function RegisterForm() {
       {/* Google OAuth */}
       <button
         type="button"
-        onClick={() => signIn('google', { callbackUrl: '/trips' })}
+        onClick={() => signIn('google', { callbackUrl: '/' })}
         className="w-full flex items-center justify-center gap-3 py-3 rounded-full border border-white/20 text-white/80 text-sm font-medium transition-all hover:bg-white/[0.07] hover:border-white/35 hover:text-white mb-5"
       >
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
