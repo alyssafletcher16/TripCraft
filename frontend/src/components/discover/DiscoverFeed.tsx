@@ -49,6 +49,29 @@ const COUNTRY_REGION: Record<string, string> = {
   'Papua New Guinea': 'Oceania', Samoa: 'Oceania', Vanuatu: 'Oceania',
 }
 
+function budgetInRange(budget: number | null, range: string): boolean {
+  if (budget === null) return false
+  if (range === 'Under $1K') return budget < 1000
+  if (range === '$1K–$3K') return budget >= 1000 && budget < 3000
+  if (range === '$3K–$7K') return budget >= 3000 && budget < 7000
+  if (range === '$7K+') return budget >= 7000
+  return false
+}
+
+function tripDurationDays(card: { startDate: string | null; endDate: string | null }): number | null {
+  if (!card.startDate || !card.endDate) return null
+  return Math.round((new Date(card.endDate).getTime() - new Date(card.startDate).getTime()) / 86_400_000) + 1
+}
+
+function daysInRange(days: number | null, range: string): boolean {
+  if (days === null) return false
+  if (range === '1–3 days') return days >= 1 && days <= 3
+  if (range === '4–7 days') return days >= 4 && days <= 7
+  if (range === '8–14 days') return days >= 8 && days <= 14
+  if (range === '15+ days') return days >= 15
+  return false
+}
+
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
 
 function MultiSelectDropdown({
@@ -138,6 +161,8 @@ export function DiscoverFeed() {
   const [sortByUpvotes, setSortByUpvotes] = useState(false)
   const [selectedRegions, setSelectedRegions] = useState<Set<string>>(new Set())
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set())
+  const [selectedBudgets, setSelectedBudgets] = useState<Set<string>>(new Set())
+  const [selectedDays, setSelectedDays] = useState<Set<string>>(new Set())
   const [selectedCity, setSelectedCity] = useState<MapCluster | null>(null)
   const [allCards, setAllCards] = useState<DiscoverTrip[]>([])
   const [loading, setLoading] = useState(true)
@@ -208,6 +233,14 @@ export function DiscoverFeed() {
       result = result.filter((c) => c.vibes.some((v) => selectedTags.has(v.vibe)))
     }
 
+    if (selectedBudgets.size > 0) {
+      result = result.filter((c) => [...selectedBudgets].some((r) => budgetInRange(c.budget, r)))
+    }
+
+    if (selectedDays.size > 0) {
+      result = result.filter((c) => [...selectedDays].some((r) => daysInRange(tripDurationDays(c), r)))
+    }
+
     if (selectedCity) {
       result = result.filter((c) =>
         c.destination.toLowerCase().includes(selectedCity.label.toLowerCase())
@@ -219,7 +252,7 @@ export function DiscoverFeed() {
     }
 
     return result
-  }, [allCards, search, selectedRegions, selectedTags, selectedCity, sortByUpvotes])
+  }, [allCards, search, selectedRegions, selectedTags, selectedBudgets, selectedDays, selectedCity, sortByUpvotes])
 
   function toggleRegion(r: string) {
     setSelectedRegions((prev) => {
@@ -233,6 +266,22 @@ export function DiscoverFeed() {
     setSelectedTags((prev) => {
       const next = new Set(prev)
       next.has(t) ? next.delete(t) : next.add(t)
+      return next
+    })
+  }
+
+  function toggleBudget(b: string) {
+    setSelectedBudgets((prev) => {
+      const next = new Set(prev)
+      next.has(b) ? next.delete(b) : next.add(b)
+      return next
+    })
+  }
+
+  function toggleDays(d: string) {
+    setSelectedDays((prev) => {
+      const next = new Set(prev)
+      next.has(d) ? next.delete(d) : next.add(d)
       return next
     })
   }
@@ -274,7 +323,7 @@ export function DiscoverFeed() {
     }
   }
 
-  const hasActiveFilters = search.trim() || selectedRegions.size > 0 || selectedTags.size > 0 || sortByUpvotes
+  const hasActiveFilters = search.trim() || selectedRegions.size > 0 || selectedTags.size > 0 || selectedBudgets.size > 0 || selectedDays.size > 0 || sortByUpvotes
 
   return (
     <div>
@@ -363,6 +412,24 @@ export function DiscoverFeed() {
             onClear={() => setSelectedTags(new Set())}
           />
 
+          {/* Budget range multi-select */}
+          <MultiSelectDropdown
+            label="Budget"
+            options={BUDGET_RANGES}
+            selected={selectedBudgets}
+            onToggle={toggleBudget}
+            onClear={() => setSelectedBudgets(new Set())}
+          />
+
+          {/* Trip length multi-select */}
+          <MultiSelectDropdown
+            label="Duration"
+            options={DAYS_RANGES}
+            selected={selectedDays}
+            onToggle={toggleDays}
+            onClear={() => setSelectedDays(new Set())}
+          />
+
           {/* Clear all filters */}
           {hasActiveFilters && (
             <button
@@ -371,6 +438,8 @@ export function DiscoverFeed() {
                 setSortByUpvotes(false)
                 setSelectedRegions(new Set())
                 setSelectedTags(new Set())
+                setSelectedBudgets(new Set())
+                setSelectedDays(new Set())
               }}
               className="text-[12px] text-slate hover:text-terra transition-colors whitespace-nowrap px-1"
             >
@@ -381,7 +450,7 @@ export function DiscoverFeed() {
       </div>
 
       {/* Active filter summary */}
-      {(selectedRegions.size > 0 || selectedTags.size > 0) && (
+      {(selectedRegions.size > 0 || selectedTags.size > 0 || selectedBudgets.size > 0 || selectedDays.size > 0) && (
         <div className="flex flex-wrap gap-1.5 mb-4">
           {[...selectedRegions].map((r) => (
             <span
@@ -399,6 +468,24 @@ export function DiscoverFeed() {
             >
               {t}
               <button onClick={() => toggleTag(t)} className="hover:opacity-60 ml-0.5">✕</button>
+            </span>
+          ))}
+          {[...selectedBudgets].map((b) => (
+            <span
+              key={b}
+              className="flex items-center gap-1 bg-gold/10 text-gold rounded-full px-2.5 py-0.5 text-[11px]"
+            >
+              {b}
+              <button onClick={() => toggleBudget(b)} className="hover:opacity-60 ml-0.5">✕</button>
+            </span>
+          ))}
+          {[...selectedDays].map((d) => (
+            <span
+              key={d}
+              className="flex items-center gap-1 bg-tide/10 text-deep rounded-full px-2.5 py-0.5 text-[11px]"
+            >
+              {d}
+              <button onClick={() => toggleDays(d)} className="hover:opacity-60 ml-0.5">✕</button>
             </span>
           ))}
         </div>
