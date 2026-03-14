@@ -3,27 +3,21 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { UpcomingTab } from '@/components/profile/UpcomingTab'
-import { CompletedTab } from '@/components/profile/CompletedTab'
+import { MyTripsTab } from '@/components/profile/MyTripsTab'
 import { SettingsTab } from '@/components/profile/SettingsTab'
 import { api } from '@/lib/api'
 
-const TABS = ['Active', 'Completed', 'Settings'] as const
+const TABS = ['My Trips', 'Settings'] as const
 type Tab = typeof TABS[number]
 
 export function ProfileContent() {
   const { data: session } = useSession()
   const searchParams = useSearchParams()
-  const initialTab = (searchParams.get('tab') as Tab) ?? 'Active'
+  const initialTab = (searchParams.get('tab') as Tab) ?? 'My Trips'
   const [activeTab, setActiveTab] = useState<Tab>(
-    TABS.includes(initialTab as Tab) ? initialTab : 'Active'
+    TABS.includes(initialTab as Tab) ? initialTab : 'My Trips'
   )
-  const [completedRefreshKey, setCompletedRefreshKey] = useState(0)
   const [pendingRequestCount, setPendingRequestCount] = useState(0)
-
-  function handleTripCompleted() {
-    setCompletedRefreshKey((k) => k + 1)
-  }
 
   // Load pending follow request count for badge
   useEffect(() => {
@@ -59,14 +53,7 @@ export function ProfileContent() {
         </div>
       </div>
 
-      {activeTab === 'Active' && (
-        <UpcomingTab onTripCompleted={handleTripCompleted} />
-      )}
-
-      {activeTab === 'Completed' && (
-        <CompletedTab refreshKey={completedRefreshKey} />
-      )}
-
+      {activeTab === 'My Trips' && <MyTripsTab />}
       {activeTab === 'Settings' && <SettingsTab />}
     </>
   )

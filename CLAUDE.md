@@ -91,3 +91,28 @@ Frontend uses `@/*` → `frontend/src/*` (configured in `tsconfig.json`).
 Vercel deploys the frontend only (`vercel.json`). Always commit before deploying — git and Vercel must stay in sync.
 
 **Always run `vercel --prod` from the repo root (`/TripCraft/TripCraft`), never from `frontend/`.** The root is linked to the correct `tripcraft_vercel` project; `frontend/` is linked to a stale `frontend` project and will deploy to the wrong URL.
+
+### Pre-Deployment UI & Responsiveness Checklist
+
+Before every deployment, verify that all UI changes are fully responsive and dynamic across device sizes. This is a hard requirement — do not deploy frontend changes without completing this checklist.
+
+**Breakpoints to verify** (using Tailwind's scale):
+- Mobile: `sm` (≥640px) and below — single-column layouts, stacked navigation, touch-friendly tap targets
+- Tablet: `md` (≥768px) — transitional layouts, sidebars may collapse
+- Desktop: `lg` (≥1024px) and `xl` (≥1280px) — full layouts with sidebars and multi-column views
+
+**What to check on every changed component:**
+1. No horizontal overflow or clipped content at any breakpoint
+2. Text is readable — no truncation of important content, no font sizes below 14px on mobile
+3. Interactive elements (buttons, inputs, modals) are accessible and correctly sized on touch screens
+4. Sidebars, drawers, and navigation collapse gracefully on smaller screens
+5. Images and cards scale correctly — no broken aspect ratios or overflow
+6. Modals and overlays are fully visible and dismissible on mobile
+7. Flex/grid layouts reflow correctly — no items escaping their containers
+
+**How to test before deploying:**
+- Use Chrome DevTools (or equivalent) responsive mode to simulate `375px` (mobile), `768px` (tablet), and `1280px` (desktop)
+- Toggle the sidebar open/closed at each breakpoint if the changed page includes it
+- Scroll through the full page at each breakpoint to catch overflow issues
+
+If any breakpoint fails these checks, fix the responsive styles before deploying.
