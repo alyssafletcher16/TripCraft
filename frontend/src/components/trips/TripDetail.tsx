@@ -10,6 +10,7 @@ import { GlobalItinerarySearch } from './GlobalItinerarySearch'
 import { ActivityCompareModal, type Tour } from './ActivityCompareModal'
 import { Badge } from '@/components/ui/Badge'
 import type { Trip, TripStatus, ChecklistItem, Block } from '@/types'
+import { api } from '@/lib/api'
 
 // ── Geo helpers (world map) ────────────────────────────────────────────────────
 function geo(lon: number, lat: number): [number, number] {
@@ -570,8 +571,11 @@ function TodoTab({
 }
 
 // ── Budget tab ─────────────────────────────────────────────────────────────────
-function BudgetTab({ trip }: { trip: Trip }) {
+function BudgetTab({ trip, accessToken, onUpdate }: { trip: Trip; accessToken?: string; onUpdate?: () => void }) {
   const [perPerson, setPerPerson] = useState(false)
+  const [editingBudget, setEditingBudget] = useState(false)
+  const [budgetInput, setBudgetInput] = useState('')
+  const [savingBudget, setSavingBudget] = useState(false)
   const div = perPerson ? (trip.travelers || 1) : 1
   const pp = perPerson ? ' / person' : ''
 
@@ -603,6 +607,25 @@ function BudgetTab({ trip }: { trip: Trip }) {
 
   const totalSpent = rows.reduce((s, r) => s + r.spent, 0)
 
+  function startEditBudget() {
+    setBudgetInput(trip.budget ? String(trip.budget) : '')
+    setEditingBudget(true)
+  }
+
+  async function saveBudget() {
+    const val = parseFloat(budgetInput)
+    if (isNaN(val) || val < 0) { setEditingBudget(false); return }
+    if (!accessToken) return
+    setSavingBudget(true)
+    try {
+      await api.trips.update(trip.id, { budget: val }, accessToken)
+      onUpdate?.()
+    } finally {
+      setSavingBudget(false)
+      setEditingBudget(false)
+    }
+  }
+
   return (
     <div className="max-w-xl flex flex-col gap-5">
       {/* Summary */}
@@ -611,26 +634,63 @@ function BudgetTab({ trip }: { trip: Trip }) {
           <div className="text-[11px] text-slate mb-1.5">Current Trip Cost{pp}</div>
           <div className="font-mono text-2xl font-medium text-ink">${totalSpent.toLocaleString()}</div>
         </div>
-        <div className="bg-white rounded-2xl border border-mist p-5">
-          <div className="text-[11px] text-slate mb-1.5">
-            {trip.budget ? `Budget${pp}` : 'No budget set'}
+        <div
+          className="bg-white rounded-2xl border border-mist p-5 cursor-pointer group relative"
+          onClick={() => !editingBudget && startEditBudget()}
+          title="Click to edit budget"
+        >
+          <div className="text-[11px] text-slate mb-1.5 flex items-center justify-between">
+            <span>{trip.budget ? `Budget${pp}` : 'No budget set'}</span>
+            {!editingBudget && (
+              <svg className="w-3 h-3 text-slate opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            )}
           </div>
-          <div className="font-mono text-2xl font-medium text-ocean">
-            {trip.budget ? `$${Math.round(budgetBase).toLocaleString()}` : '—'}
-          </div>
+          {editingBudget ? (
+            <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+              <span className="font-mono text-xl text-ocean">$</span>
+              <input
+                autoFocus
+                type="number"
+                min="0"
+                value={budgetInput}
+                onChange={(e) => setBudgetInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') saveBudget(); if (e.key === 'Escape') setEditingBudget(false) }}
+                onBlur={saveBudget}
+                className="font-mono text-xl font-medium text-ocean w-full bg-transparent border-b border-ocean outline-none"
+                disabled={savingBudget}
+              />
+            </div>
+          ) : (
+            <div className="font-mono text-2xl font-medium text-ocean">
+              {trip.budget ? `$${Math.round(budgetBase).toLocaleString()}` : '—'}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Per-person toggle */}
+      {/* View toggle for multi-traveler trips */}
       {trip.travelers > 1 && (
-        <div className="flex justify-end">
-          <button
-            onClick={() => setPerPerson((p) => !p)}
-            className="font-mono text-[11px] px-4 py-1.5 rounded-full border border-mist transition-colors"
-            style={{ background: perPerson ? '#0D2B45' : 'transparent', color: perPerson ? '#fff' : '#5B7A8E' }}
-          >
-            {perPerson ? `Per person (${trip.travelers} travelers)` : 'Total'} ↕
-          </button>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-slate font-mono">View:</span>
+          <div className="flex rounded-full border border-mist overflow-hidden text-[11px] font-mono">
+            <button
+              onClick={() => setPerPerson(false)}
+              className="px-4 py-1.5 transition-colors"
+              style={{ background: !perPerson ? '#0D2B45' : 'transparent', color: !perPerson ? '#fff' : '#5B7A8E' }}
+            >
+              See all
+            </button>
+            <button
+              onClick={() => setPerPerson(true)}
+              className="px-4 py-1.5 transition-colors border-l border-mist"
+              style={{ background: perPerson ? '#0D2B45' : 'transparent', color: perPerson ? '#fff' : '#5B7A8E' }}
+            >
+              Per traveler
+            </button>
+          </div>
         </div>
       )}
 
@@ -1574,7 +1634,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
             )}
 
             {/* Budget tab */}
-            {activeTab === 'budget' && <BudgetTab trip={trip} />}
+            {activeTab === 'budget' && <BudgetTab trip={trip} accessToken={session?.accessToken} onUpdate={fetchTrip} />}
 
             {/* Research tab */}
             {activeTab === 'research' && (

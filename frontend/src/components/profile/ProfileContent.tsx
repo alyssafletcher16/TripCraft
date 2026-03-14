@@ -31,7 +31,7 @@ export function ProfileContent() {
   return (
     <>
       {/* Tab bar */}
-      <div className="border-b border-mist px-4 sm:px-8 md:px-12">
+      <div className="sticky top-0 z-10 bg-surface border-b border-mist px-4 sm:px-8 md:px-12">
         <div className="flex gap-1">
           {TABS.map((tab) => (
             <button
