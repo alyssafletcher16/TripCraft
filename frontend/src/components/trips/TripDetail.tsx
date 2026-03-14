@@ -608,7 +608,7 @@ function BudgetTab({ trip }: { trip: Trip }) {
       {/* Summary */}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-white rounded-2xl border border-mist p-5">
-          <div className="text-[11px] text-slate mb-1.5">Total spent{pp}</div>
+          <div className="text-[11px] text-slate mb-1.5">Current Trip Cost{pp}</div>
           <div className="font-mono text-2xl font-medium text-ink">${totalSpent.toLocaleString()}</div>
         </div>
         <div className="bg-white rounded-2xl border border-mist p-5">

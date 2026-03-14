@@ -151,7 +151,7 @@ export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hid
           <button
             type="button"
             onClick={toggleDesktop}
-            className="absolute right-0 top-8 translate-x-1/2 z-10 w-6 h-6 flex items-center justify-center bg-terra-lt border border-white/30 rounded-full text-white hover:bg-white hover:text-terra transition-all duration-150 text-[13px] shadow-md"
+            className="absolute right-0 top-8 translate-x-1/2 z-20 w-6 h-6 flex items-center justify-center bg-terra-lt border border-white/30 rounded-full text-white hover:bg-white hover:text-terra transition-all duration-150 text-[13px] shadow-md"
             aria-label="Toggle sidebar"
           >
             {desktopCollapsed ? '›' : '‹'}
