@@ -66,6 +66,16 @@ export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hid
         Discover
       </Link>
 
+      {/* ── Wanderlist ──────────────────────────────────────────── */}
+      <Link
+        href="/wanderlist"
+        onClick={close}
+        className={`${SB_ITEM} ${pathname.startsWith('/wanderlist') ? SB_ACTIVE : ''}`}
+      >
+        <span className={SB_ICON}>🔖</span>
+        Wanderlist
+      </Link>
+
       {/* ── My Profile ──────────────────────────────────────────── */}
       <Link
         href="/profile"
