@@ -789,7 +789,6 @@ function ResearchTab({
     { id: 'stays',  label: 'Where to Stay' },
     { id: 'tips',   label: 'Tips & Tricks' },
     { id: 'blogs',  label: 'Blog Posts' },
-    { id: 'saved',  label: `Saved Tours (${researchItems.length})` },
   ] as const
 
   return (
@@ -889,66 +888,6 @@ function ResearchTab({
             )
           })()}
         </>
-      )}
-
-      {/* Saved tour comparisons */}
-      {filter === 'saved' && researchItems.length > 0 && (
-        <div className="bg-white rounded-2xl border border-mist overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-mist flex items-center gap-2">
-            <span className="font-mono text-[10px] text-slate uppercase tracking-wider">Saved Tour Comparisons</span>
-            <span className="bg-ocean/10 text-ocean text-[10px] font-bold px-2 py-0.5 rounded-full">
-              {researchItems.length}
-            </span>
-          </div>
-          <div className="divide-y divide-mist">
-            {researchItems.map((item) => (
-              <div key={item.id} className="px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-ink text-sm truncate">{item.activityName}</div>
-                  <div className="text-[11px] text-slate mt-0.5">
-                    {item.tour.provider} · {item.tour.bookingCompany} · {item.tour.duration}
-                  </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-[12px] font-semibold text-[#2E7D4F]">
-                      {item.tour.currency} {item.tour.price}/person
-                    </span>
-                    {item.tour.cancel.startsWith('Free') && (
-                      <span className="text-[10px] text-[#2E7D4F] border border-[#2E7D4F]/30 rounded-full px-2 py-px">
-                        Free cancel
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  {item.tour.bookingUrl && (
-                    <a
-                      href={item.tour.bookingUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-1.5 rounded-full border border-terra text-terra text-xs font-medium hover:bg-terra/5 transition-colors whitespace-nowrap"
-                    >
-                      Book ↗
-                    </a>
-                  )}
-                  <button
-                    onClick={() => onAddToDay(item)}
-                    className="px-3 py-1.5 rounded-full bg-terra text-white text-xs font-medium hover:bg-terra-lt transition-colors whitespace-nowrap"
-                  >
-                    Add to Day
-                  </button>
-                  <button
-                    onClick={() => onRemoveResearch(item.id)}
-                    className="p-1.5 text-slate hover:text-red-500 transition-colors"
-                  >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       )}
 
     </div>
@@ -1658,7 +1597,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
           </div>
 
           {/* ── Tab content ─────────────────────────────────────── */}
-          <div className="p-3 sm:p-6 overflow-y-auto" style={{ minHeight: 480, maxHeight: '70vh' }}>
+          <div className="p-3 sm:p-6" style={{ minHeight: 480 }}>
 
             {/* Itinerary tab */}
             {activeTab === 'itinerary' && (
