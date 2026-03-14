@@ -60,9 +60,9 @@ export function Block({ block, tripId, destination, onEdit, onDelete }: BlockPro
   const meta = TYPE_ICONS[block.type] ?? TYPE_ICONS.NOTE
 
   return (
-    <div className={`group relative flex items-start gap-3 px-3.5 py-3 rounded-xl border-[1.5px] border-mist bg-surface hover:border-terra/30 hover:bg-[#FBF8F6] transition-all duration-150${(onEdit || onDelete) ? ' pr-[76px] sm:pr-3.5' : ''}`}>
+    <div className={`group relative flex items-start gap-3 px-3.5 py-3 rounded-xl border-[1.5px] border-mist bg-surface hover:border-terra/30 hover:bg-[#FBF8F6] transition-all duration-150${(onEdit || onDelete) ? ' pr-[76px]' : ''}`}>
       {(onEdit || onDelete) && (
-        <div className="absolute top-2 right-2 flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10">
+        <div className="absolute top-2 right-2 flex gap-1 opacity-100 transition-opacity z-10">
           {onEdit && (
             <button
               onClick={(e) => { e.stopPropagation(); onEdit() }}

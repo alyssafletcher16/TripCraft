@@ -32,7 +32,7 @@ export function ProfileContent() {
     <>
       {/* Tab bar */}
       <div className="sticky top-0 z-10 bg-surface border-b border-mist px-4 sm:px-8 md:px-12">
-        <div className="flex gap-1">
+        <div className="flex gap-1 overflow-x-auto scrollbar-none">
           {TABS.map((tab) => (
             <button
               key={tab}
