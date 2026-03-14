@@ -1153,13 +1153,164 @@ function ResearchDayPicker({
   )
 }
 
+// ── Saved Links tab ────────────────────────────────────────────────────────────
+function SavedLinksTab({ tripId }: { tripId: string }) {
+  const [savedLinks, setSavedLinks] = useState<SavedLink[]>([])
+  const [linkInput, setLinkInput] = useState('')
+  const [linkTitle, setLinkTitle] = useState('')
+  const [addingLink, setAddingLink] = useState(false)
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(`tripcraft_links_${tripId}`)
+      if (stored) setSavedLinks(JSON.parse(stored))
+    } catch {}
+  }, [tripId])
+
+  function saveLink() {
+    if (!linkInput.trim()) return
+    const link: SavedLink = {
+      id: Date.now().toString(),
+      url: linkInput.trim(),
+      title: linkTitle.trim() || linkInput.trim(),
+      platform: detectPlatform(linkInput.trim()),
+      savedAt: new Date().toISOString(),
+    }
+    const updated = [link, ...savedLinks]
+    setSavedLinks(updated)
+    localStorage.setItem(`tripcraft_links_${tripId}`, JSON.stringify(updated))
+    setLinkInput('')
+    setLinkTitle('')
+    setAddingLink(false)
+  }
+
+  function removeLink(id: string) {
+    const updated = savedLinks.filter((l) => l.id !== id)
+    setSavedLinks(updated)
+    localStorage.setItem(`tripcraft_links_${tripId}`, JSON.stringify(updated))
+  }
+
+  const PLATFORM_COLORS: Record<string, string> = {
+    TikTok: '#010101', Instagram: '#E1306C', YouTube: '#FF0000',
+    Reddit: '#FF4500', X: '#000000', Link: '#5B7A8E',
+  }
+
+  return (
+    <div className="max-w-2xl flex flex-col gap-5">
+      <div>
+        <h2 className="font-serif text-2xl font-bold text-ink mb-1">Saved Links</h2>
+        <p className="text-sm text-slate">TikToks, Instagram reels, YouTube guides, and web articles for this trip.</p>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-mist overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-mist flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[10px] text-slate uppercase tracking-wider">Saved Social & Web Links</span>
+            {savedLinks.length > 0 && (
+              <span className="bg-ocean/10 text-ocean text-[10px] font-bold px-2 py-0.5 rounded-full">
+                {savedLinks.length}
+              </span>
+            )}
+          </div>
+          <button
+            onClick={() => setAddingLink((p) => !p)}
+            className="text-xs text-terra font-medium hover:underline"
+          >
+            + Add link
+          </button>
+        </div>
+
+        {addingLink && (
+          <div className="px-5 py-4 border-b border-mist flex flex-col gap-2 bg-foam">
+            <input
+              autoFocus
+              value={linkInput}
+              onChange={(e) => setLinkInput(e.target.value)}
+              placeholder="Paste a TikTok, Instagram, YouTube, or web link…"
+              className="w-full text-sm px-3 py-2 rounded-xl border border-mist bg-white outline-none focus:border-terra transition-colors"
+            />
+            <input
+              value={linkTitle}
+              onChange={(e) => setLinkTitle(e.target.value)}
+              placeholder="Title / description (optional)"
+              className="w-full text-sm px-3 py-2 rounded-xl border border-mist bg-white outline-none focus:border-terra transition-colors"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={saveLink}
+                disabled={!linkInput.trim()}
+                className="px-4 py-1.5 rounded-full bg-terra text-white text-xs font-semibold disabled:opacity-40"
+              >
+                Save link
+              </button>
+              <button
+                onClick={() => { setAddingLink(false); setLinkInput(''); setLinkTitle('') }}
+                className="px-4 py-1.5 rounded-full border border-mist text-xs text-slate"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {savedLinks.length === 0 && !addingLink ? (
+          <div className="px-5 py-8 text-center">
+            <p className="text-2xl mb-2">🔗</p>
+            <p className="text-sm text-slate mb-1">No links saved yet</p>
+            <p className="text-xs text-slate">
+              Save TikToks, Instagram reels, YouTube guides, and web articles here.
+            </p>
+          </div>
+        ) : (
+          <div className="divide-y divide-mist">
+            {savedLinks.map((link) => {
+              const color = PLATFORM_COLORS[link.platform] ?? '#5B7A8E'
+              return (
+                <div key={link.id} className="flex items-center gap-3 px-5 py-3.5 group">
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                    style={{ background: color }}
+                  >
+                    {link.platform.slice(0, 2).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-ink truncate">{link.title}</div>
+                    <div className="text-[11px] text-slate truncate">{link.platform} · {new Date(link.savedAt).toLocaleDateString()}</div>
+                  </div>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-slate hover:text-terra transition-colors flex-shrink-0"
+                  >
+                    Open ↗
+                  </a>
+                  <button
+                    onClick={() => removeLink(link.id)}
+                    className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 p-2 sm:p-1 text-slate hover:text-red-500 transition-all"
+                  >
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                    </svg>
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ── Tab config ─────────────────────────────────────────────────────────────────
 const TABS = [
-  { id: 'itinerary', label: 'Itinerary' },
-  { id: 'map',       label: 'Map'       },
-  { id: 'todo',      label: 'To Do'     },
-  { id: 'budget',    label: 'Budget'    },
-  { id: 'research',  label: 'Research'  },
+  { id: 'itinerary', label: 'Itinerary'   },
+  { id: 'map',       label: 'Map'         },
+  { id: 'todo',      label: 'To Do'       },
+  { id: 'budget',    label: 'Budget'      },
+  { id: 'research',  label: 'Research'    },
+  { id: 'links',     label: 'Saved Links' },
 ] as const
 type TabId = typeof TABS[number]['id']
 
@@ -1197,6 +1348,12 @@ const TAB_ICONS: Record<TabId, ReactNode> = {
     <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="11" cy="11" r="8"/>
       <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+  ),
+  links: (
+    <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
     </svg>
   ),
 }
