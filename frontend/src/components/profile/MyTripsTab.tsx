@@ -212,13 +212,12 @@ export function MyTripsTab() {
                         </p>
                       )}
                     </div>
-                    {/* Status tag — click to mark complete */}
+                    {/* Action button — mark trip as complete */}
                     <button
                       onClick={() => { setShareAnonymous(false); setPendingCompleteId(trip.id) }}
-                      title="Click to mark as complete"
-                      className="text-[11px] font-semibold px-3 py-1 rounded-full border cursor-pointer focus:outline-none transition-colors flex-shrink-0 bg-gold/10 text-amber-700 border-gold/40 hover:bg-gold/20"
+                      className="text-[11px] font-semibold px-3 py-1.5 rounded-lg cursor-pointer focus:outline-none transition-colors flex-shrink-0 bg-ocean text-white hover:bg-ocean/90"
                     >
-                      Active
+                      Mark complete
                     </button>
                   </div>
 

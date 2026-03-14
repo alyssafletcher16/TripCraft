@@ -754,7 +754,7 @@ function ResearchTab({
   onAddToDay: (item: ResearchItem) => void
   onRemoveResearch: (id: string) => void
 }) {
-  const [filter, setFilter] = useState<'all' | 'insights' | 'saved' | 'links'>('all')
+  const [filter, setFilter] = useState<'tours' | 'stays' | 'tips' | 'blogs' | 'saved' | 'links'>('tours')
   const [savedLinks, setSavedLinks] = useState<SavedLink[]>([])
   const [linkInput, setLinkInput] = useState('')
   const [linkTitle, setLinkTitle] = useState('')
@@ -826,10 +826,12 @@ function ResearchTab({
   }
 
   const FILTERS = [
-    { id: 'all',      label: 'All' },
-    { id: 'insights', label: 'Reviews & Insights' },
-    { id: 'saved',    label: `Saved Tours (${researchItems.length})` },
-    { id: 'links',    label: `Social Links (${savedLinks.length})` },
+    { id: 'tours',  label: 'Top Tours' },
+    { id: 'stays',  label: 'Where to Stay' },
+    { id: 'tips',   label: 'Tips & Tricks' },
+    { id: 'blogs',  label: 'Blog Posts' },
+    { id: 'saved',  label: `Saved Tours (${researchItems.length})` },
+    { id: 'links',  label: `Social Links (${savedLinks.length})` },
   ] as const
 
   return (
@@ -861,8 +863,8 @@ function ResearchTab({
         ))}
       </div>
 
-      {/* Reviews & Insights — sourced from the web */}
-      {(filter === 'all' || filter === 'insights') && (
+      {/* Web research — one category at a time */}
+      {(filter === 'tours' || filter === 'stays' || filter === 'tips' || filter === 'blogs') && (
         <>
           {researchLoading && (
             <div className="bg-white rounded-2xl border border-mist px-5 py-10 text-center">
@@ -875,64 +877,64 @@ function ResearchTab({
               <p className="text-slate text-sm">Could not load suggestions. Try again later.</p>
             </div>
           )}
-          {researchData && (
-            <>
-              {(
-                [
-                  { key: 'tours', label: 'Top Tours & Experiences', dot: '#2E7D4F' },
-                  { key: 'stays', label: 'Where to Stay', dot: '#0D2B45' },
-                  { key: 'tips',  label: 'Tips & Tricks',  dot: '#D4A843' },
-                  { key: 'blogs', label: 'Travel Blog Posts', dot: '#5B7A8E' },
-                ] as const
-              ).map(({ key, label, dot }) => {
-                const items = researchData[key]
-                if (items.length === 0) return null
-                return (
-                  <div key={key} className="bg-white rounded-2xl border border-mist overflow-hidden">
-                    <div className="px-5 py-3.5 border-b border-mist flex items-center gap-2">
-                      <span className="font-mono text-[10px] text-slate uppercase tracking-wider">{label}</span>
-                      <span className="bg-ocean/10 text-ocean text-[10px] font-bold px-2 py-0.5 rounded-full">{items.length}</span>
-                    </div>
-                    <div className="divide-y divide-mist">
-                      {items.map((item, i) => (
-                        <a
-                          key={i}
-                          href={item.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex gap-3 px-5 py-4 hover:bg-foam/50 transition-colors group"
-                        >
-                          <div className="w-2 h-2 rounded-full mt-[5px] flex-shrink-0 transition-opacity group-hover:opacity-100 opacity-60" style={{ background: dot }} />
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[13px] text-ocean font-medium leading-snug group-hover:underline">{item.title}</p>
-                            {item.description && (
-                              <p className="text-[12px] text-ink/70 leading-relaxed mt-0.5">{item.description}</p>
-                            )}
-                            <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-                              {item.rating && (
-                                <span className="font-mono text-[10px] text-[#2E7D4F]">★ {item.rating}</span>
-                              )}
-                              {item.price && (
-                                <span className="font-mono text-[10px] text-slate">{item.price}</span>
-                              )}
-                              <span className="font-mono text-[10px] text-slate flex items-center gap-1">
-                                {item.source} <span className="opacity-50">↗</span>
-                              </span>
-                            </div>
-                          </div>
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })}
-            </>
-          )}
+          {researchData && (() => {
+            const categoryMap: Record<string, { label: string; dot: string }> = {
+              tours: { label: 'Top Tours & Experiences', dot: '#2E7D4F' },
+              stays: { label: 'Where to Stay',           dot: '#0D2B45' },
+              tips:  { label: 'Tips & Tricks',           dot: '#D4A843' },
+              blogs: { label: 'Travel Blog Posts',       dot: '#5B7A8E' },
+            }
+            const { label, dot } = categoryMap[filter]
+            const items = researchData[filter as keyof typeof researchData]
+            if (items.length === 0) return (
+              <div className="bg-white rounded-2xl border border-mist px-5 py-8 text-center">
+                <p className="text-slate text-sm">No results found for this category.</p>
+              </div>
+            )
+            return (
+              <div className="bg-white rounded-2xl border border-mist overflow-hidden">
+                <div className="px-5 py-3.5 border-b border-mist flex items-center gap-2">
+                  <span className="font-mono text-[10px] text-slate uppercase tracking-wider">{label}</span>
+                  <span className="bg-ocean/10 text-ocean text-[10px] font-bold px-2 py-0.5 rounded-full">{items.length}</span>
+                </div>
+                <div className="divide-y divide-mist">
+                  {items.map((item, i) => (
+                    <a
+                      key={i}
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex gap-3 px-5 py-4 hover:bg-foam/50 transition-colors group"
+                    >
+                      <div className="w-2 h-2 rounded-full mt-[5px] flex-shrink-0 transition-opacity group-hover:opacity-100 opacity-60" style={{ background: dot }} />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[13px] text-ocean font-medium leading-snug group-hover:underline">{item.title}</p>
+                        {item.description && (
+                          <p className="text-[12px] text-ink/70 leading-relaxed mt-0.5">{item.description}</p>
+                        )}
+                        <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                          {item.rating && (
+                            <span className="font-mono text-[10px] text-[#2E7D4F]">★ {item.rating}</span>
+                          )}
+                          {item.price && (
+                            <span className="font-mono text-[10px] text-slate">{item.price}</span>
+                          )}
+                          <span className="font-mono text-[10px] text-slate flex items-center gap-1">
+                            {item.source} <span className="opacity-50">↗</span>
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )
+          })()}
         </>
       )}
 
       {/* Saved tour comparisons */}
-      {(filter === 'all' || filter === 'saved') && researchItems.length > 0 && (
+      {filter === 'saved' && researchItems.length > 0 && (
         <div className="bg-white rounded-2xl border border-mist overflow-hidden">
           <div className="px-5 py-3.5 border-b border-mist flex items-center gap-2">
             <span className="font-mono text-[10px] text-slate uppercase tracking-wider">Saved Tour Comparisons</span>
@@ -992,7 +994,7 @@ function ResearchTab({
       )}
 
       {/* Saved social / web links */}
-      {(filter === 'all' || filter === 'links') && (
+      {filter === 'links' && (
         <div className="bg-white rounded-2xl border border-mist overflow-hidden">
           <div className="px-5 py-3.5 border-b border-mist flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -1479,7 +1481,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
                 {trip.status !== 'COMPLETED' && !pendingComplete && (
                   <button
                     onClick={() => handleStatusChange('COMPLETED')}
-                    className="text-[11px] font-semibold px-3 py-1.5 rounded-full border border-gold/40 bg-gold/10 text-gold hover:bg-gold/20 transition-colors cursor-pointer"
+                    className="text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-ocean text-white hover:bg-ocean/90 transition-colors cursor-pointer"
                   >
                     Mark complete
                   </button>
