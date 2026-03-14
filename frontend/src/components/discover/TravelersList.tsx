@@ -93,12 +93,11 @@ export function TravelersList() {
     if (!session?.accessToken) return
     setActionLoading(userId)
     try {
-      await api.social.follow(userId, session.accessToken)
+      const res = await api.social.follow(userId, session.accessToken) as { follow: { status: 'PENDING' | 'ACCEPTED' } }
+      const newStatus = res.follow.status
       setResults((prev) =>
         prev.map((u) =>
-          u.id === userId
-            ? { ...u, followStatus: u.isPrivate ? 'PENDING' : 'ACCEPTED' }
-            : u
+          u.id === userId ? { ...u, followStatus: newStatus } : u
         )
       )
     } catch {

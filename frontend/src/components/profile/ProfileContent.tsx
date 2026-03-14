@@ -5,9 +5,10 @@ import { useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { MyTripsTab } from '@/components/profile/MyTripsTab'
 import { SettingsTab } from '@/components/profile/SettingsTab'
+import { TravelersTab } from '@/components/profile/TravelersTab'
 import { api } from '@/lib/api'
 
-const TABS = ['My Trips', 'Settings'] as const
+const TABS = ['My Trips', 'Travelers', 'Settings'] as const
 type Tab = typeof TABS[number]
 
 export function ProfileContent() {
@@ -54,6 +55,7 @@ export function ProfileContent() {
       </div>
 
       {activeTab === 'My Trips' && <MyTripsTab />}
+      {activeTab === 'Travelers' && <TravelersTab />}
       {activeTab === 'Settings' && <SettingsTab />}
     </>
   )

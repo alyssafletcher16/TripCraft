@@ -55,14 +55,15 @@ export function TravelerProfileView({ userId }: { userId: string }) {
     if (!session?.accessToken || !data) return
     setActionLoading(true)
     try {
-      await api.social.follow(userId, session.accessToken)
+      const res = await api.social.follow(userId, session.accessToken) as { follow: { status: 'PENDING' | 'ACCEPTED' } }
+      const newStatus = res.follow.status
       setData((prev) =>
         prev
           ? {
               ...prev,
-              followStatus: prev.user.isPrivate ? 'PENDING' : 'ACCEPTED',
-              canSeeTrips: !prev.user.isPrivate,
-              followerCount: prev.user.isPrivate ? prev.followerCount : prev.followerCount + 1,
+              followStatus: newStatus,
+              canSeeTrips: newStatus === 'ACCEPTED',
+              followerCount: newStatus === 'ACCEPTED' ? prev.followerCount + 1 : prev.followerCount,
             }
           : prev
       )
