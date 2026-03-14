@@ -161,8 +161,13 @@ export function CompletedTab({ refreshKey }: CompletedTabProps) {
       <h2 className="font-serif text-2xl md:text-3xl font-bold text-ink mb-2">Past Trips</h2>
       <button
         onClick={() => setShowImport(true)}
-        className="flex-shrink-0 px-4 py-1.5 rounded-xl bg-terra text-white text-sm font-semibold hover:bg-terra/90 transition-colors mb-4"
+        className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-terra text-white text-sm font-semibold hover:bg-terra/90 transition-colors mb-4"
       >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
         Import itinerary
       </button>
       {trips.length > 0 && (
