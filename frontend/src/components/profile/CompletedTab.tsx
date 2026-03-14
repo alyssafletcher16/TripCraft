@@ -222,13 +222,18 @@ export function CompletedTab({ refreshKey }: CompletedTabProps) {
                     <p className="text-slate/50 text-[10px] font-mono uppercase mt-0.5">{range}</p>
                   )}
                   {trip.reflection ? (
-                    <span className="text-[10px] text-success/70 font-medium">Reflected</span>
+                    <Link
+                      href={`/trips/${trip.id}`}
+                      className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-success/10 text-success/80 border border-success/20 hover:bg-success/20 transition-colors mt-0.5"
+                    >
+                      View Reflection
+                    </Link>
                   ) : (
                     <Link
                       href={`/trips/${trip.id}`}
-                      className="text-[10px] text-slate/40 hover:text-slate underline"
+                      className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-mist text-slate border border-mist hover:bg-ocean/10 hover:text-ocean hover:border-ocean/20 transition-colors mt-0.5"
                     >
-                      Add reflection
+                      Add Reflection
                     </Link>
                   )}
                 </div>

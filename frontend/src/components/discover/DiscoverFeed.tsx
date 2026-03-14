@@ -6,6 +6,7 @@ import { CommunityCard } from './CommunityCard'
 import type { DiscoverTrip } from './CommunityCard'
 import { DiscoverMap } from './DiscoverMap'
 import type { MapCluster } from './DiscoverMap'
+import { api } from '@/lib/api'
 
 // ── Filter chips ──────────────────────────────────────────────────────────────
 const FILTERS = ['Trending', 'Hiking', 'Foodie', 'Budget', 'Couples', 'Solo', 'Adventure']
@@ -31,6 +32,7 @@ export function DiscoverFeed() {
   const [loading, setLoading] = useState(true)
   const [upvoted, setUpvoted] = useState<Set<string>>(new Set())
   const [destinationCounts, setDestinationCounts] = useState<Record<string, number>>({})
+  const [followingIds, setFollowingIds] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     fetch(`${API}/api/discover/stats`)
@@ -38,6 +40,18 @@ export function DiscoverFeed() {
       .then((data) => { if (data.counts) setDestinationCounts(data.counts) })
       .catch(() => {})
   }, [])
+
+  useEffect(() => {
+    if (!session?.accessToken) return
+    api.social.following(session.accessToken)
+      .then((data) => {
+        const d = data as { following?: { followingId: string }[] }
+        if (d.following) {
+          setFollowingIds(new Set(d.following.map((f) => f.followingId)))
+        }
+      })
+      .catch(() => {})
+  }, [session?.accessToken])
 
   const fetchFeed = useCallback(async () => {
     setLoading(true)
@@ -154,6 +168,7 @@ export function DiscoverFeed() {
               index={i}
               upvoted={upvoted.has(card.id)}
               onUpvote={handleUpvote}
+              initialFollowing={card.user.id ? followingIds.has(card.user.id) : false}
             />
           ))}
         </div>

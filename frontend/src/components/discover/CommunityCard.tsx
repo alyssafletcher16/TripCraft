@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useCityPhoto } from '@/hooks/useCityPhoto'
+import { api } from '@/lib/api'
 
 const AVATAR_COLORS = ['#4A6FA5', '#3A7D5A', '#8A4F3A', '#6A4F8A', '#4A7A6A', '#3A5A8A']
 
@@ -40,17 +42,47 @@ interface Props {
   index: number
   upvoted: boolean
   onUpvote: (id: string) => void
+  initialFollowing?: boolean
 }
 
-export function CommunityCard({ card, index, upvoted, onUpvote }: Props) {
+export function CommunityCard({ card, index, upvoted, onUpvote, initialFollowing = false }: Props) {
   const router = useRouter()
   const { data: session } = useSession()
   const photoUrl = useCityPhoto(card.destination)
+  const [following, setFollowing] = useState(initialFollowing)
+  const [followLoading, setFollowLoading] = useState(false)
 
-  function handleView() {
+  function handleCardClick() {
     const isOwner = session?.user?.id && session.user.id === card.user.id
     router.push(isOwner ? `/trips/${card.id}` : `/discover/${card.id}`)
   }
+
+  function handleAuthorClick(e: React.MouseEvent) {
+    e.stopPropagation()
+    if (card.user.id) {
+      router.push(`/discover/traveler/${card.user.id}`)
+    }
+  }
+
+  async function handleFollow(e: React.MouseEvent) {
+    e.stopPropagation()
+    if (!session?.accessToken || !card.user.id) return
+    setFollowLoading(true)
+    try {
+      if (following) {
+        await api.social.unfollow(card.user.id, session.accessToken)
+        setFollowing(false)
+      } else {
+        await api.social.follow(card.user.id, session.accessToken)
+        setFollowing(true)
+      }
+    } catch {
+      // no-op
+    } finally {
+      setFollowLoading(false)
+    }
+  }
+
   const firstVibe = card.vibes[0]?.vibe ?? ''
   const highlight = VIBE_BG[firstVibe] ?? '#EEF4F8'
   const authorInitial = (card.user.name ?? 'A')[0].toUpperCase()
@@ -68,9 +100,14 @@ export function CommunityCard({ card, index, upvoted, onUpvote }: Props) {
 
   const [primaryVibe, ...restVibes] = card.vibes.map((v) => v.vibe)
 
-  return (
-    <div className="bg-white rounded-[18px] border-[1.5px] border-mist overflow-hidden cursor-pointer transition-all duration-[0.22s] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(13,43,69,0.12)] hover:border-terra/60">
+  const isOwnCard = session?.user?.id && session.user.id === card.user.id
+  const showFollowBtn = !!card.user.id && !!session?.accessToken && !isOwnCard
 
+  return (
+    <div
+      onClick={handleCardClick}
+      className="bg-white rounded-[18px] border-[1.5px] border-mist overflow-hidden cursor-pointer transition-all duration-[0.22s] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(13,43,69,0.12)] hover:border-terra/60"
+    >
       {/* ── Image area ── */}
       <div
         className="h-[140px] relative overflow-hidden flex items-center justify-center text-[52px]"
@@ -107,13 +144,36 @@ export function CommunityCard({ card, index, upvoted, onUpvote }: Props) {
       {/* ── Body ── */}
       <div className="px-4 py-3.5">
         <div className="flex items-center gap-2 mb-2">
-          <div
-            className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-[11px] font-semibold text-white flex-shrink-0"
-            style={{ background: avatarColor }}
+          {/* Author — clickable to profile */}
+          <button
+            onClick={handleAuthorClick}
+            className="flex items-center gap-2 hover:opacity-75 transition-opacity min-w-0"
+            disabled={!card.user.id}
           >
-            {authorInitial}
-          </div>
-          <span className="text-[12px] text-slate">by {card.user.name ?? 'Anonymous'}</span>
+            <div
+              className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-[11px] font-semibold text-white flex-shrink-0"
+              style={{ background: avatarColor }}
+            >
+              {authorInitial}
+            </div>
+            <span className="text-[12px] text-slate truncate">by {card.user.name ?? 'Anonymous'}</span>
+          </button>
+
+          {/* Follow button */}
+          {showFollowBtn && (
+            <button
+              onClick={handleFollow}
+              disabled={followLoading}
+              className="ml-auto flex-shrink-0 text-[10px] font-semibold px-2.5 py-0.5 rounded-full border transition-all"
+              style={{
+                borderColor: following ? '#D6E4EE' : '#0D2B45',
+                background: following ? '#fff' : '#0D2B45',
+                color: following ? '#5B7A8E' : '#fff',
+              }}
+            >
+              {following ? 'Following' : 'Follow'}
+            </button>
+          )}
         </div>
         <div className="text-[11px] text-slate mb-2">{meta}</div>
         <div className="flex gap-1.5 flex-wrap">
@@ -128,16 +188,6 @@ export function CommunityCard({ card, index, upvoted, onUpvote }: Props) {
             </span>
           ))}
         </div>
-      </div>
-
-      {/* ── Footer ── */}
-      <div className="px-4 py-2.5 border-t border-mist">
-        <button
-          onClick={handleView}
-          className="w-full py-3 rounded-[10px] border-none bg-ocean text-white text-[12px]"
-        >
-          View →
-        </button>
       </div>
     </div>
   )

@@ -1379,7 +1379,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
         </div>
 
         {/* ── Reflection banners ────────────────────────────────── */}
-        {trip.status === 'COMPLETED' && !trip.reflection && (
+        {trip.status === 'COMPLETED' && !trip.reflection && trip.userId === session?.user?.id && (
           <div
             className="rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 border border-gold/20"
             style={{ background: 'linear-gradient(135deg, #0D2B45, #143352)' }}
@@ -1399,21 +1399,81 @@ export function TripDetail({ tripId }: { tripId: string }) {
         )}
         {trip.reflection && (
           <div className="bg-white rounded-2xl border border-mist p-5">
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">✦</span>
                 <span className="font-mono text-[10px] text-slate uppercase tracking-wider">Trip Reflection</span>
               </div>
-              <button onClick={() => setReflecting(true)} className="text-[11px] text-slate hover:text-terra transition-colors">Edit</button>
-            </div>
-            <div className="text-[13px] text-slate leading-relaxed space-y-1">
-              {trip.reflection.tripTitle && <div className="font-serif text-base font-bold text-ink mb-1">{trip.reflection.tripTitle}</div>}
-              {trip.reflection.rank != null && (
-                <div>🏆 <span className="text-terra font-semibold">
-                  {trip.reflection.rank < 25 ? "Worst trip I've taken" : trip.reflection.rank < 50 ? "Solid but not top-tier" : trip.reflection.rank < 75 ? "One of my favorites" : "Top 3 of my life"}
-                </span></div>
+              {trip.userId === session?.user?.id && (
+                <button
+                  onClick={() => setReflecting(true)}
+                  className="text-[11px] font-semibold px-3 py-1 rounded-full border border-mist text-slate hover:border-terra/40 hover:text-terra transition-colors"
+                >
+                  Edit Reflection
+                </button>
               )}
-              {trip.reflection.expectation && <div>💭 {trip.reflection.expectation}</div>}
+            </div>
+            <div className="space-y-3">
+              {trip.reflection.tripTitle && (
+                <div className="font-serif text-lg font-bold text-ink">"{trip.reflection.tripTitle}"</div>
+              )}
+              {trip.reflection.rank != null && (
+                <div className="flex items-center gap-2 text-[13px]">
+                  <span>🏆</span>
+                  <span className="text-terra font-semibold">
+                    {trip.reflection.rank < 25 ? "Worst trip I've taken" : trip.reflection.rank < 50 ? "Solid but not top-tier" : trip.reflection.rank < 75 ? "One of my favorites" : "Top 3 of my life"}
+                  </span>
+                  <span className="text-slate/40 text-[11px] font-mono">({trip.reflection.rank}/100)</span>
+                </div>
+              )}
+              {trip.reflection.expectation && (
+                <div className="text-[13px] text-slate">💭 <span className="text-ink">{trip.reflection.expectation}</span></div>
+              )}
+              {trip.reflection.sentence && (
+                <div className="bg-foam rounded-xl p-3 border border-mist">
+                  <div className="text-[10px] font-mono text-slate uppercase tracking-wider mb-1">Note to future self</div>
+                  <div className="text-[13px] text-ink leading-relaxed italic">"{trip.reflection.sentence}"</div>
+                </div>
+              )}
+              {trip.reflection.bestDecision && (
+                <div className="text-[13px] text-slate">
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-slate/60 block mb-0.5">Best decision</span>
+                  <span className="text-ink">{trip.reflection.bestDecision}</span>
+                </div>
+              )}
+              {trip.reflection.regret && (
+                <div className="text-[13px] text-slate">
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-slate/60 block mb-0.5">Skip next time</span>
+                  <span className="text-ink">{trip.reflection.regret}</span>
+                </div>
+              )}
+              {Array.isArray(trip.reflection.changes) && (trip.reflection.changes as string[]).length > 0 && (
+                <div>
+                  <div className="text-[11px] font-mono uppercase tracking-wider text-slate/60 mb-1.5">What I'd change</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(trip.reflection.changes as string[]).map((c: string) => (
+                      <span key={c} className="text-[11px] px-2.5 py-1 rounded-full bg-ocean/5 border border-ocean/10 text-ocean/70">
+                        {c}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {trip.reflection.rebook && Object.keys(trip.reflection.rebook as Record<string, string>).length > 0 && (
+                <div>
+                  <div className="text-[11px] font-mono uppercase tracking-wider text-slate/60 mb-1.5">Would rebook?</div>
+                  <div className="flex flex-col gap-1.5">
+                    {Object.entries(trip.reflection.rebook as Record<string, string>).map(([item, verdict]) => (
+                      <div key={item} className="flex items-center justify-between text-[12px]">
+                        <span className="text-slate truncate mr-3">{item}</span>
+                        <span className={`font-semibold flex-shrink-0 ${verdict === 'Absolutely' ? 'text-success' : verdict === 'No' ? 'text-terra' : 'text-gold'}`}>
+                          {verdict}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

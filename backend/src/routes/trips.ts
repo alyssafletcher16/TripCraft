@@ -12,6 +12,24 @@ export const tripsRouter = Router()
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } })
 
+interface ParsedBlock {
+  type: 'TRANSPORT' | 'STAY' | 'ACTIVITY' | 'FOOD' | 'NOTE'
+  title: string
+  detail?: string
+  price?: string
+  status?: 'BOOKED' | 'PENDING' | 'CANCELLED'
+  confCode?: string
+  cancelPolicy?: string
+  bookingUrl?: string
+}
+
+interface ParsedDay {
+  dayNum: number
+  name?: string
+  theme?: string
+  blocks?: ParsedBlock[]
+}
+
 interface ParsedTrip {
   title: string
   destination: string
@@ -21,6 +39,7 @@ interface ParsedTrip {
   budget?: number
   travelers?: number
   notes?: string
+  days?: ParsedDay[]
 }
 
 function colVal(row: Record<string, unknown>, candidates: string[]): string | undefined {
@@ -53,7 +72,7 @@ tripsRouter.post('/import', requireAuth, upload.single('file'), async (req: Auth
       const anthropic = new Anthropic()
       const msg = await anthropic.messages.create({
         model: 'claude-opus-4-6',
-        max_tokens: 2048,
+        max_tokens: 4096,
         messages: [{
           role: 'user',
           content: `Extract every trip mentioned in this document. Return a JSON array where each element has:
@@ -65,6 +84,23 @@ tripsRouter.post('/import', requireAuth, upload.single('file'), async (req: Auth
 - budget (number, optional total budget)
 - travelers (number, optional)
 - notes (string, one-sentence summary, optional)
+- days (array, optional): the day-by-day itinerary. Each day has:
+  - dayNum (number, 1-based)
+  - name (string, e.g. "Arrival Day", "Day 1", optional)
+  - theme (string, short description of the day's theme, optional)
+  - blocks (array): individual activities/bookings. Each block has:
+    - type (one of: TRANSPORT, STAY, ACTIVITY, FOOD, NOTE)
+    - title (string, concise name e.g. "Flight AA123", "Check in at Hotel XYZ")
+    - detail (string, extra info like address, operator, notes, optional)
+    - price (string, display price e.g. "$142/nt", optional)
+    - status (one of: BOOKED, PENDING — use BOOKED if confirmation code or booking ref exists, else PENDING)
+    - confCode (string, confirmation/booking reference if present, optional)
+    - cancelPolicy (string, cancellation terms if mentioned, optional)
+    - bookingUrl (string, URL if present, optional)
+
+Block type guide: TRANSPORT for flights/trains/transfers, STAY for hotels/accommodation, ACTIVITY for tours/attractions/experiences, FOOD for restaurants/dining, NOTE for reminders/free text.
+
+If the document does not have a structured day-by-day itinerary, omit the days field entirely.
 
 Document:
 ${text}
@@ -122,6 +158,26 @@ tripsRouter.post('/import/confirm', requireAuth, async (req: AuthRequest, res) =
             budget: t.budget ?? null,
             status: (t.startDate && new Date(t.startDate) < new Date()) ? 'COMPLETED' : 'PLANNING',
             coverEmoji: '✈️',
+            days: t.days && t.days.length > 0 ? {
+              create: t.days.map((d) => ({
+                dayNum: d.dayNum,
+                name: d.name ?? `Day ${d.dayNum}`,
+                theme: d.theme ?? null,
+                blocks: d.blocks && d.blocks.length > 0 ? {
+                  create: d.blocks.map((b, i) => ({
+                    type: b.type,
+                    title: b.title,
+                    detail: b.detail ?? null,
+                    price: b.price ?? null,
+                    status: b.status ?? 'PENDING',
+                    confCode: b.confCode ?? null,
+                    cancelPolicy: b.cancelPolicy ?? null,
+                    bookingUrl: b.bookingUrl ?? null,
+                    sortOrder: i,
+                  })),
+                } : undefined,
+              })),
+            } : undefined,
           },
         })
       )
