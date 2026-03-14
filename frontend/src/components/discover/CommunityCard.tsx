@@ -19,13 +19,7 @@ const VIBE_BG: Record<string, string> = {
   Luxury:     '#FAF5E8',
 }
 
-const VIBE_EMOJI: Record<string, string> = {
-  Adventure:  '🧗', Hiking: '🥾', Cultural: '🏛', Romantic: '♡',
-  Foodie: '🍝', Relaxation: '🌅', Solo: '🧳', Nightlife: '🌙',
-  Budget: '💸', Luxury: '✦',
-}
 
-const PHOTO_BG = ['#EEF4F8', '#D6E4EE', '#EEF0FA']
 
 export interface DiscoverTrip {
   id: string
@@ -59,7 +53,6 @@ export function CommunityCard({ card, index, upvoted, onUpvote }: Props) {
   }
   const firstVibe = card.vibes[0]?.vibe ?? ''
   const highlight = VIBE_BG[firstVibe] ?? '#EEF4F8'
-  const photoEmojis = card.vibes.slice(0, 3).map((v) => VIBE_EMOJI[v.vibe] ?? '✈')
   const authorInitial = (card.user.name ?? 'A')[0].toUpperCase()
   const avatarColor = AVATAR_COLORS[index % AVATAR_COLORS.length]
 
@@ -109,19 +102,6 @@ export function CommunityCard({ card, index, upvoted, onUpvote }: Props) {
             ↑ {card._count.upvotes + (upvoted ? 1 : 0)}
           </button>
         </div>
-      </div>
-
-      {/* ── Photo strip ── */}
-      <div className="flex gap-0.5 h-12 overflow-hidden">
-        {[0, 1, 2].map((j) => (
-          <div
-            key={j}
-            className="flex-1 flex items-center justify-center text-base"
-            style={{ background: PHOTO_BG[j] }}
-          >
-            {photoEmojis[j] ?? '✈'}
-          </div>
-        ))}
       </div>
 
       {/* ── Body ── */}
