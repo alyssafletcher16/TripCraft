@@ -187,7 +187,11 @@ export function WanderlistView() {
           {/* Empty state */}
           {links.length === 0 && !addingLink && (
             <div className="px-5 py-12 text-center">
-              <p className="text-3xl mb-3">🔖</p>
+              <div className="flex justify-center mb-3">
+                <svg className="w-8 h-8 text-slate opacity-40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                </svg>
+              </div>
               <p className="text-sm text-slate mb-1">No links saved yet</p>
               <p className="text-xs text-slate">
                 Save TikToks, Instagram reels, YouTube guides, and web articles here.
@@ -226,8 +230,11 @@ export function WanderlistView() {
                         {link.platform} · {new Date(link.savedAt).toLocaleDateString()}
                       </div>
                       {addedTripName && (
-                        <div className="text-[11px] text-green-600 mt-0.5">
-                          Added to {addedTripName} ✓
+                        <div className="flex items-center gap-1 text-[11px] text-green-600 mt-0.5">
+                          <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none">
+                            <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          Added to {addedTripName}
                         </div>
                       )}
                     </div>
