@@ -1379,7 +1379,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
         </div>
 
         {/* ── Reflection banners ────────────────────────────────── */}
-        {trip.status === 'COMPLETED' && !trip.reflection && trip.userId === session?.user?.id && (
+        {trip.status === 'COMPLETED' && !trip.reflection && (
           <div
             className="rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 border border-gold/20"
             style={{ background: 'linear-gradient(135deg, #0D2B45, #143352)' }}
@@ -1404,14 +1404,12 @@ export function TripDetail({ tripId }: { tripId: string }) {
                 <span className="text-lg">✦</span>
                 <span className="font-mono text-[10px] text-slate uppercase tracking-wider">Trip Reflection</span>
               </div>
-              {trip.userId === session?.user?.id && (
-                <button
-                  onClick={() => setReflecting(true)}
-                  className="text-[11px] font-semibold px-3 py-1 rounded-full border border-mist text-slate hover:border-terra/40 hover:text-terra transition-colors"
-                >
-                  Edit Reflection
-                </button>
-              )}
+              <button
+                onClick={() => setReflecting(true)}
+                className="text-[11px] font-semibold px-3 py-1 rounded-full border border-mist text-slate hover:border-terra/40 hover:text-terra transition-colors"
+              >
+                Edit Reflection
+              </button>
             </div>
             <div className="space-y-3">
               {trip.reflection.tripTitle && (
