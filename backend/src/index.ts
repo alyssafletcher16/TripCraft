@@ -14,6 +14,7 @@ import { compareRouter } from './routes/compare'
 import { activitiesRouter } from './routes/activities'
 import { bookingClicksRouter } from './routes/bookingClicks'
 import { itineraryRouter } from './routes/itinerary'
+import { socialRouter } from './routes/social'
 
 dotenv.config()
 
@@ -46,6 +47,7 @@ app.use('/api/compare', compareRouter)
 app.use('/api/activities', activitiesRouter)
 app.use('/api/booking-clicks', bookingClicksRouter)
 app.use('/api/itinerary', itineraryRouter)
+app.use('/api/social', socialRouter)
 
 app.listen(PORT, () => {
   console.log(`TripCraft API running on http://localhost:${PORT}`)

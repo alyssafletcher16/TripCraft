@@ -89,3 +89,5 @@ Frontend uses `@/*` → `frontend/src/*` (configured in `tsconfig.json`).
 ### Deployment
 
 Vercel deploys the frontend only (`vercel.json`). Always commit before deploying — git and Vercel must stay in sync.
+
+**Always run `vercel --prod` from the repo root (`/TripCraft/TripCraft`), never from `frontend/`.** The root is linked to the correct `tripcraft_vercel` project; `frontend/` is linked to a stale `frontend` project and will deploy to the wrong URL.

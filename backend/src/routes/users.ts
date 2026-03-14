@@ -88,7 +88,7 @@ usersRouter.get('/me', requireAuth, async (req: AuthRequest, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.userId },
-      select: { id: true, email: true, name: true, avatar: true, createdAt: true },
+      select: { id: true, email: true, name: true, avatar: true, isPrivate: true, createdAt: true },
     })
     if (!user) return res.status(404).json({ error: 'User not found' })
     return res.json(user)
@@ -100,12 +100,16 @@ usersRouter.get('/me', requireAuth, async (req: AuthRequest, res) => {
 
 // PATCH /api/users/me
 usersRouter.patch('/me', requireAuth, async (req: AuthRequest, res) => {
-  const { name, avatar } = req.body
+  const { name, avatar, isPrivate } = req.body
   try {
     const user = await prisma.user.update({
       where: { id: req.userId },
-      data: { name, avatar },
-      select: { id: true, email: true, name: true, avatar: true },
+      data: {
+        ...(name !== undefined ? { name } : {}),
+        ...(avatar !== undefined ? { avatar } : {}),
+        ...(isPrivate !== undefined ? { isPrivate: Boolean(isPrivate) } : {}),
+      },
+      select: { id: true, email: true, name: true, avatar: true, isPrivate: true },
     })
     return res.json(user)
   } catch (err) {

@@ -104,4 +104,37 @@ export const api = {
     upvote: (tripId: string, token: string) =>
       request(`/api/discover/${tripId}/upvote`, { method: 'POST' }, token),
   },
+
+  // ─── Social ───────────────────────────────────────────────────────────────
+  social: {
+    search: (q: string, token: string) =>
+      request(`/api/social/search?q=${encodeURIComponent(q)}`, {}, token),
+
+    getProfile: (userId: string, token: string) =>
+      request(`/api/social/users/${userId}`, {}, token),
+
+    follow: (userId: string, token: string) =>
+      request(`/api/social/follow/${userId}`, { method: 'POST' }, token),
+
+    unfollow: (userId: string, token: string) =>
+      request(`/api/social/follow/${userId}`, { method: 'DELETE' }, token),
+
+    getRequests: (token: string) =>
+      request('/api/social/requests', {}, token),
+
+    acceptRequest: (requestId: string, token: string) =>
+      request(`/api/social/requests/${requestId}/accept`, { method: 'PATCH' }, token),
+
+    rejectRequest: (requestId: string, token: string) =>
+      request(`/api/social/requests/${requestId}/reject`, { method: 'PATCH' }, token),
+
+    followers: (token: string) =>
+      request('/api/social/followers', {}, token),
+
+    following: (token: string) =>
+      request('/api/social/following', {}, token),
+
+    updatePrivacy: (isPrivate: boolean, token: string) =>
+      request('/api/users/me', { method: 'PATCH', body: JSON.stringify({ isPrivate }) }, token),
+  },
 }

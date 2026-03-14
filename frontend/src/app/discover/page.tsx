@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { Navbar } from '@/components/layout/Navbar'
 import { Sidebar } from '@/components/layout/Sidebar'
-import { DiscoverFeed } from '@/components/discover/DiscoverFeed'
+import { DiscoverTabs } from '@/components/discover/DiscoverTabs'
 
 export const metadata: Metadata = { title: 'Discover — TripCraft' }
 
@@ -13,11 +13,11 @@ export default function DiscoverPage() {
         <Sidebar activeTab="discover" />
         <main className="p-4 sm:p-8 md:p-12 bg-surface">
           <p className="eyebrow mb-2">Explore</p>
-          <h1 className="page-title mb-2">Discover Itineraries</h1>
+          <h1 className="page-title mb-2">Discover</h1>
           <p className="text-slate text-sm mb-8">
-            Real trips built by real travelers. Fork any itinerary and make it yours.
+            Browse real itineraries or find travelers to follow.
           </p>
-          <DiscoverFeed />
+          <DiscoverTabs />
         </main>
       </div>
     </div>
