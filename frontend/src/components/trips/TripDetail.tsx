@@ -762,6 +762,9 @@ function ResearchTab({
   const [linkInput, setLinkInput] = useState('')
   const [linkTitle, setLinkTitle] = useState('')
   const [addingLink, setAddingLink] = useState(false)
+  const [blogPosts, setBlogPosts] = useState<Array<{ title: string; url: string; description: string; source: string }>>([])
+  const [blogsLoading, setBlogsLoading] = useState(false)
+  const [blogsError, setBlogsError] = useState(false)
 
   useEffect(() => {
     try {
@@ -769,6 +772,27 @@ function ResearchTab({
       if (stored) setSavedLinks(JSON.parse(stored))
     } catch {}
   }, [tripId])
+
+  useEffect(() => {
+    if (!trip.destination) return
+    const cacheKey = `tripcraft_blogs_${trip.destination}`
+    const cached = sessionStorage.getItem(cacheKey)
+    if (cached) {
+      try { setBlogPosts(JSON.parse(cached)); return } catch {}
+    }
+    setBlogsLoading(true)
+    setBlogsError(false)
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+    fetch(`${API_URL}/api/blogs/${encodeURIComponent(trip.destination)}`)
+      .then((r) => r.json())
+      .then((data) => {
+        const posts = data.blogPosts ?? []
+        setBlogPosts(posts)
+        sessionStorage.setItem(cacheKey, JSON.stringify(posts))
+      })
+      .catch(() => setBlogsError(true))
+      .finally(() => setBlogsLoading(false))
+  }, [trip.destination])
 
   function saveLink() {
     if (!linkInput.trim()) return
@@ -810,9 +834,9 @@ function ResearchTab({
       <div>
         <h2 className="font-serif text-2xl font-bold text-ink mb-1">Research Hub</h2>
         <p className="text-sm text-slate">
-          {trip.insights.length > 0
-            ? `${trip.insights.length} insights synthesized for ${trip.destination}`
-            : `Insights, saved tours, and social links for ${trip.destination}`}
+          {blogPosts.length > 0
+            ? `${blogPosts.length} blog posts found for ${trip.destination}`
+            : `Blog posts, saved tours, and social links for ${trip.destination}`}
         </p>
       </div>
 
@@ -834,39 +858,52 @@ function ResearchTab({
         ))}
       </div>
 
-      {/* Reviews & Insights */}
+      {/* Reviews & Insights — Travel Blog Posts */}
       {(filter === 'all' || filter === 'insights') && (
         <div className="bg-white rounded-2xl border border-mist overflow-hidden">
           <div className="px-5 py-3.5 border-b border-mist flex items-center gap-2">
             <span className="font-mono text-[10px] text-slate uppercase tracking-wider">Reviews & Insights</span>
-            {trip.insights.length > 0 && (
+            {blogPosts.length > 0 && (
               <span className="bg-ocean/10 text-ocean text-[10px] font-bold px-2 py-0.5 rounded-full">
-                {trip.insights.length}
+                {blogPosts.length}
               </span>
             )}
           </div>
-          {trip.insights.length === 0 ? (
+          {blogsLoading ? (
             <div className="px-5 py-8 text-center">
-              <p className="text-slate text-sm mb-3">No insights yet for this trip.</p>
-              <p className="text-slate text-xs">
-                Insights are generated when you add your destination and vibes.
-              </p>
+              <div className="inline-block w-5 h-5 border-2 border-ocean/30 border-t-ocean rounded-full animate-spin mb-3" />
+              <p className="text-slate text-sm">Finding blog posts about {trip.destination.split(',')[0]}…</p>
+            </div>
+          ) : blogsError ? (
+            <div className="px-5 py-8 text-center">
+              <p className="text-slate text-sm">Could not load blog posts. Try again later.</p>
+            </div>
+          ) : blogPosts.length === 0 ? (
+            <div className="px-5 py-8 text-center">
+              <p className="text-slate text-sm">No blog posts found for this destination.</p>
             </div>
           ) : (
             <div className="divide-y divide-mist">
-              {trip.insights.map((ins) => (
-                <div key={ins.id} className="flex gap-3 px-5 py-4">
-                  <div
-                    className="w-2 h-2 rounded-full mt-[5px] flex-shrink-0"
-                    style={{ background: ins.color ?? (ins.type === 'INFO' ? '#5BAD7A' : ins.type === 'WARNING' ? '#D4A843' : '#D46B6B') }}
-                  />
-                  <div>
-                    <p className="text-[13px] text-ink leading-relaxed">{ins.text}</p>
-                    {ins.source && (
-                      <p className="font-mono text-[10px] text-slate mt-1.5">{ins.source}</p>
+              {blogPosts.map((post, i) => (
+                <a
+                  key={i}
+                  href={post.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex gap-3 px-5 py-4 hover:bg-foam/50 transition-colors group"
+                >
+                  <div className="w-2 h-2 rounded-full mt-[5px] flex-shrink-0 bg-ocean/40 group-hover:bg-ocean transition-colors" />
+                  <div className="min-w-0">
+                    <p className="text-[13px] text-ocean font-medium leading-snug group-hover:underline">{post.title}</p>
+                    {post.description && (
+                      <p className="text-[12px] text-ink/70 leading-relaxed mt-0.5">{post.description}</p>
                     )}
+                    <p className="font-mono text-[10px] text-slate mt-1.5 flex items-center gap-1">
+                      {post.source}
+                      <span className="opacity-50">↗</span>
+                    </p>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           )}
