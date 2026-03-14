@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
+import { ProfileWorldMap, TripPin, destinationToCoords } from '@/components/profile/ProfileHeader'
 
 interface TripCard {
   id: string
@@ -114,8 +115,8 @@ export function TravelerProfileView({ userId }: { userId: string }) {
       <div className="p-8 md:p-12 text-center py-24">
         <div className="text-3xl mb-3">🔍</div>
         <div className="font-serif text-lg font-bold text-ink mb-1">Traveler not found</div>
-        <button onClick={() => router.back()} className="text-sm text-ocean hover:underline mt-2">
-          Go back
+        <button onClick={() => router.back()} className="text-xs font-mono tracking-widest text-slate hover:text-ink bg-slate/10 hover:bg-slate/15 px-3 py-1.5 rounded transition-colors mt-2 flex items-center gap-2">
+          ← Back
         </button>
       </div>
     )
@@ -123,21 +124,30 @@ export function TravelerProfileView({ userId }: { userId: string }) {
 
   const { user, followStatus, canSeeTrips, trips, followerCount, followingCount } = data
 
+  const tripPins: TripPin[] = trips.flatMap((t) => {
+    const coords = destinationToCoords(t.destination)
+    return coords ? [{ destination: t.destination, title: t.title, coords }] : []
+  })
+
   return (
     <div>
       {/* ── Profile header ── */}
       <div className="relative overflow-hidden" style={{ background: '#071825', minHeight: 180 }}>
+        {/* World map */}
+        <div className="absolute inset-0">
+          <ProfileWorldMap trips={tripPins} />
+        </div>
         <div
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(to right, rgba(7,24,37,0.95) 0%, rgba(7,24,37,0.7) 100%)',
+              'linear-gradient(to right, rgba(7,24,37,0.88) 0%, rgba(7,24,37,0.60) 50%, rgba(7,24,37,0.25) 100%)',
           }}
         />
         <div className="relative z-10 px-6 sm:px-10 md:px-12 py-10 sm:py-12">
           <button
             onClick={() => router.back()}
-            className="text-[11px] font-mono tracking-widest text-slate/60 hover:text-slate mb-6 flex items-center gap-1.5"
+            className="text-xs font-mono tracking-widest text-slate/80 hover:text-white mb-6 flex items-center gap-2 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded transition-colors"
           >
             ← BACK
           </button>

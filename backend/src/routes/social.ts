@@ -208,7 +208,7 @@ socialRouter.get('/followers', requireAuth, async (req: AuthRequest, res) => {
       include: { follower: { select: { id: true, name: true, avatar: true, isPrivate: true } } },
       orderBy: { createdAt: 'desc' },
     })
-    return res.json({ followers: rows.map((r) => r.follower) })
+    return res.json({ followers: rows.map((r) => ({ ...r.follower, followedAt: r.createdAt })) })
   } catch (err) {
     console.error(err)
     return res.status(500).json({ error: 'Internal server error' })

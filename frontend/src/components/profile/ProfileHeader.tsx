@@ -57,9 +57,10 @@ function destinationToCoords(destination: string): [number, number] | null {
 }
 
 // ── Profile World Map ─────────────────────────────────────────────────────────
-interface TripPin { destination: string; title: string; coords: [number, number] }
+export interface TripPin { destination: string; title: string; coords: [number, number] }
+export { destinationToCoords }
 
-function ProfileWorldMap({ trips }: { trips: TripPin[] }) {
+export function ProfileWorldMap({ trips }: { trips: TripPin[] }) {
   const [hovered, setHovered] = useState<{ label: string; x: number; y: number } | null>(null)
 
   return (
@@ -82,9 +83,9 @@ function ProfileWorldMap({ trips }: { trips: TripPin[] }) {
         <path
           key={i}
           d={d}
-          fill="rgba(255,255,255,0.05)"
-          stroke="rgba(255,255,255,0.15)"
-          strokeWidth={0.7}
+          fill="rgba(255,255,255,0.09)"
+          stroke="rgba(255,255,255,0.28)"
+          strokeWidth={0.8}
           strokeLinejoin="round"
         />
       ))}
@@ -213,7 +214,7 @@ export function ProfileHeader() {
       <div
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(to right, rgba(7,24,37,0.92) 0%, rgba(7,24,37,0.75) 50%, rgba(7,24,37,0.45) 100%)',
+          background: 'linear-gradient(to right, rgba(7,24,37,0.88) 0%, rgba(7,24,37,0.60) 50%, rgba(7,24,37,0.25) 100%)',
         }}
       />
 

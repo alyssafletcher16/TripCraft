@@ -10,6 +10,7 @@ interface SocialUser {
   name: string | null
   avatar: string | null
   isPrivate: boolean
+  followedAt?: string
 }
 
 interface FollowRequest {
@@ -55,13 +56,13 @@ function UserCard({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className="font-medium text-ink text-sm truncate">{user.name ?? 'Unnamed Traveler'}</span>
+          {badge}
           {user.isPrivate && (
             <span className="text-[10px] font-mono tracking-wider text-slate bg-surface border border-mist rounded px-1.5 py-0.5 flex-shrink-0">
               PRIVATE
             </span>
           )}
         </div>
-        {badge}
       </div>
       <div onClick={(e) => e.stopPropagation()}>{action}</div>
     </div>
@@ -79,6 +80,14 @@ export function TravelersTab() {
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [requestActionLoading, setRequestActionLoading] = useState<string | null>(null)
+  const [lastViewedFollowers, setLastViewedFollowers] = useState<string | null>(null)
+
+  useEffect(() => {
+    const stored = localStorage.getItem('lastViewedFollowers')
+    setLastViewedFollowers(stored)
+    // Update timestamp so next visit won't show current followers as new
+    localStorage.setItem('lastViewedFollowers', new Date().toISOString())
+  }, [])
 
   useEffect(() => {
     if (!session?.accessToken) return
@@ -304,15 +313,23 @@ export function TravelersTab() {
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {filteredFollowers.map((user) => (
-                <UserCard
-                  key={user.id}
-                  user={user}
-                  actionLoading={actionLoading === user.id}
-                  onCardClick={() => router.push(`/discover/traveler/${user.id}`)}
-                  action={<FollowBackButton user={user} />}
-                />
-              ))}
+              {filteredFollowers.map((user) => {
+                const isNew = !!user.followedAt && !!lastViewedFollowers && new Date(user.followedAt) > new Date(lastViewedFollowers)
+                return (
+                  <UserCard
+                    key={user.id}
+                    user={user}
+                    actionLoading={actionLoading === user.id}
+                    onCardClick={() => router.push(`/discover/traveler/${user.id}`)}
+                    badge={isNew ? (
+                      <span className="text-[10px] font-mono tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-200 rounded px-1.5 py-0.5 flex-shrink-0">
+                        NEW
+                      </span>
+                    ) : undefined}
+                    action={<FollowBackButton user={user} />}
+                  />
+                )
+              })}
             </div>
           )}
         </div>

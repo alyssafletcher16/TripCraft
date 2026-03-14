@@ -125,7 +125,7 @@ export function PublicTripView({ tripId }: { tripId: string }) {
       {/* Back */}
       <button
         onClick={() => router.back()}
-        className="text-[12px] text-slate hover:text-terra transition-colors mb-5 flex items-center gap-1"
+        className="text-xs font-mono tracking-widest text-slate hover:text-ink bg-slate/10 hover:bg-slate/15 px-3 py-1.5 rounded transition-colors mb-5 flex items-center gap-2"
       >
         ← Back
       </button>

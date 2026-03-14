@@ -156,7 +156,7 @@ export function AddBlockForm({ dayId, tripId, destination, vibes, date, onSucces
         <button
           type="button"
           onClick={() => setStep('type')}
-          className="text-[11px] text-slate hover:text-ink mb-3 flex items-center gap-1 transition-colors"
+          className="text-xs font-mono tracking-widest text-slate hover:text-ink bg-slate/10 hover:bg-slate/15 px-3 py-1.5 rounded transition-colors mb-3 flex items-center gap-2"
         >
           ← Back
         </button>
@@ -231,7 +231,7 @@ export function AddBlockForm({ dayId, tripId, destination, vibes, date, onSucces
             if (blockType === 'ACTIVITY') setStep('activity-method')
             else setStep('type')
           }}
-          className="text-[11px] text-slate hover:text-ink flex items-center gap-1 transition-colors"
+          className="text-xs font-mono tracking-widest text-slate hover:text-ink bg-slate/10 hover:bg-slate/15 px-3 py-1.5 rounded transition-colors flex items-center gap-2"
         >
           ← Back
         </button>
