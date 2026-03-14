@@ -42,6 +42,29 @@ export function ItineraryDay({ day, destination, vibes, onBlockAdded }: Props) {
     setEditingBlock(null)
   }
 
+  const blockSummary = (() => {
+    if (open || blocks.length === 0) return null
+    const counts: Record<string, number> = {}
+    for (const b of blocks) counts[b.type] = (counts[b.type] ?? 0) + 1
+    const labels: Record<string, string> = {
+      STAY: 'hotel',
+      ACTIVITY: 'activity',
+      FOOD: 'reservation',
+      TRANSPORT: 'transport',
+      NOTE: 'note',
+    }
+    const plural: Record<string, string> = {
+      STAY: 'hotels',
+      ACTIVITY: 'activities',
+      FOOD: 'reservations',
+      TRANSPORT: 'transports',
+      NOTE: 'notes',
+    }
+    return Object.entries(counts)
+      .map(([type, n]) => `${n} ${n === 1 ? labels[type] : plural[type]}`)
+      .join(', ')
+  })()
+
   return (
     <div className="bg-white rounded-2xl border-[1.5px] border-mist overflow-hidden hover:border-terra/30 transition-colors">
       {/* Header */}
@@ -54,6 +77,9 @@ export function ItineraryDay({ day, destination, vibes, onBlockAdded }: Props) {
             Day {String(day.dayNum).padStart(2, '0')}
           </span>
           {day.theme && <div className="text-[11px] text-slate">{day.theme}</div>}
+          {blockSummary && (
+            <div className="text-[11px] text-slate/60">{blockSummary}</div>
+          )}
         </div>
         <div className="flex items-center gap-3">
           {day.date && (
