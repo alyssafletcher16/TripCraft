@@ -24,7 +24,7 @@ const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
 
 export function DiscoverFeed() {
   const { data: session } = useSession()
-  const [feedTab, setFeedTab] = useState<'community' | 'friends'>('community')
+  // friends tab removed
   const [filter, setFilter] = useState('Trending')
   const [selectedCity, setSelectedCity] = useState<MapCluster | null>(null)
   const [cards, setCards] = useState<DiscoverTrip[]>([])
@@ -105,90 +105,57 @@ export function DiscoverFeed() {
       {/* Divider */}
       <div className="h-px bg-mist my-5" />
 
-      {/* ── Tabs ── */}
-      <div className="flex gap-1.5 mb-7 border-b border-mist">
-        {(['community', 'friends'] as const).map((t) => (
+      {/* Filter chips */}
+      <div className="flex gap-2 mb-5 flex-wrap">
+        {FILTERS.map((f) => (
           <button
-            key={t}
-            onClick={() => setFeedTab(t)}
-            className="px-5 py-2.5 text-[13px] font-medium border-b-2 -mb-px transition-all"
+            key={f}
+            onClick={() => setFilter(f)}
+            className="px-4 py-1.5 rounded-full border-[1.5px] text-[12px] transition-all"
             style={{
-              borderBottomColor: feedTab === t ? '#C4603A' : 'transparent',
-              color: feedTab === t ? '#C4603A' : '#5B7A8E',
+              borderColor: filter === f ? '#0D2B45' : '#D6E4EE',
+              background:  filter === f ? '#0D2B45' : '#fff',
+              color:       filter === f ? '#fff'    : '#0A1F30',
             }}
           >
-            {t === 'community' ? '🌍 Community' : '👥 Friends'}
+            {f}
           </button>
         ))}
       </div>
 
-      {/* ── Community tab ── */}
-      {feedTab === 'community' && (
-        <>
-          {/* Filter chips */}
-          <div className="flex gap-2 mb-5 flex-wrap">
-            {FILTERS.map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className="px-4 py-1.5 rounded-full border-[1.5px] text-[12px] transition-all"
-                style={{
-                  borderColor: filter === f ? '#0D2B45' : '#D6E4EE',
-                  background:  filter === f ? '#0D2B45' : '#fff',
-                  color:       filter === f ? '#fff'    : '#0A1F30',
-                }}
-              >
-                {f}
-              </button>
-            ))}
-          </div>
-
-          {/* City filter label */}
-          {selectedCity && (
-            <div className="font-mono text-[10px] text-terra tracking-[1.5px] uppercase mb-3.5">
-              Showing itineraries tagged &ldquo;{selectedCity.label}&rdquo;
-            </div>
-          )}
-
-          {/* Card grid */}
-          {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[18px]">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="h-64 bg-white rounded-[18px] border-[1.5px] border-mist animate-pulse" />
-              ))}
-            </div>
-          ) : cards.length === 0 ? (
-            <div className="py-16 text-center">
-              <div className="text-3xl mb-3">🗺️</div>
-              <div className="font-serif text-base font-bold text-ink mb-1">
-                {selectedCity ? `No itineraries yet for ${selectedCity.label}` : 'No trips shared yet'}
-              </div>
-              <p className="text-[13px] text-slate">Be the first to share a trip here.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[18px]">
-              {cards.map((card, i) => (
-                <CommunityCard
-                  key={card.id}
-                  card={card}
-                  index={i}
-                  upvoted={upvoted.has(card.id)}
-                  onUpvote={handleUpvote}
-                />
-              ))}
-            </div>
-          )}
-        </>
+      {/* City filter label */}
+      {selectedCity && (
+        <div className="font-mono text-[10px] text-terra tracking-[1.5px] uppercase mb-3.5">
+          Showing itineraries tagged &ldquo;{selectedCity.label}&rdquo;
+        </div>
       )}
 
-      {/* ── Friends tab ── */}
-      {feedTab === 'friends' && (
-        <div className="max-w-[680px]">
-          <div className="bg-white rounded-[18px] border-[1.5px] border-dashed border-mist p-8 text-center">
-            <div className="text-2xl mb-2">👥</div>
-            <div className="font-serif text-base font-bold text-ink mb-1">Friends feed coming soon</div>
-            <p className="text-[13px] text-slate">Follow friends to see their trips in real time.</p>
+      {/* Card grid */}
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[18px]">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="h-64 bg-white rounded-[18px] border-[1.5px] border-mist animate-pulse" />
+          ))}
+        </div>
+      ) : cards.length === 0 ? (
+        <div className="py-16 text-center">
+          <div className="text-3xl mb-3">🗺️</div>
+          <div className="font-serif text-base font-bold text-ink mb-1">
+            {selectedCity ? `No itineraries yet for ${selectedCity.label}` : 'No trips shared yet'}
           </div>
+          <p className="text-[13px] text-slate">Be the first to share a trip here.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[18px]">
+          {cards.map((card, i) => (
+            <CommunityCard
+              key={card.id}
+              card={card}
+              index={i}
+              upvoted={upvoted.has(card.id)}
+              onUpvote={handleUpvote}
+            />
+          ))}
         </div>
       )}
     </div>

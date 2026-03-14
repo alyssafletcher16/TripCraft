@@ -359,8 +359,25 @@ function TodoTab({
   // Sync when trip updates externally
   useEffect(() => { setItems(trip.checklist ?? []) }, [trip.checklist])
 
-  const pendingBlocks = trip.days
-    .flatMap((d) => d.blocks.filter((b) => b.status === 'PENDING'))
+  const [pendingBlocks, setPendingBlocks] = useState<Block[]>(
+    trip.days.flatMap((d) => d.blocks.filter((b) => b.status === 'PENDING'))
+  )
+
+  useEffect(() => {
+    setPendingBlocks(trip.days.flatMap((d) => d.blocks.filter((b) => b.status === 'PENDING')))
+  }, [trip.days])
+
+  async function markBooked(block: Block) {
+    setPendingBlocks((p) => p.filter((b) => b.id !== block.id))
+    try {
+      await fetch(`${API}/api/days/${block.dayId}/blocks/${block.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ status: 'BOOKED' }),
+      })
+      onUpdate()
+    } catch {}
+  }
 
   const done = items.filter((i) => i.done).length
   const total = items.length
@@ -435,9 +452,10 @@ function TodoTab({
           <div className="divide-y divide-mist">
             {pendingBlocks.map((b) => (
               <div key={b.id} className="flex items-center gap-3 px-5 py-3">
-                <div
-                  className="w-5 h-5 rounded-md border-2 border-mist flex-shrink-0"
-                  style={{ background: 'transparent' }}
+                <button
+                  onClick={() => markBooked(b)}
+                  className="w-5 h-5 rounded-md border-2 border-mist flex-shrink-0 flex items-center justify-center transition-all hover:border-ocean hover:bg-ocean/10"
+                  title="Mark as booked"
                 />
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium text-ink">Book: {b.title}</div>

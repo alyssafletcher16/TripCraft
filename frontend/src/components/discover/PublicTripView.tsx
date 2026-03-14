@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useCityPhoto } from '@/hooks/useCityPhoto'
 
@@ -56,10 +57,21 @@ interface PublicTrip {
 
 export function PublicTripView({ tripId }: { tripId: string }) {
   const router = useRouter()
+  const { data: session } = useSession()
   const [trip, setTrip] = useState<PublicTrip | null>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
+  const [upvoted, setUpvoted] = useState(false)
   const photoUrl = useCityPhoto(trip?.destination ?? '')
+
+  const handleUpvote = useCallback(async () => {
+    if (!session?.accessToken) return
+    setUpvoted((prev) => !prev)
+    await fetch(`${API}/api/discover/${tripId}/upvote`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${session.accessToken}` },
+    }).catch(() => setUpvoted((prev) => !prev))
+  }, [session, tripId])
 
   useEffect(() => {
     fetch(`${API}/api/discover/${tripId}`)
@@ -153,7 +165,14 @@ export function PublicTripView({ tripId }: { tripId: string }) {
         {durationLabel && <span className="text-sm text-slate">{durationLabel}</span>}
         <span className="text-sm text-slate">{trip.travelers} traveler{trip.travelers !== 1 ? 's' : ''}</span>
         {trip.budget && <span className="text-sm text-slate">${trip.budget.toLocaleString()} budget</span>}
-        <div className="ml-auto text-[12px] text-gold font-semibold">↑ {trip._count.upvotes}</div>
+        <button
+          onClick={handleUpvote}
+          className="ml-auto text-[12px] font-semibold transition-colors"
+          style={{ color: upvoted ? '#C9A84C' : '#5B7A8E' }}
+          title={session ? 'Upvote this trip' : 'Sign in to upvote'}
+        >
+          ↑ {trip._count.upvotes + (upvoted ? 1 : 0)}
+        </button>
       </div>
 
       {/* Days */}
