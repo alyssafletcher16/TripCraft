@@ -1,5 +1,7 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { useCityPhoto } from '@/hooks/useCityPhoto'
 
 const AVATAR_COLORS = ['#4A6FA5', '#3A7D5A', '#8A4F3A', '#6A4F8A', '#4A7A6A', '#3A5A8A']
@@ -35,7 +37,7 @@ export interface DiscoverTrip {
   startDate: string | null
   endDate: string | null
   vibes: { vibe: string }[]
-  user: { name: string | null; avatar: string | null }
+  user: { id: string | null; name: string | null; avatar: string | null }
   _count: { upvotes: number }
 }
 
@@ -47,7 +49,14 @@ interface Props {
 }
 
 export function CommunityCard({ card, index, upvoted, onUpvote }: Props) {
+  const router = useRouter()
+  const { data: session } = useSession()
   const photoUrl = useCityPhoto(card.destination)
+
+  function handleView() {
+    const isOwner = session?.user?.id && session.user.id === card.user.id
+    router.push(isOwner ? `/trips/${card.id}` : `/discover/${card.id}`)
+  }
   const firstVibe = card.vibes[0]?.vibe ?? ''
   const highlight = VIBE_BG[firstVibe] ?? '#EEF4F8'
   const photoEmojis = card.vibes.slice(0, 3).map((v) => VIBE_EMOJI[v.vibe] ?? '✈')
@@ -142,11 +151,11 @@ export function CommunityCard({ card, index, upvoted, onUpvote }: Props) {
       </div>
 
       {/* ── Footer ── */}
-      <div className="px-4 py-2.5 border-t border-mist flex gap-2">
-        <button className="flex-1 py-3 rounded-[10px] border-[1.5px] border-mist text-[12px] text-slate transition-colors hover:border-terra hover:text-terra">
-          Fork trip
-        </button>
-        <button className="flex-1 py-3 rounded-[10px] border-none bg-ocean text-white text-[12px]">
+      <div className="px-4 py-2.5 border-t border-mist">
+        <button
+          onClick={handleView}
+          className="w-full py-3 rounded-[10px] border-none bg-ocean text-white text-[12px]"
+        >
           View →
         </button>
       </div>

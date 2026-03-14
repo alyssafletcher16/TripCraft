@@ -62,6 +62,35 @@ discoverRouter.get('/stats', async (_req, res) => {
   }
 })
 
+// GET /api/discover/:tripId  — single public trip with full itinerary
+discoverRouter.get('/:tripId', async (req, res) => {
+  const { tripId } = req.params
+  try {
+    const raw = await prisma.trip.findFirst({
+      where: { id: tripId, status: 'COMPLETED' },
+      include: {
+        vibes: true,
+        user: { select: { id: true, name: true, avatar: true } },
+        community: true,
+        days: {
+          orderBy: { dayNum: 'asc' },
+          include: { blocks: { orderBy: { sortOrder: 'asc' } } },
+        },
+        _count: { select: { upvotes: true } },
+      },
+    }) as any
+    if (!raw) return res.status(404).json({ error: 'Trip not found' })
+    const { community, user, ...trip } = raw
+    return res.json({
+      ...trip,
+      user: community?.isAnonymous ? { id: null, name: null, avatar: null } : user,
+    })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 // POST /api/discover/:tripId/upvote  — toggle upvote
 discoverRouter.post('/:tripId/upvote', requireAuth, async (req: AuthRequest, res) => {
   const { tripId } = req.params
