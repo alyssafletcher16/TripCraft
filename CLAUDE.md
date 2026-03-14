@@ -62,6 +62,7 @@ All routes under `backend/src/routes/`:
 - `intelligence.ts` — AI-generated traveler insights via Anthropic SDK
 - `activities.ts` / `compare.ts` — Activity search and comparison
 - `bookingClicks.ts` — Affiliate click tracking (GetYourGuide, Viator, Booking.com)
+- `social.ts` — Follow system: search users, follow/unfollow, accept/reject requests, public traveler profiles
 
 ### Key Data Models
 
@@ -70,6 +71,8 @@ All routes under `backend/src/routes/`:
 Trip status: `PLANNING` → `ACTIVE` → `COMPLETED`. Completed trips can have a `TripReflection`.
 
 `Community` model controls public visibility and upvotes. Public trips appear in `/discover`.
+
+`User` has `isPrivate Boolean` — when true, follow requests are `PENDING` until accepted. `Follow` model tracks follower/following relationships with status `PENDING | ACCEPTED`.
 
 ### UI & Styling
 
@@ -88,9 +91,32 @@ Frontend uses `@/*` → `frontend/src/*` (configured in `tsconfig.json`).
 
 ### Deployment
 
+This project has **two separate deployments** that must both be kept in sync:
+
+#### Frontend — Vercel
 Vercel deploys the frontend only (`vercel.json`). Always commit before deploying — git and Vercel must stay in sync.
 
 **Always run `vercel --prod` from the repo root (`/TripCraft/TripCraft`), never from `frontend/`.** The root is linked to the correct `tripcraft_vercel` project; `frontend/` is linked to a stale `frontend` project and will deploy to the wrong URL.
+
+#### Backend — Render (`https://tripcraft-w3yf.onrender.com`)
+The Express backend is deployed on Render and **auto-deploys when commits are pushed to `origin/main`**. Vercel does NOT deploy the backend.
+
+**Critical rule: after any backend change, always `git push origin main`** so Render picks up the new code. If you only run `vercel --prod` without pushing first, the backend on Render will be out of date and new API routes will return `Cannot GET /api/...`.
+
+#### Production Database — Render PostgreSQL
+The production database is separate from the local `localhost:5432/tripcraft` database. They are **not in sync** — schema changes applied locally do NOT affect production.
+
+**After any `schema.prisma` change, apply it to production:**
+```bash
+DATABASE_URL="postgresql://tripcraft_db_8vrc_user:...@dpg-d6oeieh5pdvs73ehf97g-a.oregon-postgres.render.com/tripcraft_db_8vrc" npx prisma db push
+```
+The internal Render hostname (`dpg-...a` without suffix) only works from within Render's network. Always use the **external hostname** ending in `.oregon-postgres.render.com` when running Prisma commands locally against production.
+
+#### Deployment checklist
+1. `git add ... && git commit` — stage and commit all changes
+2. `git push origin main` — triggers Render backend redeploy
+3. `vercel --prod` (from repo root) — deploys frontend to Vercel
+4. If `schema.prisma` changed: run `prisma db push` against the production DATABASE_URL (step above)
 
 ### Pre-Deployment UI & Responsiveness Checklist
 
