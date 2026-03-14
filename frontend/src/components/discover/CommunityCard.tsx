@@ -136,7 +136,7 @@ export function CommunityCard({ card, index, upvoted, onUpvote, initialFollowing
               color: '#E2C06A',
             }}
           >
-            ↑ {card._count.upvotes + (upvoted ? 1 : 0)}
+            ↑ {card._count.upvotes}
           </button>
         </div>
       </div>

@@ -66,25 +66,36 @@ export function PublicTripView({ tripId }: { tripId: string }) {
 
   const handleUpvote = useCallback(async () => {
     if (!session?.accessToken) return
-    setUpvoted((prev) => !prev)
-    await fetch(`${API}/api/discover/${tripId}/upvote`, {
+    const wasUpvoted = upvoted
+    setUpvoted(!wasUpvoted)
+    setTrip((prev) => prev ? { ...prev, _count: { ...prev._count, upvotes: prev._count.upvotes + (wasUpvoted ? -1 : 1) } } : prev)
+    const ok = await fetch(`${API}/api/discover/${tripId}/upvote`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${session.accessToken}` },
-    }).catch(() => setUpvoted((prev) => !prev))
-  }, [session, tripId])
+    }).then((r) => r.ok).catch(() => false)
+    if (!ok) {
+      setUpvoted(wasUpvoted)
+      setTrip((prev) => prev ? { ...prev, _count: { ...prev._count, upvotes: prev._count.upvotes + (wasUpvoted ? 1 : -1) } } : prev)
+    }
+  }, [session, tripId, upvoted])
 
   useEffect(() => {
-    fetch(`${API}/api/discover/${tripId}`)
+    const headers: Record<string, string> = {}
+    if (session?.accessToken) headers['Authorization'] = `Bearer ${session.accessToken}`
+    fetch(`${API}/api/discover/${tripId}`, { headers })
       .then((r) => {
         if (!r.ok) { setNotFound(true); setLoading(false); return null }
         return r.json()
       })
       .then((data) => {
-        if (data) setTrip(data)
+        if (data) {
+          setTrip(data)
+          setUpvoted(!!data.userUpvoted)
+        }
         setLoading(false)
       })
       .catch(() => { setNotFound(true); setLoading(false) })
-  }, [tripId])
+  }, [tripId, session?.accessToken])
 
   if (loading) {
     return (
@@ -171,7 +182,7 @@ export function PublicTripView({ tripId }: { tripId: string }) {
           style={{ color: upvoted ? '#C9A84C' : '#5B7A8E' }}
           title={session ? 'Upvote this trip' : 'Sign in to upvote'}
         >
-          ↑ {trip._count.upvotes + (upvoted ? 1 : 0)}
+          ↑ {trip._count.upvotes}
         </button>
       </div>
 

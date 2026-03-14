@@ -12,6 +12,10 @@ const TAGS = ['Adventure', 'Hiking', 'Cultural', 'Romantic', 'Foodie', 'Relaxati
 
 const REGIONS = ['Africa', 'Asia', 'Europe', 'Middle East', 'North America', 'South America', 'Oceania']
 
+const BUDGET_RANGES = ['Under $1K', '$1K–$3K', '$3K–$7K', '$7K+']
+
+const DAYS_RANGES = ['1–3 days', '4–7 days', '8–14 days', '15+ days']
+
 const COUNTRY_REGION: Record<string, string> = {
   France: 'Europe', Germany: 'Europe', Italy: 'Europe', Spain: 'Europe',
   'United Kingdom': 'Europe', Portugal: 'Europe', Greece: 'Europe',
@@ -160,13 +164,16 @@ export function DiscoverFeed() {
       .catch(() => {})
   }, [session?.accessToken])
 
-  const fetchFeed = useCallback(async () => {
+  const fetchFeed = useCallback(async (token?: string) => {
     setLoading(true)
     const url = `${API}/api/discover?sort=popular&limit=60`
     try {
-      const res = await fetch(url)
+      const res = await fetch(url, token ? { headers: { Authorization: `Bearer ${token}` } } : undefined)
       const data = await res.json()
-      setAllCards(Array.isArray(data.trips) ? data.trips : [])
+      const trips: DiscoverTrip[] = Array.isArray(data.trips) ? data.trips : []
+      setAllCards(trips)
+      // Seed upvoted state from server data
+      setUpvoted(new Set(trips.filter((t) => (t as any).userUpvoted).map((t) => t.id)))
     } catch {
       setAllCards([])
     } finally {
@@ -174,7 +181,7 @@ export function DiscoverFeed() {
     }
   }, [])
 
-  useEffect(() => { fetchFeed() }, [fetchFeed])
+  useEffect(() => { fetchFeed(session?.accessToken ?? undefined) }, [fetchFeed, session?.accessToken])
 
   // Client-side filtering + sorting
   const cards = useMemo(() => {
@@ -232,21 +239,39 @@ export function DiscoverFeed() {
 
   async function handleUpvote(tripId: string) {
     if (!session?.accessToken) return
+    const wasUpvoted = upvoted.has(tripId)
+    // Optimistic update
     setUpvoted((prev) => {
       const next = new Set(prev)
-      next.has(tripId) ? next.delete(tripId) : next.add(tripId)
+      wasUpvoted ? next.delete(tripId) : next.add(tripId)
       return next
     })
-    await fetch(`${API}/api/discover/${tripId}/upvote`, {
+    setAllCards((prev) =>
+      prev.map((c) =>
+        c.id === tripId
+          ? { ...c, _count: { ...c._count, upvotes: c._count.upvotes + (wasUpvoted ? -1 : 1) } }
+          : c
+      )
+    )
+    const ok = await fetch(`${API}/api/discover/${tripId}/upvote`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${session.accessToken}` },
-    }).catch(() => {
+    }).then((r) => r.ok).catch(() => false)
+    if (!ok) {
+      // Revert on failure
       setUpvoted((prev) => {
         const next = new Set(prev)
-        next.has(tripId) ? next.delete(tripId) : next.add(tripId)
+        wasUpvoted ? next.add(tripId) : next.delete(tripId)
         return next
       })
-    })
+      setAllCards((prev) =>
+        prev.map((c) =>
+          c.id === tripId
+            ? { ...c, _count: { ...c._count, upvotes: c._count.upvotes + (wasUpvoted ? 1 : -1) } }
+            : c
+        )
+      )
+    }
   }
 
   const hasActiveFilters = search.trim() || selectedRegions.size > 0 || selectedTags.size > 0 || sortByUpvotes

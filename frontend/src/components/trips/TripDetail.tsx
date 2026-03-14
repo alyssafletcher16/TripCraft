@@ -1275,6 +1275,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
 
         {/* ── Trip header ───────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-mist overflow-hidden">
+          {/* Cover photo — clean, no text overlay */}
           <div className="relative h-48 bg-foam overflow-hidden">
             <img
               src={cityPhoto ?? undefined}
@@ -1282,31 +1283,10 @@ export function TripDetail({ tripId }: { tripId: string }) {
               className="w-full h-full object-cover"
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-            <div className="absolute bottom-4 left-4 right-4 sm:left-7 sm:right-7 flex items-end justify-between">
-              <div>
-                <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                  <h1 className="font-serif text-2xl font-bold text-white drop-shadow">{trip.title}</h1>
-                  {trip.status !== 'COMPLETED' && !pendingComplete && (
-                    <button
-                      onClick={() => handleStatusChange('COMPLETED')}
-                      className="text-[11px] font-semibold px-2.5 py-1 rounded-full border border-white/30 bg-black/30 text-white backdrop-blur-sm hover:bg-black/50 transition-colors cursor-pointer"
-                    >
-                      Mark complete
-                    </button>
-                  )}
-                  {trip.status === 'COMPLETED' && (
-                    <span className="text-[11px] font-mono border border-white/30 rounded-full px-2.5 py-1 bg-black/30 text-white/70 backdrop-blur-sm">
-                      Completed
-                    </span>
-                  )}
-                </div>
-                <p className="text-white/80 text-sm drop-shadow">
-                  {trip.destination}{trip.country ? `, ${trip.country}` : ''}
-                </p>
-              </div>
-              <span className="text-3xl leading-none drop-shadow">{trip.coverEmoji ?? '✈'}</span>
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+            {trip.coverEmoji && (
+              <span className="absolute top-3 right-3 text-3xl leading-none drop-shadow">{trip.coverEmoji}</span>
+            )}
           </div>
 
           {/* Confirm complete panel */}
@@ -1349,25 +1329,53 @@ export function TripDetail({ tripId }: { tripId: string }) {
             </div>
           )}
 
+          {/* Info block — title, city, meta, actions */}
           <div className="px-4 sm:px-7 py-4">
-            <div className="flex flex-wrap gap-3 sm:gap-5 text-[11px] font-mono text-slate uppercase tracking-wide mb-3">
-              {trip.startDate && (
-                <span>
-                  {new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  {trip.endDate ? ` – ${new Date(trip.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}
-                </span>
-              )}
-              <span>{trip.travelers} traveler{trip.travelers !== 1 ? 's' : ''}</span>
-              {trip.budget != null && (
-                <span>
-                  {trip.budgetType === 'per_person'
-                    ? `$${trip.budget.toLocaleString()}/person`
-                    : `$${trip.budget.toLocaleString()} total`}
-                </span>
-              )}
+            <div className="flex items-start justify-between gap-4">
+              {/* Left: title + city + meta */}
+              <div className="min-w-0">
+                <h1 className="font-serif text-2xl font-bold text-ink leading-tight">{trip.title}</h1>
+                <p className="text-slate text-sm mt-0.5">
+                  {trip.destination}{trip.country ? `, ${trip.country}` : ''}
+                </p>
+                <div className="flex flex-wrap gap-3 sm:gap-5 text-[11px] font-mono text-slate uppercase tracking-wide mt-2">
+                  {trip.startDate && (
+                    <span>
+                      {new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {trip.endDate ? ` – ${new Date(trip.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}
+                    </span>
+                  )}
+                  <span>{trip.travelers} traveler{trip.travelers !== 1 ? 's' : ''}</span>
+                </div>
+              </div>
+
+              {/* Right: budget + action */}
+              <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                {trip.budget != null && (
+                  <span className="text-[11px] font-mono text-slate uppercase tracking-wide">
+                    {trip.budgetType === 'per_person'
+                      ? `$${trip.budget.toLocaleString()}/person`
+                      : `$${trip.budget.toLocaleString()} total`}
+                  </span>
+                )}
+                {trip.status !== 'COMPLETED' && !pendingComplete && (
+                  <button
+                    onClick={() => handleStatusChange('COMPLETED')}
+                    className="text-[11px] font-semibold px-3 py-1.5 rounded-full border border-gold/40 bg-gold/10 text-gold hover:bg-gold/20 transition-colors cursor-pointer"
+                  >
+                    Mark complete
+                  </button>
+                )}
+                {trip.status === 'COMPLETED' && (
+                  <span className="text-[11px] font-mono border border-mist rounded-full px-3 py-1.5 bg-foam text-slate">
+                    Completed
+                  </span>
+                )}
+              </div>
             </div>
+
             {trip.vibes.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1.5 mt-3">
                 {trip.vibes.map((v) => (
                   <span key={v.id} className="bg-ocean/8 text-ocean text-xs px-3 py-1 rounded-full border border-ocean/15">
                     {v.vibe}

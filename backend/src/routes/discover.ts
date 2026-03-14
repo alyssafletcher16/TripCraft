@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import jwt from 'jsonwebtoken'
 import { prisma } from '../lib/prisma'
 import { requireAuth, AuthRequest } from '../middleware/auth'
 
@@ -7,6 +8,17 @@ export const discoverRouter = Router()
 // GET /api/discover  — public trips feed
 discoverRouter.get('/', async (req, res) => {
   const { vibe, destination, sort = 'popular', limit = '20', offset = '0' } = req.query as Record<string, string>
+
+  // Optionally identify the caller for userUpvoted — no auth required
+  let callerId: string | null = null
+  const auth = req.headers.authorization
+  if (auth?.startsWith('Bearer ')) {
+    try {
+      const decoded = jwt.verify(auth.slice(7), process.env.JWT_SECRET!) as { userId: string }
+      callerId = decoded.userId
+    } catch {}
+  }
+
   try {
     const where = {
       status: 'COMPLETED' as const,
@@ -30,9 +42,20 @@ discoverRouter.get('/', async (req, res) => {
       prisma.trip.count({ where }),
     ])
 
+    // Fetch which trips this user has already upvoted
+    let upvotedTripIds = new Set<string>()
+    if (callerId) {
+      const existing = await prisma.communityUpvote.findMany({
+        where: { userId: callerId, tripId: { in: rawTrips.map((t) => t.id) } },
+        select: { tripId: true },
+      })
+      upvotedTripIds = new Set(existing.map((u) => u.tripId))
+    }
+
     const trips = rawTrips.map(({ community, user, ...trip }) => ({
       ...trip,
       user: community?.isAnonymous ? { name: null, avatar: null } : user,
+      userUpvoted: upvotedTripIds.has(trip.id),
     }))
 
     return res.json({ trips, total, limit: parseInt(limit), offset: parseInt(offset) })
@@ -65,25 +88,42 @@ discoverRouter.get('/stats', async (_req, res) => {
 // GET /api/discover/:tripId  — single public trip with full itinerary
 discoverRouter.get('/:tripId', async (req, res) => {
   const { tripId } = req.params
+
+  // Optionally identify the caller for userUpvoted
+  let callerId: string | null = null
+  const auth = req.headers.authorization
+  if (auth?.startsWith('Bearer ')) {
+    try {
+      const decoded = jwt.verify(auth.slice(7), process.env.JWT_SECRET!) as { userId: string }
+      callerId = decoded.userId
+    } catch {}
+  }
+
   try {
-    const raw = await prisma.trip.findFirst({
-      where: { id: tripId, status: 'COMPLETED' },
-      include: {
-        vibes: true,
-        user: { select: { id: true, name: true, avatar: true } },
-        community: true,
-        days: {
-          orderBy: { dayNum: 'asc' },
-          include: { blocks: { orderBy: { sortOrder: 'asc' } } },
+    const [raw, userUpvote] = await Promise.all([
+      prisma.trip.findFirst({
+        where: { id: tripId, status: 'COMPLETED' },
+        include: {
+          vibes: true,
+          user: { select: { id: true, name: true, avatar: true } },
+          community: true,
+          days: {
+            orderBy: { dayNum: 'asc' },
+            include: { blocks: { orderBy: { sortOrder: 'asc' } } },
+          },
+          _count: { select: { upvotes: true } },
         },
-        _count: { select: { upvotes: true } },
-      },
-    }) as any
+      }) as any,
+      callerId
+        ? prisma.communityUpvote.findUnique({ where: { userId_tripId: { userId: callerId, tripId } } })
+        : Promise.resolve(null),
+    ])
     if (!raw) return res.status(404).json({ error: 'Trip not found' })
     const { community, user, ...trip } = raw
     return res.json({
       ...trip,
       user: community?.isAnonymous ? { id: null, name: null, avatar: null } : user,
+      userUpvoted: !!userUpvote,
     })
   } catch (err) {
     console.error(err)
