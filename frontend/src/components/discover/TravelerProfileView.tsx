@@ -219,7 +219,7 @@ export function TravelerProfileView({ userId }: { userId: string }) {
             <div className="font-serif text-xl font-bold text-ink mb-2">This account is private</div>
             <p className="text-sm text-slate max-w-xs mx-auto">
               {followStatus === 'PENDING'
-                ? 'Your follow request is pending. Once accepted, you'll be able to see their itineraries.'
+                ? "Your follow request is pending. Once accepted, you'll be able to see their itineraries."
                 : 'Follow this traveler to see their itineraries.'}
             </p>
             {followStatus === null && (
@@ -236,7 +236,7 @@ export function TravelerProfileView({ userId }: { userId: string }) {
           <div className="py-20 text-center">
             <div className="text-3xl mb-3">🗺️</div>
             <div className="font-serif text-base font-bold text-ink mb-1">No public trips yet</div>
-            <p className="text-[13px] text-slate">This traveler hasn't shared any itineraries.</p>
+            <p className="text-[13px] text-slate">This traveler has not shared any itineraries yet.</p>
           </div>
         ) : (
           <>
