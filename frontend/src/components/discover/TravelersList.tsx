@@ -63,16 +63,13 @@ export function TravelersList() {
   const router = useRouter()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<TravelerUser[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const search = useCallback(
     async (q: string) => {
-      if (!session?.accessToken || !q.trim()) {
-        setResults([])
-        return
-      }
+      if (!session?.accessToken) return
       setLoading(true)
       try {
         const data = await api.social.search(q, session.accessToken) as { users: TravelerUser[] }
@@ -154,26 +151,25 @@ export function TravelersList() {
         )}
       </div>
 
-      {/* Empty state (no query) */}
-      {!query.trim() && (
-        <div className="py-16 text-center">
-          <div className="text-3xl mb-3">🧭</div>
-          <div className="font-serif text-base font-bold text-ink mb-1">Find Travelers</div>
-          <p className="text-[13px] text-slate">Search by name to discover other travelers.</p>
+      {/* Loading skeleton */}
+      {loading && (
+        <div className="flex flex-col gap-3">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-[68px] bg-white rounded-2xl border-[1.5px] border-mist animate-pulse" />
+          ))}
         </div>
       )}
 
       {/* No results */}
-      {query.trim() && !loading && results.length === 0 && (
+      {!loading && results.length === 0 && (
         <div className="py-16 text-center">
-          <div className="text-3xl mb-3">🔍</div>
           <div className="font-serif text-base font-bold text-ink mb-1">No travelers found</div>
-          <p className="text-[13px] text-slate">Try a different name.</p>
+          <p className="text-[13px] text-slate">{query.trim() ? 'Try a different name.' : 'No other accounts exist yet.'}</p>
         </div>
       )}
 
       {/* Results list */}
-      {results.length > 0 && (
+      {!loading && results.length > 0 && (
         <div className="flex flex-col gap-3">
           {results.map((user) => (
             <div

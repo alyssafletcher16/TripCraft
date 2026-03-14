@@ -10,16 +10,19 @@ export const socialRouter = Router()
 socialRouter.get('/search', requireAuth, async (req: AuthRequest, res) => {
   const q = (req.query.q as string)?.trim() ?? ''
   const myId = req.userId!
-  if (!q) return res.json({ users: [] })
 
   try {
     const users = await prisma.user.findMany({
       where: {
         id: { not: myId },
-        OR: [
-          { name: { contains: q, mode: 'insensitive' } },
-          { email: { contains: q, mode: 'insensitive' } },
-        ],
+        ...(q
+          ? {
+              OR: [
+                { name: { contains: q, mode: 'insensitive' } },
+                { email: { contains: q, mode: 'insensitive' } },
+              ],
+            }
+          : {}),
       },
       select: { id: true, name: true, avatar: true, isPrivate: true, _count: { select: { trips: true } } },
       take: 20,
