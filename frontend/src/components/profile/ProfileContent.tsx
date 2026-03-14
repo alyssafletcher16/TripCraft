@@ -44,7 +44,7 @@ export function ProfileContent() {
               }`}
             >
               {tab}
-              {tab === 'Settings' && pendingRequestCount > 0 && (
+              {tab === 'Travelers' && pendingRequestCount > 0 && (
                 <span className="absolute -top-0.5 -right-1 w-4 h-4 rounded-full bg-terra text-white text-[9px] font-bold flex items-center justify-center">
                   {pendingRequestCount}
                 </span>
