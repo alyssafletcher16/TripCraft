@@ -143,7 +143,7 @@ export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hid
     <>
       {/* Desktop sidebar — collapsible */}
       {!hideDesktop && (
-        <div className={`hidden md:flex relative transition-[width] duration-200 bg-terra sticky top-[62px] h-[calc(100vh-62px)] ${desktopCollapsed ? 'w-5' : 'w-[272px]'}`}>
+        <div className={`hidden md:flex relative transition-[width] duration-200 bg-terra sticky top-[62px] h-[calc(100vh-62px)] z-10 ${desktopCollapsed ? 'w-5' : 'w-[272px]'}`}>
           <div className={`w-[272px] overflow-hidden transition-opacity duration-200 ${desktopCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
             {sidebarContent}
           </div>
