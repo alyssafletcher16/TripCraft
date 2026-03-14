@@ -72,7 +72,11 @@ export function Sidebar({ activeTab: _, hideDesktop }: { activeTab?: string; hid
         onClick={close}
         className={`${SB_ITEM} ${pathname.startsWith('/wanderlist') ? SB_ACTIVE : ''}`}
       >
-        <span className={SB_ICON}>🔖</span>
+        <span className={`${SB_ICON} flex items-center justify-center`}>
+          <svg className="w-[17px] h-[17px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+          </svg>
+        </span>
         Wanderlist
       </Link>
 
