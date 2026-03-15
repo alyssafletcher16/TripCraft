@@ -96,6 +96,19 @@ const STATUS_VARIANT: Record<TripStatus, 'gold' | 'green' | 'ocean' | 'slate'> =
   ACTIVE: 'gold', COMPLETED: 'green', PLANNING: 'gold',
 }
 
+const VIBES = [
+  { id: 'adventure',  label: 'Adventure'  },
+  { id: 'foodie',     label: 'Foodie'     },
+  { id: 'cultural',   label: 'Cultural'   },
+  { id: 'romantic',   label: 'Romantic'   },
+  { id: 'hiking',     label: 'Hiking'     },
+  { id: 'relaxation', label: 'Relaxation' },
+  { id: 'solo',       label: 'Solo'       },
+  { id: 'nightlife',  label: 'Nightlife'  },
+  { id: 'budget',     label: 'Budget'     },
+  { id: 'luxury',     label: 'Luxury'     },
+]
+
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
 
 // ── Price parser ───────────────────────────────────────────────────────────────
@@ -1168,6 +1181,71 @@ export function TripDetail({ tripId }: { tripId: string }) {
   const [shareAnonymous, setShareAnonymous] = useState(false)
   const [confirming, setConfirming] = useState(false)
 
+  // Edit mode state
+  const [editing, setEditing] = useState(false)
+  const [editForm, setEditForm] = useState({
+    title: '', destination: '', country: '', startDate: '', endDate: '',
+    travelers: 1, budget: '', budgetType: 'total' as 'total' | 'per_person',
+    vibes: [] as string[], coverEmoji: '',
+  })
+  const [saving, setSaving] = useState(false)
+  const [customVibeInput, setCustomVibeInput] = useState('')
+
+  function startEditing() {
+    if (!trip) return
+    setEditForm({
+      title: trip.title,
+      destination: trip.destination,
+      country: trip.country ?? '',
+      startDate: trip.startDate ? trip.startDate.split('T')[0] : '',
+      endDate: trip.endDate ? trip.endDate.split('T')[0] : '',
+      travelers: trip.travelers,
+      budget: trip.budget != null ? String(trip.budget) : '',
+      budgetType: trip.budgetType,
+      vibes: trip.vibes.map((v) => v.vibe),
+      coverEmoji: trip.coverEmoji ?? '',
+    })
+    setEditing(true)
+  }
+
+  async function saveEdits() {
+    if (!session?.accessToken || !trip) return
+    setSaving(true)
+    try {
+      const payload: Record<string, unknown> = {
+        title: editForm.title.trim() || trip.title,
+        destination: editForm.destination.trim() || trip.destination,
+        country: editForm.country.trim() || null,
+        startDate: editForm.startDate || null,
+        endDate: editForm.endDate || null,
+        travelers: editForm.travelers,
+        budget: editForm.budget ? parseFloat(editForm.budget) : null,
+        budgetType: editForm.budgetType,
+        vibes: editForm.vibes,
+        coverEmoji: editForm.coverEmoji.trim() || null,
+      }
+      await api.trips.update(trip.id, payload, session.accessToken)
+      setEditing(false)
+      fetchTrip()
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  function toggleVibe(vibe: string) {
+    setEditForm((f) => ({
+      ...f,
+      vibes: f.vibes.includes(vibe) ? f.vibes.filter((v) => v !== vibe) : [...f.vibes, vibe],
+    }))
+  }
+
+  function addCustomVibe() {
+    const tag = customVibeInput.trim()
+    if (!tag || editForm.vibes.includes(tag)) return
+    setEditForm((f) => ({ ...f, vibes: [...f.vibes, tag] }))
+    setCustomVibeInput('')
+  }
+
   // Research state
   const [searchActivity, setSearchActivity] = useState<SearchActivity | null>(null)
   const [researchItems, setResearchItems] = useState<ResearchItem[]>([])
@@ -1404,57 +1482,253 @@ export function TripDetail({ tripId }: { tripId: string }) {
 
           {/* Info block — title, city, meta, actions */}
           <div className="px-4 sm:px-7 py-4">
-            <div className="flex items-start justify-between gap-4">
-              {/* Left: title + city + meta */}
-              <div className="min-w-0">
-                <h1 className="font-serif text-2xl font-bold text-ink leading-tight">{trip.title}</h1>
-                <p className="text-slate text-sm mt-0.5">
-                  {trip.destination}{trip.country ? `, ${trip.country}` : ''}
-                </p>
-                <div className="flex flex-wrap gap-3 sm:gap-5 text-[11px] font-mono text-slate uppercase tracking-wide mt-2">
-                  {trip.startDate && (
-                    <span>
-                      {new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                      {trip.endDate ? ` – ${new Date(trip.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}
-                    </span>
+            {editing ? (
+              /* ── Edit mode ────────────────────────────────────── */
+              <div className="flex flex-col gap-4">
+                {/* Title */}
+                <div>
+                  <label className="block text-slate text-[10px] font-mono uppercase tracking-wider mb-1">Trip name</label>
+                  <input
+                    value={editForm.title}
+                    onChange={(e) => setEditForm((f) => ({ ...f, title: e.target.value }))}
+                    className="w-full border border-mist rounded-xl px-4 py-2.5 text-sm text-ink bg-white focus:outline-none focus:border-terra focus:ring-1 focus:ring-terra/30"
+                    placeholder="Trip name"
+                  />
+                </div>
+
+                {/* Destination + Country */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate text-[10px] font-mono uppercase tracking-wider mb-1">Destination</label>
+                    <input
+                      value={editForm.destination}
+                      onChange={(e) => setEditForm((f) => ({ ...f, destination: e.target.value }))}
+                      className="w-full border border-mist rounded-xl px-4 py-2.5 text-sm text-ink bg-white focus:outline-none focus:border-terra focus:ring-1 focus:ring-terra/30"
+                      placeholder="City or region"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate text-[10px] font-mono uppercase tracking-wider mb-1">Country</label>
+                    <input
+                      value={editForm.country}
+                      onChange={(e) => setEditForm((f) => ({ ...f, country: e.target.value }))}
+                      className="w-full border border-mist rounded-xl px-4 py-2.5 text-sm text-ink bg-white focus:outline-none focus:border-terra focus:ring-1 focus:ring-terra/30"
+                      placeholder="Country"
+                    />
+                  </div>
+                </div>
+
+                {/* Dates */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate text-[10px] font-mono uppercase tracking-wider mb-1">Start date</label>
+                    <input
+                      type="date"
+                      value={editForm.startDate}
+                      onChange={(e) => setEditForm((f) => ({ ...f, startDate: e.target.value }))}
+                      className="w-full border border-mist rounded-xl px-4 py-2.5 text-sm text-ink bg-white focus:outline-none focus:border-terra focus:ring-1 focus:ring-terra/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate text-[10px] font-mono uppercase tracking-wider mb-1">End date</label>
+                    <input
+                      type="date"
+                      value={editForm.endDate}
+                      onChange={(e) => setEditForm((f) => ({ ...f, endDate: e.target.value }))}
+                      className="w-full border border-mist rounded-xl px-4 py-2.5 text-sm text-ink bg-white focus:outline-none focus:border-terra focus:ring-1 focus:ring-terra/30"
+                    />
+                  </div>
+                </div>
+
+                {/* Travelers + Budget */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-slate text-[10px] font-mono uppercase tracking-wider mb-1">Travelers</label>
+                    <input
+                      type="number"
+                      min={1}
+                      value={editForm.travelers}
+                      onChange={(e) => setEditForm((f) => ({ ...f, travelers: Math.max(1, parseInt(e.target.value) || 1) }))}
+                      className="w-full border border-mist rounded-xl px-4 py-2.5 text-sm text-ink bg-white focus:outline-none focus:border-terra focus:ring-1 focus:ring-terra/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate text-[10px] font-mono uppercase tracking-wider mb-1">Budget ($)</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={editForm.budget}
+                      onChange={(e) => setEditForm((f) => ({ ...f, budget: e.target.value }))}
+                      className="w-full border border-mist rounded-xl px-4 py-2.5 text-sm text-ink bg-white focus:outline-none focus:border-terra focus:ring-1 focus:ring-terra/30"
+                      placeholder="0"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate text-[10px] font-mono uppercase tracking-wider mb-1">Budget type</label>
+                    <select
+                      value={editForm.budgetType}
+                      onChange={(e) => setEditForm((f) => ({ ...f, budgetType: e.target.value as 'total' | 'per_person' }))}
+                      className="w-full border border-mist rounded-xl px-4 py-2.5 text-sm text-ink bg-white focus:outline-none focus:border-terra focus:ring-1 focus:ring-terra/30"
+                    >
+                      <option value="total">Total</option>
+                      <option value="per_person">Per person</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Cover Emoji */}
+                <div>
+                  <label className="block text-slate text-[10px] font-mono uppercase tracking-wider mb-1">Cover emoji</label>
+                  <input
+                    value={editForm.coverEmoji}
+                    onChange={(e) => setEditForm((f) => ({ ...f, coverEmoji: e.target.value }))}
+                    className="w-20 border border-mist rounded-xl px-4 py-2.5 text-lg text-center bg-white focus:outline-none focus:border-terra focus:ring-1 focus:ring-terra/30"
+                    placeholder="✈️"
+                    maxLength={4}
+                  />
+                </div>
+
+                {/* Vibes */}
+                <div>
+                  <label className="block text-slate text-[10px] font-mono uppercase tracking-wider mb-1.5">Trip vibes</label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {VIBES.map((v) => {
+                      const active = editForm.vibes.includes(v.id)
+                      return (
+                        <button
+                          key={v.id}
+                          type="button"
+                          onClick={() => toggleVibe(v.id)}
+                          className="px-3 py-1 rounded-full text-xs font-medium border transition-all"
+                          style={{
+                            background: active ? '#0D2B45' : '#fff',
+                            color: active ? '#fff' : '#5B7A8E',
+                            borderColor: active ? '#0D2B45' : '#D6E4EE',
+                          }}
+                        >
+                          {v.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  {/* Custom vibes already added */}
+                  {editForm.vibes.filter((v) => !VIBES.some((vb) => vb.id === v)).length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      {editForm.vibes.filter((v) => !VIBES.some((vb) => vb.id === v)).map((v) => (
+                        <button
+                          key={v}
+                          type="button"
+                          onClick={() => toggleVibe(v)}
+                          className="px-3 py-1 rounded-full text-xs font-medium border transition-all bg-ocean text-white border-ocean"
+                        >
+                          {v} &times;
+                        </button>
+                      ))}
+                    </div>
                   )}
-                  <span>{trip.travelers} traveler{trip.travelers !== 1 ? 's' : ''}</span>
+                  {/* Add custom vibe */}
+                  <div className="flex gap-2 mt-2">
+                    <input
+                      value={customVibeInput}
+                      onChange={(e) => setCustomVibeInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomVibe() } }}
+                      placeholder="Add custom tag…"
+                      className="border border-mist rounded-xl px-3 py-1.5 text-xs text-ink bg-white focus:outline-none focus:border-terra focus:ring-1 focus:ring-terra/30 w-40"
+                    />
+                    <button
+                      type="button"
+                      onClick={addCustomVibe}
+                      disabled={!customVibeInput.trim()}
+                      className="px-3 py-1.5 rounded-xl text-xs font-medium border border-mist text-slate hover:border-terra hover:text-terra transition-colors disabled:opacity-40"
+                    >
+                      + Add
+                    </button>
+                  </div>
+                </div>
+
+                {/* Save / Cancel */}
+                <div className="flex items-center gap-3 pt-1">
+                  <button
+                    onClick={saveEdits}
+                    disabled={saving}
+                    className="px-5 py-2 rounded-xl bg-terra text-white text-sm font-semibold hover:bg-terra/90 transition-colors disabled:opacity-60"
+                  >
+                    {saving ? 'Saving…' : 'Save changes'}
+                  </button>
+                  <button
+                    onClick={() => setEditing(false)}
+                    className="px-5 py-2 rounded-xl border border-mist text-sm text-slate hover:text-ink transition-colors"
+                  >
+                    Cancel
+                  </button>
                 </div>
               </div>
+            ) : (
+              /* ── Display mode ─────────────────────────────────── */
+              <>
+                <div className="flex items-start justify-between gap-4">
+                  {/* Left: title + city + meta */}
+                  <div className="min-w-0">
+                    <h1 className="font-serif text-2xl font-bold text-ink leading-tight">{trip.title}</h1>
+                    <p className="text-slate text-sm mt-0.5">
+                      {trip.destination}{trip.country ? `, ${trip.country}` : ''}
+                    </p>
+                    <div className="flex flex-wrap gap-3 sm:gap-5 text-[11px] font-mono text-slate uppercase tracking-wide mt-2">
+                      {trip.startDate && (
+                        <span>
+                          {new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          {trip.endDate ? ` – ${new Date(trip.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}
+                        </span>
+                      )}
+                      <span>{trip.travelers} traveler{trip.travelers !== 1 ? 's' : ''}</span>
+                    </div>
+                  </div>
 
-              {/* Right: budget + action */}
-              <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                {trip.budget != null && (
-                  <span className="text-[11px] font-mono text-slate uppercase tracking-wide">
-                    {trip.budgetType === 'per_person'
-                      ? `$${trip.budget.toLocaleString()}/person`
-                      : `$${trip.budget.toLocaleString()} total`}
-                  </span>
-                )}
-                {trip.status !== 'COMPLETED' && !pendingComplete && (
-                  <button
-                    onClick={() => handleStatusChange('COMPLETED')}
-                    className="text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-ocean text-white hover:bg-ocean/90 transition-colors cursor-pointer"
-                  >
-                    Mark complete
-                  </button>
-                )}
-                {trip.status === 'COMPLETED' && (
-                  <span className="text-[11px] font-mono border border-mist rounded-full px-3 py-1.5 bg-foam text-slate">
-                    Completed
-                  </span>
-                )}
-              </div>
-            </div>
+                  {/* Right: edit + budget + action */}
+                  <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                    <button
+                      onClick={startEditing}
+                      className="text-[11px] font-medium text-slate hover:text-terra transition-colors flex items-center gap-1"
+                    >
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                      </svg>
+                      Edit
+                    </button>
+                    {trip.budget != null && (
+                      <span className="text-[11px] font-mono text-slate uppercase tracking-wide">
+                        {trip.budgetType === 'per_person'
+                          ? `$${trip.budget.toLocaleString()}/person`
+                          : `$${trip.budget.toLocaleString()} total`}
+                      </span>
+                    )}
+                    {trip.status !== 'COMPLETED' && !pendingComplete && (
+                      <button
+                        onClick={() => handleStatusChange('COMPLETED')}
+                        className="text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-ocean text-white hover:bg-ocean/90 transition-colors cursor-pointer"
+                      >
+                        Mark complete
+                      </button>
+                    )}
+                    {trip.status === 'COMPLETED' && (
+                      <span className="text-[11px] font-mono border border-mist rounded-full px-3 py-1.5 bg-foam text-slate">
+                        Completed
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-            {trip.vibes.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-3">
-                {trip.vibes.map((v) => (
-                  <span key={v.id} className="bg-ocean/8 text-ocean text-xs px-3 py-1 rounded-full border border-ocean/15">
-                    {v.vibe}
-                  </span>
-                ))}
-              </div>
+                {trip.vibes.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-3">
+                    {trip.vibes.map((v) => (
+                      <span key={v.id} className="bg-ocean/8 text-ocean text-xs px-3 py-1 rounded-full border border-ocean/15">
+                        {v.vibe}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -1568,7 +1842,7 @@ export function TripDetail({ tripId }: { tripId: string }) {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-5 py-3 sm:py-3.5 text-[12px] sm:text-[13px] whitespace-nowrap transition-all border-b-2 -mb-px flex-shrink-0"
+                  className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-5 py-3 sm:py-3.5 text-[12px] sm:text-[13px] whitespace-nowrap transition-colors border-b-2 -mb-px flex-shrink-0"
                   style={{
                     fontWeight: activeTab === tab.id ? 600 : 400,
                     color: activeTab === tab.id ? '#C4603A' : '#5B7A8E',

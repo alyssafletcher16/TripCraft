@@ -174,7 +174,7 @@ export function UpcomingTab({ onTripCompleted }: UpcomingTabProps) {
                   {/* Mark complete button */}
                   <button
                     onClick={() => handleStatusChange(trip.id, 'COMPLETED')}
-                    className="text-xs font-semibold px-3 py-1.5 rounded-full border cursor-pointer focus:outline-none transition-colors flex-shrink-0 bg-gold/10 text-gold border-gold/30 hover:bg-gold/20"
+                    className="text-xs font-semibold px-3 py-1.5 rounded-lg cursor-pointer focus:outline-none transition-colors flex-shrink-0 bg-ocean text-white hover:bg-ocean/90"
                   >
                     Mark complete
                   </button>

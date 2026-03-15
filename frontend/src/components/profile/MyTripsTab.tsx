@@ -330,16 +330,16 @@ export function MyTripsTab() {
                     {trip.reflection ? (
                       <Link
                         href={`/trips/${trip.id}`}
-                        className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-success/10 text-success/80 border border-success/20 hover:bg-success/20 transition-colors mt-0.5"
+                        className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full text-ocean border border-ocean/30 hover:bg-ocean/10 transition-colors mt-0.5"
                       >
-                        View Reflection
+                        View Reflection →
                       </Link>
                     ) : (
                       <Link
                         href={`/trips/${trip.id}`}
-                        className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-mist text-slate border border-mist hover:bg-ocean/10 hover:text-ocean hover:border-ocean/20 transition-colors mt-0.5"
+                        className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full text-terra border border-terra/30 hover:bg-terra/10 transition-colors mt-0.5"
                       >
-                        Add Reflection
+                        Add Reflection →
                       </Link>
                     )}
                   </div>

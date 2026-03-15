@@ -109,12 +109,8 @@ export function EditBlockModal({ block, onClose, onSaved }: Props) {
               onClick={() => setStatus(s)}
               className={`px-3 py-2 rounded-full text-xs font-medium transition-all ${
                 status === s
-                  ? s === 'BOOKED'
-                    ? 'bg-green-100 text-green-700 border border-green-300'
-                    : s === 'CANCELLED'
-                    ? 'bg-red-100 text-red-700 border border-red-300'
-                    : 'bg-amber-100 text-amber-700 border border-amber-300'
-                  : 'bg-white border border-mist text-slate'
+                  ? 'bg-ocean text-white border border-ocean'
+                  : 'bg-white border border-mist text-slate hover:border-ocean/40 hover:text-ocean'
               }`}
             >
               {s.toLowerCase()}
