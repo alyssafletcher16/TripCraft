@@ -173,12 +173,17 @@ export function MyTripsTab() {
 
       {/* ── Active ── */}
       <div className="mb-10">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-serif text-xl font-bold text-ink">Active</h2>
-          <Link href="/trips/new" className="text-xs font-semibold text-terra hover:underline">
-            + New trip
-          </Link>
-        </div>
+        <h2 className="font-serif text-xl font-bold text-ink mb-2">Active</h2>
+        <Link
+          href="/trips/new"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-terra text-white text-xs font-semibold hover:bg-terra/90 transition-colors mb-2"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          New trip
+        </Link>
 
         {activeTrips.length === 0 ? (
           <div className="bg-white rounded-2xl border border-mist p-6 text-center">
@@ -337,9 +342,13 @@ export function MyTripsTab() {
                     ) : (
                       <Link
                         href={`/trips/${trip.id}`}
-                        className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full text-terra border border-terra/30 hover:bg-terra/10 transition-colors mt-0.5"
+                        className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full text-terra border border-terra/30 hover:bg-terra/10 transition-colors mt-0.5"
                       >
-                        Add Reflection →
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="12" y1="5" x2="12" y2="19" />
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        Add Reflection
                       </Link>
                     )}
                   </div>
