@@ -1748,7 +1748,8 @@ export function TripDetail({ tripId }: { tripId: string }) {
               className="flex-shrink-0 w-full sm:w-auto px-5 py-2.5 sm:py-2 rounded-full text-[12px] font-semibold transition-all hover:bg-gold/30"
               style={{ background: 'rgba(201,168,76,0.2)', border: '1px solid rgba(201,168,76,0.4)', color: '#E2C06A' }}
             >
-              Reflect on this trip →
+              <svg className="w-3.5 h-3.5 inline-block mr-1.5 -mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+              Add Reflection
             </button>
           </div>
         )}
@@ -1763,7 +1764,8 @@ export function TripDetail({ tripId }: { tripId: string }) {
                 onClick={() => setReflecting(true)}
                 className="text-[11px] font-semibold px-3 py-1 rounded-full border border-mist text-slate hover:border-terra/40 hover:text-terra transition-colors"
               >
-                Edit Reflection
+                <svg className="w-3.5 h-3.5 inline-block mr-1 -mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                View Reflection
               </button>
             </div>
             <div className="space-y-3">
