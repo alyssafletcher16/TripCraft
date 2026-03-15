@@ -73,7 +73,12 @@ socialRouter.get('/users/:userId', requireAuth, async (req: AuthRequest, res) =>
     let trips: object[] = []
     if (canSeeTrips) {
       trips = await prisma.trip.findMany({
-        where: { userId, status: 'COMPLETED', isPublic: true },
+        where: {
+          userId,
+          status: 'COMPLETED',
+          // Accepted followers see all completed trips; everyone else only sees public ones
+          ...(isAccepted ? {} : { isPublic: true }),
+        },
         include: {
           vibes: true,
           _count: { select: { upvotes: true } },
